@@ -12,6 +12,7 @@
     { path: 'review',    title: 'Повторение',     icon: 'review',    nav: 'side' },
     { path: 'talk',      title: 'Разговор',       icon: 'talk',      nav: 'side' },
     { path: 'dialogues', title: 'Диалоги',        icon: 'dialogues', nav: 'side' },
+    { path: 'reading',   title: 'Чтение',         icon: 'book',      nav: 'side' },
     { path: 'words',     title: 'Выражения',      icon: 'words',     nav: 'side' },
     { path: 'mistakes',  title: 'Ошибки',         icon: 'mistakes',  nav: 'side' },
     { path: 'progress',  title: 'Прогресс',       icon: 'progress',  nav: 'side' },
@@ -20,6 +21,7 @@
     { path: 'lesson',    parent: 'today' },
     { path: 'dialogue',  parent: 'dialogues' },
     { path: 'story',     parent: 'dialogues' },
+    { path: 'text',      parent: 'reading' },
     { path: 'session',   parent: 'today' },
     { path: 'chat',      parent: 'chats' },
     { path: 'game',      parent: 'games' }

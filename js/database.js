@@ -352,7 +352,7 @@
     dialogues: function (r) {
       if (!isStr(r.id)) return null;
       return {
-        id: r.id, kind: ['dialogue', 'talk', 'story', 'chat'].indexOf(r.kind) >= 0 ? r.kind : 'dialogue',
+        id: r.id, kind: ['dialogue', 'talk', 'story', 'chat', 'text'].indexOf(r.kind) >= 0 ? r.kind : 'dialogue',
         bestScore: clampNum(r.bestScore, 0, 100, 0), lastScore: clampNum(r.lastScore, 0, 100, 0),
         naturalness: isNum(r.naturalness) ? r.naturalness : null, completions: num(r.completions, 1), lastTs: num(r.lastTs, 0)
       };

@@ -183,7 +183,7 @@
     var lessonsDone = 0;
     EG.data.lessons.forEach(function (l) { if (S().lessons.has(l.id)) lessonsDone++; });
     var dlgDone = S().dialogues.size;
-    var dlgTotal = EG.data.dialogues.length + EG.data.scenarios.length + EG.data.stories.length + EG.data.episodes.length;
+    var dlgTotal = EG.data.dialogues.length + EG.data.scenarios.length + EG.data.stories.length + EG.data.episodes.length + EG.data.texts.length;
     // вес: словарь 60%, уроки 20%, диалоги 20%
     var pct = total ? (learned / total) * 60 + (lessonsDone / EG.data.lessons.length) * 20 + (Math.min(dlgDone, dlgTotal) / dlgTotal) * 20 : 0;
     return { pct: Math.round(pct), learned: learned, total: total, lessonsDone: lessonsDone, dlgDone: dlgDone, dlgTotal: dlgTotal };
@@ -223,12 +223,16 @@
       recs.push({ icon: 'review', tone: 'accent', title: 'Повторите ' + reviewDue + ' ' + EG.util.plural(reviewDue, 'выражение', 'выражения', 'выражений'),
         text: 'Интервальное повторение закрепляет фразы в долгой памяти. Лучше всего — именно сегодня.', href: '#/review' });
     }
-    var words = EG.wordTrainer && EG.wordTrainer.counts(EG.storage.get('wordLevel'));
-    if (words && (words.due > 0 || words.fresh > 0)) {
-      recs.push({ icon: 'vocab', tone: 'accent',
-        title: words.due ? 'Слова: ' + words.due + ' ' + EG.util.plural(words.due, 'слово ждёт', 'слова ждут', 'слов ждут') + ' повторения' : 'Пополните словарный запас',
-        text: words.due ? 'Короткая сессия с выбором перевода из 4 вариантов — выученные слова появляются всё реже.' : 'Ещё ' + words.fresh + ' новых слов вашего уровня. 20 слов — около пяти минут.',
-        href: '#/vocab' });
+    if (EG.wordTrainer) {
+      var wdue = EG.wordTrainer.dueAll().length;
+      var wnext = EG.wordTrainer.nextUnit();
+      if (wdue > 0) {
+        recs.push({ icon: 'vocab', tone: 'accent', title: 'Слова: ' + wdue + ' ' + EG.util.plural(wdue, 'слово ждёт', 'слова ждут', 'слов ждут') + ' повторения',
+          text: 'Выбор перевода, написание и аудирование — выученные слова появляются всё реже.', href: '#/vocab/review' });
+      } else if (wnext) {
+        recs.push({ icon: 'vocab', tone: 'accent', title: 'Новые слова: ' + wnext.level + ' · блок ' + wnext.n,
+          text: 'Карточки, перевод в обе стороны и написание — 10 слов примерно за 5 минут.', href: '#/vocab/learn/' + wnext.level + '/' + wnext.n });
+      }
     }
     if (mistakes >= 3) {
       recs.push({ icon: 'mistakes', tone: 'warn', title: 'Разберите ошибки (' + mistakes + ')',
@@ -258,6 +262,11 @@
     if (lesson) {
       recs.push({ icon: 'words', tone: 'accent', title: 'Урок: ' + lesson.title + ' · ' + lesson.level,
         text: lesson.items.length + ' новых выражений в контексте ситуации.', href: '#/lesson/' + lesson.id });
+    }
+    var text = nextOf(EG.data.texts, 'text');
+    if (text) {
+      recs.push({ icon: 'book', tone: 'accent', title: 'Чтение: ' + text.title + ' · ' + text.level,
+        text: text.titleRu + '. ' + text.words + ' слов и ' + text.questions.length + ' вопросов на понимание — незнакомые слова переводятся по нажатию.', href: '#/text/' + text.id });
     }
     var sc = nextOf(EG.data.scenarios, 'talk');
     if (sc) {

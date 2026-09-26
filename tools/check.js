@@ -16,7 +16,7 @@ const ctx = {
 };
 ctx.window = ctx;
 vm.createContext(ctx);
-const files = ['data/vocabulary.js', 'data/registers.js', 'data/dialogues.js', 'data/stories.js', 'data/chats.js', 'data/lessons.js', 'data/wordbank.js', 'js/storage.js', 'js/database.js', 'js/state.js', 'js/srs.js', 'js/progress.js', 'js/exercises.js', 'js/dialogues.js', 'js/chat.js', 'js/games.js', 'js/wordtrainer.js'];
+const files = ['data/vocabulary.js', 'data/registers.js', 'data/dialogues.js', 'data/dialogues-more.js', 'data/stories.js', 'data/chats.js', 'data/chats-more.js', 'data/lessons.js', 'data/words/a1.js', 'data/words/a2.js', 'data/words/b1.js', 'data/words/b2.js', 'data/words/c1.js', 'data/wordbank.js', 'data/texts.js', 'js/storage.js', 'js/database.js', 'js/state.js', 'js/srs.js', 'js/progress.js', 'js/exercises.js', 'js/dialogues.js', 'js/chat.js', 'js/games.js', 'js/wordtrainer.js', 'js/lexicon.js'];
 const warns=[]; const ow=console.warn; console.warn=(...a)=>{warns.push(a.join(' '));};
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx, { filename: f });
 const EG = ctx.EG;
@@ -144,6 +144,54 @@ console.log('  exercise availability:', JSON.stringify(cnt));
   if (boxes.join() !== '1,2,3,4,1,2') err('word boxes', boxes.join());
   if (EG.wordTrainer.schedule(null, true, 2000, 0).box !== 3) err('known word should jump');
   console.log('words', W.length, JSON.stringify(pos), '| boxes', boxes.join(','));
+}
+
+// тексты для чтения: ответы, глоссарий встречается в тексте, покрытие словарём
+{
+  const ids = new Set();
+  let tokens = 0, known = 0;
+  const unknown = {};
+  for (const t of EG.data.texts) {
+    if (ids.has(t.id)) err('text dup id', t.id); ids.add(t.id);
+    if (!EG.LEVELS.includes(t.level)) err('text level', t.id);
+    if (!EG.data.textTopics[t.topic]) err('text topic', t.id, t.topic);
+    if (!t.paragraphs.length || !t.questions.length) err('text empty', t.id);
+    t.questions.forEach((q, i) => {
+      if (!(q.answer >= 0 && q.answer < q.options.length)) err('text answer idx', t.id, i);
+      if (new Set(q.options).size !== q.options.length) err('text dup options', t.id, i);
+    });
+    const low = t.paragraphs.join(' ').toLowerCase().replace(/’/g, "'");
+    t.glossary.forEach(g => { if (low.indexOf(g[0].toLowerCase()) < 0) err('glossary not in text', t.id, g[0]); });
+    for (const tok of t.paragraphs.join(' ').match(/[A-Za-zÀ-ÿ]+(?:[-'’][A-Za-zÀ-ÿ]+)*/g)) {
+      tokens++;
+      if (EG.lexicon.lookup(tok).length) known++; else unknown[tok.toLowerCase()] = (unknown[tok.toLowerCase()] || 0) + 1;
+    }
+  }
+  const top = Object.entries(unknown).sort((a, b) => b[1] - a[1]).slice(0, 25).map(e => e[0] + ':' + e[1]).join(' ');
+  console.log('texts', EG.data.texts.length, '| словарь покрывает', Math.round(known / tokens * 100) + '% слов текстов | чаще всего без перевода:', top);
+  for (const [f, lemma] of [['went', 'go'], ['cities', 'city'], ['stopped', 'stop'], ['children', 'child'], ['happier', 'happy'], ['making', 'make'], ["doesn't", 'do']]) {
+    const hit = EG.lexicon.lookup(f).map(w => w.en);
+    if (!hit.includes(lemma)) err('lemma', f, '→', hit.join(','));
+  }
+  const toks = 'I was looking for my keys in front of the house'.split(' ');
+  const ph = EG.lexicon.phraseAt(toks, 3).map(w => w.en);
+  if (!ph.includes('look for')) err('phraseAt look for', ph.join(','));
+}
+// блоки тренажёра слов
+{
+  for (const l of EG.LEVELS) {
+    const us = EG.wordTrainer.units(l);
+    const n = us.reduce((s, u) => s + u.words.length, 0);
+    if (n !== EG.data.words.filter(w => w.level === l).length) err('units lose words', l);
+    if (us.some(u => u.words.length < 10 || u.words.length > 30)) err('unit size', l);
+  }
+  const w = EG.data.words.find(x => x.en === 'colour');
+  if (EG.wordTrainer.checkSpelling(w, 'color') === 'wrong') err('spelling color');
+  if (EG.wordTrainer.checkSpelling(w, 'colr') !== 'typo') err('spelling typo');
+  if (EG.wordTrainer.checkSpelling(w, 'red') !== 'wrong') err('spelling wrong');
+  if (EG.wordTrainer.checkSpelling(EG.data.wordsById['compulsory'], 'mandatory') !== 'synonym') err('spelling synonym');
+  if (EG.wordTrainer.mask('ice cream', 2) !== 'ic_ _____') err('mask', EG.wordTrainer.mask('ice cream', 2));
+  console.log('units', EG.LEVELS.map(l => l + ':' + EG.wordTrainer.units(l).length).join(' '));
 }
 console.log(errors ? `\n${errors} ERRORS` : '\nOK');
 process.exitCode = errors ? 1 : 0;
