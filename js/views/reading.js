@@ -222,6 +222,7 @@
     function startQuiz() {
       closePop();
       var idx = 0, right = 0;
+      var showRu = false; // перевод вопросов: включённый остаётся до конца теста
       // варианты перемешиваем (кроме «верно/неверно»), чтобы правильный ответ не стоял всегда на одном месте
       var orders = t.questions.map(function (q) {
         var ids = q.options.map(function (_, i) { return i; });
@@ -230,11 +231,27 @@
       function renderQ() {
         var q = t.questions[idx], order = orders[idx];
         var locked = false;
-        var en = EG.util.levelIndex(t.level) >= 2;
+        var ruParts = [];
+        function ru(text, cls) {
+          if (!text) return null;
+          var el = h('span', { class: cls, lang: 'ru', hidden: !showRu }, text);
+          ruParts.push(el);
+          return el;
+        }
         var btns = order.map(function (oi, k) {
           return h('button', { class: 'option', type: 'button', onclick: function () { pick(k); } },
-            h('span', { class: 'opt-key' }, String(k + 1)), h('span', { class: 'opt-text', lang: en ? 'en' : 'ru' }, q.options[oi]));
+            h('span', { class: 'opt-key' }, String(k + 1)),
+            h('span', { class: 'opt-body' }, h('span', { class: 'opt-text', lang: 'en' }, q.options[oi]), ru(q.optionsRu && q.optionsRu[oi], 'opt-ru')));
         });
+        var hasRu = ruParts.length > 0 || !!q.qRu;
+        var qRu = ru(q.qRu, 'q-ru');
+        var ruBtn = hasRu ? h('button', { class: 'link-btn', type: 'button', 'aria-pressed': String(showRu), onclick: toggleRu }, showRu ? 'Скрыть перевод' : 'Перевод') : null;
+        function toggleRu() {
+          showRu = !showRu;
+          ruParts.forEach(function (el) { el.hidden = !showRu; });
+          ruBtn.textContent = showRu ? 'Скрыть перевод' : 'Перевод';
+          ruBtn.setAttribute('aria-pressed', String(showRu));
+        }
         var foot = h('div');
         function pick(k) {
           if (locked) return;
@@ -259,10 +276,12 @@
         keyHandler = function (e) { var n = parseInt(e.key, 10); if (n >= 1 && n <= btns.length) { e.preventDefault(); pick(n - 1); } };
         body.replaceChildren(h('div', { class: 'card ex-card enter' },
           h('div', { class: 'row between' }, h('div', { class: 'ex-label' }, icon('book'), 'Вопрос ' + (idx + 1) + ' из ' + t.questions.length),
-            h('button', { class: 'link-btn', type: 'button', onclick: function () { keyHandler = null; showReading(); } }, 'Перечитать текст')),
+            h('div', { class: 'row quiz-links' }, ruBtn,
+              h('button', { class: 'link-btn', type: 'button', onclick: function () { keyHandler = null; showReading(); } }, 'Перечитать текст'))),
           EG.ui.bar(idx / t.questions.length * 100),
-          h('p', { class: 'big-ru', lang: en ? 'en' : 'ru' }, q.q),
-          h('div', { class: 'options' + (en ? ' en' : '') }, btns),
+          h('p', { class: 'big-ru', lang: 'en' }, q.q),
+          qRu,
+          h('div', { class: 'options en' }, btns),
           foot));
         window.scrollTo(0, 0);
       }

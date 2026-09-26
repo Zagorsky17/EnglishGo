@@ -159,6 +159,8 @@ console.log('  exercise availability:', JSON.stringify(cnt));
     t.questions.forEach((q, i) => {
       if (!(q.answer >= 0 && q.answer < q.options.length)) err('text answer idx', t.id, i);
       if (new Set(q.options).size !== q.options.length) err('text dup options', t.id, i);
+      if (!q.qRu || !q.optionsRu || q.optionsRu.length !== q.options.length) err('text question translation', t.id, i);
+      if (/[а-яё]/i.test(q.q + q.options.join(''))) err('text question not in English', t.id, i);
     });
     const low = t.paragraphs.join(' ').toLowerCase().replace(/’/g, "'");
     t.glossary.forEach(g => { if (low.indexOf(g[0].toLowerCase()) < 0) err('glossary not in text', t.id, g[0]); });

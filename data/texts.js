@@ -1,6 +1,7 @@
 /* data/texts.js — тексты для раздела «Чтение»: связный текст уровня A1–C1 + тест на понимание.
    Текст: { id, level, topic, title, titleRu, paragraphs: [абзацы], glossary: [[выражение, перевод]], questions: [Q] }.
-   Вопрос: {q, options, answer — индекс правильного варианта, explain}. До B1 вопросы по-русски, с B1 — по-английски.
+   Вопрос: {q, options, answer — индекс правильного варианта, explain, qRu, optionsRu}. Вопросы и варианты всегда
+   по-английски, qRu/optionsRu — перевод по кнопке «Перевод» (для TFE перевод вариантов — «Верно/Неверно»).
    Любое слово текста можно нажать: перевод берётся из словаря тренажёра (data/words), выражения — из glossary. */
 (function (EG) {
   'use strict';
@@ -8,7 +9,9 @@
   var D = EG.data = EG.data || {};
   var TF = ['Верно', 'Неверно'];
   var TFE = ['True', 'False'];
-  function Q(q, options, answer, explain) { return { q: q, options: options, answer: answer, explain: explain || '' }; }
+  function Q(q, options, answer, explain, qRu, optionsRu) {
+    return { q: q, options: options, answer: answer, explain: explain || '', qRu: qRu, optionsRu: optionsRu || (options === TFE ? TF : null) };
+  }
   function T(id, level, topic, title, titleRu, paragraphs, glossary, questions) {
     return { id: id, level: level, topic: topic, title: title, titleRu: titleRu, paragraphs: paragraphs, glossary: glossary, questions: questions };
   }
@@ -42,12 +45,12 @@
       ['years old', 'лет (о возрасте)'], ['a cook', 'повар'], ['called', 'по имени, под названием'], ['every summer', 'каждое лето'],
       ['has lunch', 'обедает (have lunch — обедать)'], ['very much', 'очень (сильно)']
     ], [
-      Q('Кем работает Анна?', ['Врачом', 'Учителем английского', 'Поваром', 'Студенткой'], 1, '«I am a teacher. I teach English…»'),
-      Q('Кто в семье работает в ресторане?', ['Отец', 'Брат', 'Мама', 'Бабушка'], 2, '«My mother, Olga, is a cook in a restaurant.»'),
-      Q('Сколько лет сестре Анны?', ['Пять', 'Десять', 'Двадцать пять', 'Пятьдесят три'], 1, '«My sister, Katya, is only ten.»'),
-      Q('Бабушка и дедушка живут в городе.', TF, 1, '«My grandparents live in a village» — в деревне.'),
-      Q('Что изучает Макс?', ['Английский', 'Медицину', 'Компьютеры', 'Животных'], 2, '«He studies computers at university.»'),
-      Q('Что семья делает по воскресеньям?', ['Ездит в деревню', 'Обедает у родителей', 'Ходит в ресторан', 'Играет в футбол'], 1, '«On Sundays my family has lunch at my parents\' house.»')
+      Q('What is Anna\'s job?', ['A doctor', 'An English teacher', 'A cook', 'A student'], 1, '«I am a teacher. I teach English…»', 'Кем работает Анна?', ['Врачом', 'Учителем английского', 'Поваром', 'Студенткой']),
+      Q('Who in the family works in a restaurant?', ['Her father', 'Her brother', 'Her mother', 'Her grandmother'], 2, '«My mother, Olga, is a cook in a restaurant.»', 'Кто в семье работает в ресторане?', ['Отец', 'Брат', 'Мама', 'Бабушка']),
+      Q('How old is Anna\'s sister?', ['Five', 'Ten', 'Twenty-five', 'Fifty-three'], 1, '«My sister, Katya, is only ten.»', 'Сколько лет сестре Анны?', ['Пять', 'Десять', 'Двадцать пять', 'Пятьдесят три']),
+      Q('Anna\'s grandparents live in a city.', TFE, 1, '«My grandparents live in a village» — в деревне.', 'Бабушка и дедушка живут в городе.'),
+      Q('What does Max study?', ['English', 'Medicine', 'Computers', 'Animals'], 2, '«He studies computers at university.»', 'Что изучает Макс?', ['Английский', 'Медицину', 'Компьютеры', 'Животных']),
+      Q('What does the family do on Sundays?', ['They go to the village', 'They have lunch at the parents\' house', 'They go to a restaurant', 'They play football'], 1, '«On Sundays my family has lunch at my parents\' house.»', 'Что семья делает по воскресеньям?', ['Ездит в деревню', 'Обедает у родителей', 'Ходит в ресторан', 'Играет в футбол'])
     ]),
     T('t-a1-day', 'A1', 'daily', 'A Day in My Life', 'Один мой день', [
       "My name is Tom and I work in an office in London. My day starts early. I get up at half past six. I take a shower, get dressed and have breakfast. I usually have coffee and toast with butter.",
@@ -58,12 +61,12 @@
       ['get dressed', 'одеваться'], ['half past six', 'половина седьмого'], ['by bus', 'на автобусе'], ['it takes', 'это занимает (время)'],
       ['go to bed', 'ложиться спать'], ['answer emails', 'отвечать на письма']
     ], [
-      Q('Во сколько Том встаёт?', ['В 6:00', 'В 6:30', 'В 7:30', 'В 9:00'], 1, '«I get up at half past six» — в половине седьмого.'),
-      Q('Что Том обычно ест на завтрак?', ['Суп', 'Бутерброд', 'Тост с маслом', 'Ничего'], 2, '«coffee and toast with butter».'),
-      Q('Почему Том иногда ходит пешком?', ['Автобус часто переполнен', 'Он любит спорт', 'Автобуса нет', 'Офис рядом с домом'], 0, '«The bus is often very full, so I sometimes walk.»'),
-      Q('Том обедает один.', TF, 1, '«I have lunch with my friends from work.»'),
-      Q('Во сколько Том заканчивает работу?', ['В 5:00', 'В 5:30', 'В 6:30', 'В 9:00'], 1, '«I finish work at half past five.»'),
-      Q('Что Том делает вечером?', ['Работает', 'Ходит в спортзал или встречается с друзьями', 'Спит', 'Учит английский'], 1, '«In the evening I go to the gym or meet friends.»')
+      Q('What time does Tom get up?', ['At 6:00', 'At 6:30', 'At 7:30', 'At 9:00'], 1, '«I get up at half past six» — в половине седьмого.', 'Во сколько Том встаёт?', ['В 6:00', 'В 6:30', 'В 7:30', 'В 9:00']),
+      Q('What does Tom usually have for breakfast?', ['Soup', 'A sandwich', 'Toast with butter', 'Nothing'], 2, '«coffee and toast with butter».', 'Что Том обычно ест на завтрак?', ['Суп', 'Бутерброд', 'Тост с маслом', 'Ничего']),
+      Q('Why does Tom sometimes walk?', ['The bus is often very full', 'He likes sport', 'There is no bus', 'The office is near his house'], 0, '«The bus is often very full, so I sometimes walk.»', 'Почему Том иногда ходит пешком?', ['Автобус часто переполнен', 'Он любит спорт', 'Автобуса нет', 'Офис рядом с домом']),
+      Q('Tom has lunch alone.', TFE, 1, '«I have lunch with my friends from work.»', 'Том обедает один.'),
+      Q('What time does Tom finish work?', ['At 5:00', 'At 5:30', 'At 6:30', 'At 9:00'], 1, '«I finish work at half past five.»', 'Во сколько Том заканчивает работу?', ['В 5:00', 'В 5:30', 'В 6:30', 'В 9:00']),
+      Q('What does Tom do in the evening?', ['He works', 'He goes to the gym or meets friends', 'He sleeps', 'He learns English'], 1, '«In the evening I go to the gym or meet friends.»', 'Что Том делает вечером?', ['Работает', 'Ходит в спортзал или встречается с друзьями', 'Спит', 'Учит английский'])
     ]),
     T('t-a1-town', 'A1', 'city', 'My Town', 'Мой город', [
       "I live in Brighton. It is a town by the sea in the south of England. It is not very big, but it is very beautiful and there are always a lot of people in the streets.",
@@ -74,12 +77,12 @@
       ['by the sea', 'у моря'], ['in the south of', 'на юге'], ['pier', 'пирс'], ['full of', 'полный (кого-то, чего-то)'],
       ['my favourite place', 'моё любимое место'], ['by train', 'на поезде']
     ], [
-      Q('Где находится Брайтон?', ['На севере Англии', 'На юге Англии', 'В Лондоне', 'В Шотландии'], 1, '«a town by the sea in the south of England».'),
-      Q('Какая вода в море?', ['Тёплая', 'Горячая', 'Холодная', 'Грязная'], 2, '«The water is cold, but people love it!»'),
-      Q('Любимое место автора — это…', ['Пляж', 'Музей', 'Книжный магазин', 'Парк'], 2, '«My favourite place is a small bookshop in North Street.»'),
-      Q('Из Брайтона до Лондона час на поезде.', TF, 0, '«Brighton is only one hour from London by train.»'),
-      Q('Как автор добирается до работы?', ['На поезде', 'Пешком', 'На автобусе', 'На машине'], 1, '«I walk to work every day.»'),
-      Q('Что есть в центре города?', ['Аэропорт', 'Магазины, кафе и рестораны', 'Университет', 'Большой стадион'], 1, '«there are many small shops, cafés and restaurants».')
+      Q('Where is Brighton?', ['In the north of England', 'In the south of England', 'In London', 'In Scotland'], 1, '«a town by the sea in the south of England».', 'Где находится Брайтон?', ['На севере Англии', 'На юге Англии', 'В Лондоне', 'В Шотландии']),
+      Q('What is the sea water like?', ['Warm', 'Hot', 'Cold', 'Dirty'], 2, '«The water is cold, but people love it!»', 'Какая вода в море?', ['Тёплая', 'Горячая', 'Холодная', 'Грязная']),
+      Q('The writer\'s favourite place is…', ['the beach', 'a museum', 'a bookshop', 'a park'], 2, '«My favourite place is a small bookshop in North Street.»', 'Любимое место автора — это…', ['Пляж', 'Музей', 'Книжный магазин', 'Парк']),
+      Q('Brighton is one hour from London by train.', TFE, 0, '«Brighton is only one hour from London by train.»', 'Из Брайтона до Лондона час на поезде.'),
+      Q('How does the writer get to work?', ['By train', 'On foot', 'By bus', 'By car'], 1, '«I walk to work every day.»', 'Как автор добирается до работы?', ['На поезде', 'Пешком', 'На автобусе', 'На машине']),
+      Q('What is there in the town centre?', ['An airport', 'Shops, cafés and restaurants', 'A university', 'A big stadium'], 1, '«there are many small shops, cafés and restaurants».', 'Что есть в центре города?', ['Аэропорт', 'Магазины, кафе и рестораны', 'Университет', 'Большой стадион'])
     ]),
     T('t-a1-cafe', 'A1', 'food', 'Lunch at the Café', 'Обед в кафе', [
       "It is Saturday. Mia and her friend Ben are hungry, so they go to a café in the city centre. The café is small, but it is warm and friendly.",
@@ -90,12 +93,12 @@
       ['can I get you', 'что вам принести'], ['asks for', 'просит (ask for — просить что-то)'], ['doesn\'t eat meat', 'не ест мясо'], ['chips', 'картофель фри (брит.)'],
       ['share', 'делить (на двоих)'], ['the bill', 'счёт'], ['leave a small tip', 'оставить небольшие чаевые']
     ], [
-      Q('Какой сегодня день?', ['Пятница', 'Суббота', 'Воскресенье', 'Понедельник'], 1, '«It is Saturday.»'),
-      Q('Что Бен пьёт?', ['Апельсиновый сок', 'Кофе', 'Чай с молоком', 'Воду'], 2, '«Ben asks for a cup of tea with milk.»'),
-      Q('Почему Миа заказывает овощной суп?', ['Она не ест мясо', 'Она не голодна', 'Это дёшево', 'Нет другой еды'], 0, '«Mia doesn\'t eat meat».'),
-      Q('Они едят два разных десерта.', TF, 1, '«they share a big piece of chocolate cake» — один кусок на двоих.'),
-      Q('Сколько стоит обед?', ['14 фунтов', '20 фунтов', '24 фунта', '42 фунта'], 2, '«It is twenty-four pounds.»'),
-      Q('Кто платит?', ['Бен', 'Миа', 'Официант', 'Они платят пополам'], 1, '«Mia pays with her card».')
+      Q('What day is it today?', ['Friday', 'Saturday', 'Sunday', 'Monday'], 1, '«It is Saturday.»', 'Какой сегодня день?', ['Пятница', 'Суббота', 'Воскресенье', 'Понедельник']),
+      Q('What does Ben drink?', ['Orange juice', 'Coffee', 'Tea with milk', 'Water'], 2, '«Ben asks for a cup of tea with milk.»', 'Что Бен пьёт?', ['Апельсиновый сок', 'Кофе', 'Чай с молоком', 'Воду']),
+      Q('Why does Mia order the vegetable soup?', ['She doesn\'t eat meat', 'She isn\'t hungry', 'It is cheap', 'There is no other food'], 0, '«Mia doesn\'t eat meat».', 'Почему Миа заказывает овощной суп?', ['Она не ест мясо', 'Она не голодна', 'Это дёшево', 'Нет другой еды']),
+      Q('They have two different desserts.', TFE, 1, '«they share a big piece of chocolate cake» — один кусок на двоих.', 'Они едят два разных десерта.'),
+      Q('How much is the lunch?', ['£14', '£20', '£24', '£42'], 2, '«It is twenty-four pounds.»', 'Сколько стоит обед?', ['14 фунтов', '20 фунтов', '24 фунта', '42 фунта']),
+      Q('Who pays?', ['Ben', 'Mia', 'The waiter', 'They share the bill'], 1, '«Mia pays with her card».', 'Кто платит?', ['Бен', 'Миа', 'Официант', 'Они платят пополам'])
     ]),
     T('t-a1-dog', 'A1', 'nature', 'Our New Dog', 'Наша новая собака', [
       "Last month my family got a dog. His name is Rocky. He is two years old and he is brown and white. We found him at an animal shelter. He didn't have a home, and now he lives with us.",
@@ -106,12 +109,12 @@
       ['last month', 'в прошлом месяце'], ['animal shelter', 'приют для животных'], ['for a walk', 'на прогулку (take for a walk — выгуливать)'], ['for hours', 'часами'],
       ['twice a day', 'два раза в день'], ['jumps into', 'прыгает в (jump into)']
     ], [
-      Q('Где семья нашла Рокки?', ['В магазине', 'В приюте для животных', 'В лесу', 'У друзей'], 1, '«We found him at an animal shelter.»'),
-      Q('Какого цвета Рокки?', ['Чёрный', 'Белый', 'Коричнево-белый', 'Рыжий'], 2, '«he is brown and white».'),
-      Q('Рокки — очень большая собака.', TF, 1, '«He is not very big, but he is very strong».'),
-      Q('Кто гуляет с Рокки утром?', ['Мама', 'Папа', 'Автор', 'Никто'], 1, '«Every morning my dad takes Rocky for a walk».'),
-      Q('Что Рокки не любит есть?', ['Мясо', 'Рыбу', 'Овощи', 'Корм'], 2, '«he doesn\'t like vegetables».'),
-      Q('Кому не нравится, что Рокки спит на диване?', ['Папе', 'Маме', 'Сестре', 'Соседям'], 1, '«my mum doesn\'t like that!»')
+      Q('Where did the family find Rocky?', ['In a shop', 'At an animal shelter', 'In a forest', 'At their friends\' house'], 1, '«We found him at an animal shelter.»', 'Где семья нашла Рокки?', ['В магазине', 'В приюте для животных', 'В лесу', 'У друзей']),
+      Q('What colour is Rocky?', ['Black', 'White', 'Brown and white', 'Ginger'], 2, '«he is brown and white».', 'Какого цвета Рокки?', ['Чёрный', 'Белый', 'Коричнево-белый', 'Рыжий']),
+      Q('Rocky is a very big dog.', TFE, 1, '«He is not very big, but he is very strong».', 'Рокки — очень большая собака.'),
+      Q('Who walks Rocky in the morning?', ['Mum', 'Dad', 'The writer', 'Nobody'], 1, '«Every morning my dad takes Rocky for a walk».', 'Кто гуляет с Рокки утром?', ['Мама', 'Папа', 'Автор', 'Никто']),
+      Q('What doesn\'t Rocky like to eat?', ['Meat', 'Fish', 'Vegetables', 'Dog food'], 2, '«he doesn\'t like vegetables».', 'Что Рокки не любит есть?', ['Мясо', 'Рыбу', 'Овощи', 'Корм']),
+      Q('Who doesn\'t like Rocky sleeping on the sofa?', ['Dad', 'Mum', 'The sister', 'The neighbours'], 1, '«my mum doesn\'t like that!»', 'Кому не нравится, что Рокки спит на диване?', ['Папе', 'Маме', 'Сестре', 'Соседям'])
     ]),
     T('t-a1-weekend', 'A1', 'daily', 'A Rainy Weekend', 'Дождливые выходные', [
       "This weekend the weather was terrible. It rained on Saturday and on Sunday, and it was cold and windy. We didn't go to the beach. We stayed at home.",
@@ -122,12 +125,12 @@
       ['it rained', 'шёл дождь'], ['stayed at home', 'остались дома'], ['got up late', 'встал поздно'], ['another city', 'другой город'],
       ['laughed a lot', 'много смеялись'], ['I hope', 'надеюсь']
     ], [
-      Q('Какая погода была на выходных?', ['Солнечная', 'Дождливая и ветреная', 'Снежная', 'Жаркая'], 1, '«It rained… it was cold and windy.»'),
-      Q('Что автор приготовил с мамой?', ['Суп', 'Торт', 'Пиццу', 'Салат'], 2, '«We made pizza together.»'),
-      Q('Кто пришёл в гости в субботу?', ['Бабушка', 'Друг Лео', 'Сестра', 'Сосед'], 1, '«my friend Leo came to my house».'),
-      Q('В воскресенье автор встал рано.', TF, 1, '«I got up late, at ten o\'clock.»'),
-      Q('О чём книга, которую читал автор?', ['О собаке', 'О мальчике, который летит на Луну', 'О море', 'О Лондоне'], 1, '«a book about a boy who travels to the moon».'),
-      Q('Что семья делала в воскресенье вечером?', ['Ходила в кино', 'Смотрела комедию по телевизору', 'Играла в игры', 'Гуляла'], 1, '«my family watched an old comedy on TV».')
+      Q('What was the weather like at the weekend?', ['Sunny', 'Rainy and windy', 'Snowy', 'Hot'], 1, '«It rained… it was cold and windy.»', 'Какая погода была на выходных?', ['Солнечная', 'Дождливая и ветреная', 'Снежная', 'Жаркая']),
+      Q('What did the writer make with Mum?', ['Soup', 'A cake', 'A pizza', 'A salad'], 2, '«We made pizza together.»', 'Что автор приготовил с мамой?', ['Суп', 'Торт', 'Пиццу', 'Салат']),
+      Q('Who came to visit on Saturday?', ['Grandma', 'The writer\'s friend Leo', 'The sister', 'A neighbour'], 1, '«my friend Leo came to my house».', 'Кто пришёл в гости в субботу?', ['Бабушка', 'Друг Лео', 'Сестра', 'Сосед']),
+      Q('The writer got up early on Sunday.', TFE, 1, '«I got up late, at ten o\'clock.»', 'В воскресенье автор встал рано.'),
+      Q('What is the writer\'s book about?', ['A dog', 'A boy who flies to the moon', 'The sea', 'London'], 1, '«a book about a boy who travels to the moon».', 'О чём книга, которую читал автор?', ['О собаке', 'О мальчике, который летит на Луну', 'О море', 'О Лондоне']),
+      Q('What did the family do on Sunday evening?', ['They went to the cinema', 'They watched a comedy on TV', 'They played games', 'They went for a walk'], 1, '«my family watched an old comedy on TV».', 'Что семья делала в воскресенье вечером?', ['Ходила в кино', 'Смотрела комедию по телевизору', 'Играла в игры', 'Гуляла'])
     ]),
 
     /* ================= A2 ================= */
@@ -141,13 +144,13 @@
       ['went on holiday', 'поехал(а) в отпуск (go on holiday)'], ['first stop', 'первая остановка'], ['tried tapas', 'попробовали тапас (закуски)'], ['as a souvenir', 'на память, как сувенир'],
       ['most of the time', 'большую часть времени'], ['still not finished', 'всё ещё не достроен'], ['luckily', 'к счастью']
     ], [
-      Q('Как друзья путешествовали между городами?', ['На самолёте', 'На машине', 'На поезде', 'На автобусе'], 2, '«We travelled by train because it is fast and comfortable.»'),
-      Q('Почему днём они ходили в музеи в Мадриде?', ['Шёл дождь', 'Было очень жарко', 'Музеи были бесплатные', 'Бары были закрыты'], 1, '«The weather was really hot — almost forty degrees!»'),
-      Q('Какой город больше всего понравился автору?', ['Мадрид', 'Севилья', 'Барселона', 'Лиссабон'], 1, '«Seville was my favourite city.»'),
-      Q('Что Сара купила на память?', ['Апельсины', 'Платье для фламенко', 'Книгу', 'Картину'], 1, '«Sara even bought a flamenco dress as a souvenir.»'),
-      Q('Храм Саграда Фамилия уже достроен.', TF, 1, '«It is still not finished».'),
-      Q('Что случилось в последний день?', ['Они опоздали на поезд', 'Сара потеряла паспорт', 'Автор заболел', 'Закрылся отель'], 1, '«Sara lost her passport.»'),
-      Q('Куда они хотят поехать в следующем году?', ['В Испанию', 'В Италию', 'В Португалию', 'Во Францию'], 2, '«Next year we want to go to Portugal.»')
+      Q('How did the friends travel between cities?', ['By plane', 'By car', 'By train', 'By bus'], 2, '«We travelled by train because it is fast and comfortable.»', 'Как друзья путешествовали между городами?', ['На самолёте', 'На машине', 'На поезде', 'На автобусе']),
+      Q('Why did they visit museums in the afternoon in Madrid?', ['It was raining', 'It was very hot', 'The museums were free', 'The bars were closed'], 1, '«The weather was really hot — almost forty degrees!»', 'Почему днём они ходили в музеи в Мадриде?', ['Шёл дождь', 'Было очень жарко', 'Музеи были бесплатные', 'Бары были закрыты']),
+      Q('Which city did the writer like most?', ['Madrid', 'Seville', 'Barcelona', 'Lisbon'], 1, '«Seville was my favourite city.»', 'Какой город больше всего понравился автору?', ['Мадрид', 'Севилья', 'Барселона', 'Лиссабон']),
+      Q('What did Sara buy as a souvenir?', ['Oranges', 'A flamenco dress', 'A book', 'A painting'], 1, '«Sara even bought a flamenco dress as a souvenir.»', 'Что Сара купила на память?', ['Апельсины', 'Платье для фламенко', 'Книгу', 'Картину']),
+      Q('The Sagrada Família is already finished.', TFE, 1, '«It is still not finished».', 'Храм Саграда Фамилия уже достроен.'),
+      Q('What happened on the last day?', ['They missed the train', 'Sara lost her passport', 'The writer got ill', 'The hotel closed'], 1, '«Sara lost her passport.»', 'Что случилось в последний день?', ['Они опоздали на поезд', 'Сара потеряла паспорт', 'Автор заболел', 'Закрылся отель']),
+      Q('Where do they want to go next year?', ['To Spain', 'To Italy', 'To Portugal', 'To France'], 2, '«Next year we want to go to Portugal.»', 'Куда они хотят поехать в следующем году?', ['В Испанию', 'В Италию', 'В Португалию', 'Во Францию'])
     ]),
     T('t-a2-first-job', 'A2', 'work', 'My First Job', 'Моя первая работа', [
       "When I was seventeen, I got my first job. I worked in a big supermarket on Saturdays and Sundays. I needed money for a new laptop, and my parents said, 'If you want it, you can earn it!'",
@@ -158,13 +161,13 @@
       ['earn it', 'заработать это'], ['showed me around', 'показал всё вокруг, провёл экскурсию'], ['till', 'касса (в магазине)'], ['harder than I expected', 'тяжелее, чем я ожидал'],
       ['on my feet', 'на ногах'], ['shouted at me', 'накричала на меня'], ['goes wrong', 'идёт не так']
     ], [
-      Q('Зачем автору были нужны деньги?', ['На машину', 'На новый ноутбук', 'На отпуск', 'На учёбу'], 1, '«I needed money for a new laptop».'),
-      Q('Когда автор работал?', ['Каждый день', 'По вечерам', 'По выходным', 'Только летом'], 2, '«on Saturdays and Sundays».'),
-      Q('Как автор чувствовал себя в первый день?', ['Спокойно', 'Очень нервничал', 'Скучал', 'Злился'], 1, '«On my first day I was very nervous.»'),
-      Q('Почему женщина накричала на автора?', ['Он ошибся со сдачей', 'Не было её любимого хлеба', 'Он был груб', 'Магазин закрывался'], 1, '«because we didn\'t have her favourite bread».'),
-      Q('Коллеги автора были недружелюбными.', TF, 1, '«my colleagues were really friendly».'),
-      Q('Сколько времени понадобилось, чтобы накопить на ноутбук?', ['Месяц', 'Два месяца', 'Четыре месяца', 'Год'], 2, '«After four months I had enough money».'),
-      Q('Чему научила автора работа?', ['Готовить', 'Работать в команде и сохранять спокойствие', 'Водить машину', 'Программировать'], 1, '«I learned to talk to strangers, to work in a team and to stay calm».')
+      Q('Why did the writer need money?', ['For a car', 'For a new laptop', 'For a holiday', 'For university'], 1, '«I needed money for a new laptop».', 'Зачем автору были нужны деньги?', ['На машину', 'На новый ноутбук', 'На отпуск', 'На учёбу']),
+      Q('When did the writer work?', ['Every day', 'In the evenings', 'At weekends', 'Only in summer'], 2, '«on Saturdays and Sundays».', 'Когда автор работал?', ['Каждый день', 'По вечерам', 'По выходным', 'Только летом']),
+      Q('How did the writer feel on the first day?', ['Calm', 'Very nervous', 'Bored', 'Angry'], 1, '«On my first day I was very nervous.»', 'Как автор чувствовал себя в первый день?', ['Спокойно', 'Очень нервничал', 'Скучал', 'Злился']),
+      Q('Why did a woman shout at the writer?', ['He gave the wrong change', 'The shop didn\'t have her favourite bread', 'He was rude', 'The shop was closing'], 1, '«because we didn\'t have her favourite bread».', 'Почему женщина накричала на автора?', ['Он ошибся со сдачей', 'Не было её любимого хлеба', 'Он был груб', 'Магазин закрывался']),
+      Q('The writer\'s colleagues were unfriendly.', TFE, 1, '«my colleagues were really friendly».', 'Коллеги автора были недружелюбными.'),
+      Q('How long did it take to save for the laptop?', ['One month', 'Two months', 'Four months', 'A year'], 2, '«After four months I had enough money».', 'Сколько времени понадобилось, чтобы накопить на ноутбук?', ['Месяц', 'Два месяца', 'Четыре месяца', 'Год']),
+      Q('What did the job teach the writer?', ['How to cook', 'How to work in a team and stay calm', 'How to drive', 'How to program'], 1, '«I learned to talk to strangers, to work in a team and to stay calm».', 'Чему научила автора работа?', ['Готовить', 'Работать в команде и сохранять спокойствие', 'Водить машину', 'Программировать'])
     ]),
     T('t-a2-market', 'A2', 'food', 'The Saturday Market', 'Субботний рынок', [
       "Every Saturday morning there is a farmers' market in the square near my flat. It opens at eight o'clock and closes at two. I love going there, even when it's raining.",
@@ -175,13 +178,13 @@
       ['farmers\' market', 'фермерский рынок'], ['even when', 'даже когда'], ['grow the food themselves', 'сами выращивают еду'], ['for the road', 'на дорожку'],
       ['it\'s worth it', 'оно того стоит'], ['comes from', 'откуда берётся, происходит'], ['have a nice chat', 'приятно поболтать']
     ], [
-      Q('Во сколько закрывается рынок?', ['В 8:00', 'В 11:00', 'В 14:00', 'В 18:00'], 2, '«It opens at eight o\'clock and closes at two.»'),
-      Q('Почему еда на рынке вкуснее?', ['Её привозят из-за границы', 'Фермеры сами её выращивают, она свежая', 'Она дешевле', 'Её готовят на месте'], 1, '«They grow the food themselves, so it is fresh».'),
-      Q('Что продаёт Питер?', ['Хлеб', 'Мёд', 'Яблоки и груши', 'Цветы'], 2, '«He sells apples and pears from his own garden.»'),
-      Q('Почему автор сначала идёт к пекарю?', ['Хлеб дешёвый', 'К одиннадцати часам хлеб обычно заканчивается', 'Она подруга автора', 'Там нет очереди'], 1, '«By eleven o\'clock her table is usually empty».'),
-      Q('На рынке дешевле, чем в супермаркете.', TF, 1, '«the market is a bit more expensive».'),
-      Q('Что значит «it\'s worth it»?', ['Это дорого', 'Оно того стоит', 'Это неважно', 'Это вредно'], 1, 'worth it — «стоит того».'),
-      Q('Какая из причин НЕ упоминается?', ['Помощь местным фермерам', 'Меньше пластика', 'Общение со знакомыми', 'Бесплатная доставка'], 3, 'О доставке в тексте ничего нет.')
+      Q('What time does the market close?', ['At 8:00', 'At 11:00', 'At 2 pm', 'At 6 pm'], 2, '«It opens at eight o\'clock and closes at two.»', 'Во сколько закрывается рынок?', ['В 8:00', 'В 11:00', 'В 14:00', 'В 18:00']),
+      Q('Why does the food at the market taste better?', ['It comes from abroad', 'The farmers grow it themselves, so it is fresh', 'It is cheaper', 'It is cooked there'], 1, '«They grow the food themselves, so it is fresh».', 'Почему еда на рынке вкуснее?', ['Её привозят из-за границы', 'Фермеры сами её выращивают, она свежая', 'Она дешевле', 'Её готовят на месте']),
+      Q('What does Peter sell?', ['Bread', 'Honey', 'Apples and pears', 'Flowers'], 2, '«He sells apples and pears from his own garden.»', 'Что продаёт Питер?', ['Хлеб', 'Мёд', 'Яблоки и груши', 'Цветы']),
+      Q('Why does the writer go to the baker first?', ['The bread is cheap', 'The bread is usually gone by eleven', 'She is the writer\'s friend', 'There is no queue there'], 1, '«By eleven o\'clock her table is usually empty».', 'Почему автор сначала идёт к пекарю?', ['Хлеб дешёвый', 'К одиннадцати часам хлеб обычно заканчивается', 'Она подруга автора', 'Там нет очереди']),
+      Q('The market is cheaper than the supermarket.', TFE, 1, '«the market is a bit more expensive».', 'На рынке дешевле, чем в супермаркете.'),
+      Q('What does "it\'s worth it" mean?', ['It is expensive', 'It is a good use of money', 'It doesn\'t matter', 'It is bad for you'], 1, 'worth it — «стоит того».', 'Что значит «it\'s worth it»?', ['Это дорого', 'Оно того стоит', 'Это неважно', 'Это вредно']),
+      Q('Which reason is NOT mentioned?', ['Helping local farmers', 'Less plastic', 'Chatting with people you know', 'Free delivery'], 3, 'О доставке в тексте ничего нет.', 'Какая из причин НЕ упоминается?', ['Помощь местным фермерам', 'Меньше пластика', 'Общение со знакомыми', 'Бесплатная доставка'])
     ]),
     T('t-a2-habits', 'A2', 'health', 'Small Habits, Big Changes', 'Маленькие привычки — большие перемены', [
       "A year ago I felt tired all the time. I worked at a computer all day, ate fast food and went to bed after midnight. My doctor told me: 'You don't need medicine. You need to change your habits.'",
@@ -193,13 +196,13 @@
       ['all the time', 'всё время'], ['at once', 'сразу, одновременно'], ['got off the bus', 'выходил из автобуса'], ['the rest of the way', 'оставшуюся часть пути'],
       ['instead of', 'вместо'], ['switch off', 'выключать'], ['fall asleep', 'засыпать'], ['in a better mood', 'в лучшем настроении']
     ], [
-      Q('Что посоветовал врач?', ['Принимать лекарства', 'Изменить привычки', 'Больше работать', 'Поехать в отпуск'], 1, '«You don\'t need medicine. You need to change your habits.»'),
-      Q('С чего автор начал?', ['С бега', 'С того, чтобы пить больше воды', 'С диеты', 'Со сна'], 1, '«First, I began to drink more water».'),
-      Q('Как автор стал больше ходить?', ['Купил велосипед', 'Выходил на две остановки раньше', 'Записался в спортзал', 'Гулял с собакой'], 1, '«I got off the bus two stops early».'),
-      Q('Какое изменение было самым трудным?', ['Вода', 'Прогулки', 'Сон', 'Лестница'], 2, '«The hardest change was sleep.»'),
-      Q('Теперь автор смотрит сериалы перед сном.', TF, 1, 'Он выключает технику в 22:30 и читает бумажную книгу.'),
-      Q('Сколько килограммов потерял автор?', ['Два', 'Пять', 'Десять', 'Нисколько'], 1, '«I\'ve lost five kilos».'),
-      Q('Главный совет автора:', ['Меняйте всё сразу', 'Будьте идеальны', 'Начните с одной маленькой привычки', 'Больше спите днём'], 2, '«Choose one small habit, do it every day…»')
+      Q('What did the doctor advise?', ['To take medicine', 'To change some habits', 'To work more', 'To go on holiday'], 1, '«You don\'t need medicine. You need to change your habits.»', 'Что посоветовал врач?', ['Принимать лекарства', 'Изменить привычки', 'Больше работать', 'Поехать в отпуск']),
+      Q('How did the writer start?', ['With running', 'By drinking more water', 'With a diet', 'With sleep'], 1, '«First, I began to drink more water».', 'С чего автор начал?', ['С бега', 'С того, чтобы пить больше воды', 'С диеты', 'Со сна']),
+      Q('How did the writer start walking more?', ['Bought a bike', 'Got off the bus two stops early', 'Joined a gym', 'Walked a dog'], 1, '«I got off the bus two stops early».', 'Как автор стал больше ходить?', ['Купил велосипед', 'Выходил на две остановки раньше', 'Записался в спортзал', 'Гулял с собакой']),
+      Q('Which change was the hardest?', ['Water', 'Walking', 'Sleep', 'The stairs'], 2, '«The hardest change was sleep.»', 'Какое изменение было самым трудным?', ['Вода', 'Прогулки', 'Сон', 'Лестница']),
+      Q('Now the writer watches TV series before bed.', TFE, 1, 'Он выключает технику в 22:30 и читает бумажную книгу.', 'Теперь автор смотрит сериалы перед сном.'),
+      Q('How many kilos did the writer lose?', ['Two', 'Five', 'Ten', 'None'], 1, '«I\'ve lost five kilos».', 'Сколько килограммов потерял автор?', ['Два', 'Пять', 'Десять', 'Нисколько']),
+      Q('The writer\'s main advice is:', ['Change everything at once', 'Be perfect', 'Start with one small habit', 'Sleep more during the day'], 2, '«Choose one small habit, do it every day…»', 'Главный совет автора:', ['Меняйте всё сразу', 'Будьте идеальны', 'Начните с одной маленькой привычки', 'Больше спите днём'])
     ]),
     T('t-a2-moving', 'A2', 'city', 'A New City', 'Новый город', [
       "Three months ago I moved from a small town to Manchester for a new job. It was a big change. In my town I knew everybody, but in Manchester I didn't know anyone.",
@@ -211,13 +214,13 @@
       ['a big change', 'большая перемена'], ['got lost', 'заблудился'], ['ended up', 'оказался (в итоге)'], ['do something about it', 'что-то с этим сделать'],
       ['language café', 'языковое кафе (встречи для практики языков)'], ['bus routes', 'автобусные маршруты'], ['have ever eaten', 'когда-либо ел'], ['be patient', 'будьте терпеливы']
     ], [
-      Q('Почему автор переехал в Манчестер?', ['Учиться', 'Из-за новой работы', 'К родственникам', 'Из-за любви'], 1, '«for a new job».'),
-      Q('Что было трудным в первые недели?', ['Жара', 'Одиночество и то, что автор терялся', 'Дорогая еда', 'Работа'], 1, '«I spent the evenings alone. I often got lost».'),
-      Q('Как часто встречается беговой клуб?', ['Каждый день', 'Два раза в неделю', 'Раз в месяц', 'По выходным'], 1, '«every Tuesday and Thursday».'),
-      Q('Где автор познакомился с Диего и Аишей?', ['На работе', 'В беговом клубе', 'В языковом кафе', 'В ресторане'], 2, '«There I met Diego… and Aisha…» — в языковом кафе.'),
-      Q('Автор до сих пор живёт в крошечной комнате.', TF, 1, '«I found a bigger flat with a balcony».'),
-      Q('Что автор нашёл в итоге?', ['Итальянский ресторан с лучшей пиццей', 'Новую работу', 'Собаку', 'Велосипед'], 0, '«the best pizza I have ever eaten».'),
-      Q('Какой совет автор НЕ даёт?', ['Соглашайтесь на приглашения', 'Пробуйте новое', 'Будьте терпеливы', 'Не уезжайте из родного города'], 3, 'Такого совета в тексте нет.')
+      Q('Why did the writer move to Manchester?', ['To study', 'For a new job', 'To be near relatives', 'For love'], 1, '«for a new job».', 'Почему автор переехал в Манчестер?', ['Учиться', 'Из-за новой работы', 'К родственникам', 'Из-за любви']),
+      Q('What was difficult in the first weeks?', ['The heat', 'Feeling lonely and getting lost', 'Expensive food', 'The job'], 1, '«I spent the evenings alone. I often got lost».', 'Что было трудным в первые недели?', ['Жара', 'Одиночество и то, что автор терялся', 'Дорогая еда', 'Работа']),
+      Q('How often does the running club meet?', ['Every day', 'Twice a week', 'Once a month', 'At weekends'], 1, '«every Tuesday and Thursday».', 'Как часто встречается беговой клуб?', ['Каждый день', 'Два раза в неделю', 'Раз в месяц', 'По выходным']),
+      Q('Where did the writer meet Diego and Aisha?', ['At work', 'At the running club', 'At a language café', 'In a restaurant'], 2, '«There I met Diego… and Aisha…» — в языковом кафе.', 'Где автор познакомился с Диего и Аишей?', ['На работе', 'В беговом клубе', 'В языковом кафе', 'В ресторане']),
+      Q('The writer still lives in a tiny room.', TFE, 1, '«I found a bigger flat with a balcony».', 'Автор до сих пор живёт в крошечной комнате.'),
+      Q('What did the writer finally find?', ['An Italian restaurant with the best pizza', 'A new job', 'A dog', 'A bike'], 0, '«the best pizza I have ever eaten».', 'Что автор нашёл в итоге?', ['Итальянский ресторан с лучшей пиццей', 'Новую работу', 'Собаку', 'Велосипед']),
+      Q('Which advice does the writer NOT give?', ['Say yes to invitations', 'Try new things', 'Be patient', 'Don\'t leave your hometown'], 3, 'Такого совета в тексте нет.', 'Какой совет автор НЕ даёт?', ['Соглашайтесь на приглашения', 'Пробуйте новое', 'Будьте терпеливы', 'Не уезжайте из родного города'])
     ]),
     T('t-a2-party', 'A2', 'people', 'The Surprise Party', 'Вечеринка-сюрприз', [
       "My grandmother Rosa turned eighty last month, and my family decided to organize a surprise party for her. It wasn't easy, because Grandma Rosa notices everything!",
@@ -229,13 +232,13 @@
       ['turned eighty', 'исполнилось восемьдесят'], ['for weeks', 'неделями'], ['was responsible for', 'отвечал за'], ['on top', 'сверху'],
       ['at the same time', 'одновременно'], ['hadn\'t seen for ten years', 'не видела десять лет'], ['gave a short speech', 'произнесла короткую речь (give a speech)'], ['had tears in our eyes', 'у нас были слёзы на глазах']
     ], [
-      Q('Почему организовать сюрприз было непросто?', ['Бабушка болела', 'Бабушка всё замечает', 'Не было денег', 'Родственники далеко'], 1, '«Grandma Rosa notices everything!»'),
-      Q('За что отвечал автор?', ['За плакат', 'За ресторан', 'За торт', 'За музыку'], 2, '«I was responsible for the cake.»'),
-      Q('Какой был торт?', ['Шоколадный', 'Лимонный с белым кремом', 'Клубничный', 'Морковный'], 1, '«a lemon cake with white cream».'),
-      Q('Что мама сказала бабушке?', ['Правду о вечеринке', 'Что будет тихий семейный ужин', 'Что они идут в кино', 'Ничего'], 1, '«we were going to a quiet family dinner».'),
-      Q('Брат бабушки прилетел из Канады.', TF, 1, 'Из Канады прилетела школьная подруга, а брат приехал из Италии.'),
-      Q('Сколько человек крикнули «Сюрприз!»?', ['Десять', 'Двадцать', 'Сорок', 'Восемьдесят'], 2, '«forty people shouted \'Surprise!\'»'),
-      Q('Что бабушка сказала в речи?', ['Что она устала', 'Что чувствует себя самой богатой женщиной в мире', 'Что не любит сюрпризы', 'Что уедет в Италию'], 1, '«I feel like the richest woman in the world».')
+      Q('Why was it hard to plan a surprise?', ['Grandma was ill', 'Grandma notices everything', 'There was no money', 'The relatives live far away'], 1, '«Grandma Rosa notices everything!»', 'Почему организовать сюрприз было непросто?', ['Бабушка болела', 'Бабушка всё замечает', 'Не было денег', 'Родственники далеко']),
+      Q('What was the writer responsible for?', ['The banner', 'The restaurant', 'The cake', 'The music'], 2, '«I was responsible for the cake.»', 'За что отвечал автор?', ['За плакат', 'За ресторан', 'За торт', 'За музыку']),
+      Q('What kind of cake was it?', ['Chocolate', 'Lemon with white cream', 'Strawberry', 'Carrot'], 1, '«a lemon cake with white cream».', 'Какой был торт?', ['Шоколадный', 'Лимонный с белым кремом', 'Клубничный', 'Морковный']),
+      Q('What did Mum tell Grandma?', ['The truth about the party', 'That it would be a quiet family dinner', 'That they were going to the cinema', 'Nothing'], 1, '«we were going to a quiet family dinner».', 'Что мама сказала бабушке?', ['Правду о вечеринке', 'Что будет тихий семейный ужин', 'Что они идут в кино', 'Ничего']),
+      Q('Grandma\'s brother flew in from Canada.', TFE, 1, 'Из Канады прилетела школьная подруга, а брат приехал из Италии.', 'Брат бабушки прилетел из Канады.'),
+      Q('How many people shouted "Surprise!"?', ['Ten', 'Twenty', 'Forty', 'Eighty'], 2, '«forty people shouted \'Surprise!\'»', 'Сколько человек крикнули «Сюрприз!»?', ['Десять', 'Двадцать', 'Сорок', 'Восемьдесят']),
+      Q('What did Grandma say in her speech?', ['That she was tired', 'That she felt like the richest woman in the world', 'That she doesn\'t like surprises', 'That she would move to Italy'], 1, '«I feel like the richest woman in the world».', 'Что бабушка сказала в речи?', ['Что она устала', 'Что чувствует себя самой богатой женщиной в мире', 'Что не любит сюрпризы', 'Что уедет в Италию'])
     ]),
 
     /* ================= B1 ================= */
@@ -250,13 +253,13 @@
       ['open-plan office', 'офис открытого типа'], ['small talk', 'светская беседа, болтовня'], ['make an effort', 'прилагать усилия'], ['stay in touch', 'поддерживать связь'],
       ['the best of both worlds', 'лучшее из двух вариантов']
     ], [
-      Q('According to the text, what is the main advantage of remote work?', ['Higher salaries', 'Saving time and money on travel', 'More meetings', 'A better office'], 1, 'Экономия времени и денег на дороге — главный плюс, о котором говорится во втором абзаце.'),
-      Q('How much extra time a week can someone gain who commuted an hour each way?', ['Two hours', 'Five hours', 'Ten hours', 'Twenty hours'], 2, '1 час туда + 1 час обратно × 5 дней = 10 часов.'),
-      Q('What is described as the biggest disadvantage?', ['Loneliness', 'Noise', 'Bad internet', 'Low pay'], 0, '«The biggest one is loneliness.»'),
-      Q('Experts recommend working on the sofa to feel relaxed.', TFE, 1, 'Наоборот: «Work in one place, not on the sofa or in bed.»'),
-      Q('Why is it hard to stop working in the evening at home?', ['The boss calls you', 'Work and private life start to mix', 'There is nothing else to do', 'The internet is faster at night'], 1, '«work and private life start to mix».'),
-      Q('What does "hybrid" work mean in the text?', ['Working two jobs', 'Working only at night', 'Some days in the office, some at home', 'Working from another country'], 2, '«two or three days in the office and the rest at home».'),
-      Q('The word "obvious" in paragraph 2 is closest in meaning to…', ['clear', 'hidden', 'strange', 'small'], 0, 'obvious — очевидный, ясный.')
+      Q('According to the text, what is the main advantage of remote work?', ['Higher salaries', 'Saving time and money on travel', 'More meetings', 'A better office'], 1, 'Экономия времени и денег на дороге — главный плюс, о котором говорится во втором абзаце.', 'Что, по словам автора, главное преимущество удалённой работы?', ['Более высокая зарплата', 'Экономия времени и денег на дорогу', 'Больше совещаний', 'Лучший офис']),
+      Q('How much extra time a week can someone gain who commuted an hour each way?', ['Two hours', 'Five hours', 'Ten hours', 'Twenty hours'], 2, '1 час туда + 1 час обратно × 5 дней = 10 часов.', 'Сколько дополнительного времени в неделю получит тот, кто ездил на работу по часу в одну сторону?', ['Два часа', 'Пять часов', 'Десять часов', 'Двадцать часов']),
+      Q('What is described as the biggest disadvantage?', ['Loneliness', 'Noise', 'Bad internet', 'Low pay'], 0, '«The biggest one is loneliness.»', 'Что названо самым большим недостатком?', ['Одиночество', 'Шум', 'Плохой интернет', 'Низкая зарплата']),
+      Q('Experts recommend working on the sofa to feel relaxed.', TFE, 1, 'Наоборот: «Work in one place, not on the sofa or in bed.»', 'Эксперты советуют работать на диване, чтобы расслабиться.'),
+      Q('Why is it hard to stop working in the evening at home?', ['The boss calls you', 'Work and private life start to mix', 'There is nothing else to do', 'The internet is faster at night'], 1, '«work and private life start to mix».', 'Почему дома трудно закончить работу вечером?', ['Звонит начальник', 'Работа и личная жизнь начинают смешиваться', 'Больше нечем заняться', 'Ночью интернет быстрее']),
+      Q('What does "hybrid" work mean in the text?', ['Working two jobs', 'Working only at night', 'Some days in the office, some at home', 'Working from another country'], 2, '«two or three days in the office and the rest at home».', 'Что в тексте означает «гибридная» работа?', ['Работа на двух работах', 'Работа только по ночам', 'Часть дней в офисе, часть — дома', 'Работа из другой страны']),
+      Q('The word "obvious" in paragraph 2 is closest in meaning to…', ['clear', 'hidden', 'strange', 'small'], 0, 'obvious — очевидный, ясный.', 'Слово «obvious» во втором абзаце ближе всего по значению к…', ['очевидный', 'скрытый', 'странный', 'маленький'])
     ]),
     T('t-b1-phone', 'B1', 'tech', 'A Week Without My Phone', 'Неделя без телефона', [
       "Last month I did an experiment: I lived for a week without my smartphone. I put it in a drawer on Sunday evening and bought a cheap old phone that could only make calls and send texts. I told my friends and family in advance, so nobody would worry.",
@@ -268,13 +271,13 @@
       ['in advance', 'заранее'], ['kept reaching', 'всё время тянулся'], ['to be honest', 'честно говоря'], ['what if', 'а что, если'],
       ['mural', 'настенная роспись'], ['cash machine', 'банкомат'], ['switched my smartphone back on', 'снова включил смартфон (switch back on)'], ['given up', 'отказался от']
     ], [
-      Q('What kind of phone did the writer use during the experiment?', ['A new smartphone', 'A simple phone for calls and texts', 'A tablet', 'No phone at all'], 1, '«a cheap old phone that could only make calls and send texts».'),
-      Q('How did the writer feel during the first two days?', ['Relaxed and happy', 'Bored and a little anxious', 'Angry with friends', 'Very busy'], 1, '«I felt bored and, to be honest, a little anxious.»'),
-      Q('What changed by Wednesday?', ['The writer bought a new phone', 'The writer started noticing things around', 'The writer stopped going to work', 'The writer moved flat'], 1, 'Автор стал замечать пекарню, роспись, старика с птицами.'),
-      Q('The writer read more books than usual.', TFE, 0, '«I read two books in one week — more than I usually read in two months.»'),
-      Q('Which problem did the writer NOT have?', ['Getting lost', 'Paying without a phone', 'Missing an invitation', 'Losing the job'], 3, 'О проблемах на работе не говорится.'),
-      Q('What did the writer find when switching the smartphone back on?', ['Many important messages', '214 mostly unimportant notifications', 'A broken screen', 'No messages at all'], 1, '«Almost none of them were important.»'),
-      Q('Which change has the writer made?', ['Sold the smartphone', 'Deleted social media apps', 'Stopped using the internet', 'Bought a second phone'], 1, '«I\'ve deleted social media apps».')
+      Q('What kind of phone did the writer use during the experiment?', ['A new smartphone', 'A simple phone for calls and texts', 'A tablet', 'No phone at all'], 1, '«a cheap old phone that could only make calls and send texts».', 'Каким телефоном автор пользовался во время эксперимента?', ['Новым смартфоном', 'Простым телефоном для звонков и SMS', 'Планшетом', 'Никаким']),
+      Q('How did the writer feel during the first two days?', ['Relaxed and happy', 'Bored and a little anxious', 'Angry with friends', 'Very busy'], 1, '«I felt bored and, to be honest, a little anxious.»', 'Как автор чувствовал себя первые два дня?', ['Спокойно и радостно', 'Скучал и немного тревожился', 'Злился на друзей', 'Был очень занят']),
+      Q('What changed by Wednesday?', ['The writer bought a new phone', 'The writer started noticing things around', 'The writer stopped going to work', 'The writer moved flat'], 1, 'Автор стал замечать пекарню, роспись, старика с птицами.', 'Что изменилось к среде?', ['Автор купил новый телефон', 'Автор начал замечать всё вокруг', 'Автор перестал ходить на работу', 'Автор переехал']),
+      Q('The writer read more books than usual.', TFE, 0, '«I read two books in one week — more than I usually read in two months.»', 'Автор прочитал больше книг, чем обычно.'),
+      Q('Which problem did the writer NOT have?', ['Getting lost', 'Paying without a phone', 'Missing an invitation', 'Losing the job'], 3, 'О проблемах на работе не говорится.', 'Какой проблемы у автора НЕ было?', ['Заблудиться', 'Заплатить без телефона', 'Пропустить приглашение', 'Потерять работу']),
+      Q('What did the writer find when switching the smartphone back on?', ['Many important messages', '214 mostly unimportant notifications', 'A broken screen', 'No messages at all'], 1, '«Almost none of them were important.»', 'Что автор обнаружил, снова включив смартфон?', ['Много важных сообщений', '214 уведомлений, в основном неважных', 'Разбитый экран', 'Ни одного сообщения']),
+      Q('Which change has the writer made?', ['Sold the smartphone', 'Deleted social media apps', 'Stopped using the internet', 'Bought a second phone'], 1, '«I\'ve deleted social media apps».', 'Что автор изменил?', ['Продал смартфон', 'Удалил приложения соцсетей', 'Перестал пользоваться интернетом', 'Купил второй телефон'])
     ]),
     T('t-b1-volunteer', 'B1', 'society', 'Why I Volunteer', 'Почему я волонтёр', [
       "Every Saturday morning, while most of my friends are still asleep, I go to a small community kitchen in the centre of our city. For the last two years I have volunteered there, helping to prepare hot meals for people who can't afford food or don't have a home.",
@@ -286,13 +289,13 @@
       ['community kitchen', 'общественная (бесплатная) кухня'], ['afford', 'позволить себе (по деньгам)'], ['by accident', 'случайно'], ['going through a difficult time', 'переживать трудный период'],
       ['come along', 'пойти вместе'], ['used to be', 'когда-то был'], ['get my confidence back', 'вернуть уверенность'], ['judge someone', 'осуждать кого-то']
     ], [
-      Q('How long has the writer volunteered at the kitchen?', ['Two months', 'One year', 'Two years', 'Ten years'], 2, '«For the last two years I have volunteered there».'),
-      Q('Why did the writer first go to the kitchen?', ['It was part of a job', 'A neighbour suggested it', 'A school project', 'To find food'], 1, '«A neighbour suggested that I come along with her».'),
-      Q('What was the writer\'s situation at that time?', ['Very busy at work', 'Unemployed and feeling useless', 'Studying at university', 'Living abroad'], 1, '«I had lost my job and I felt useless.»'),
-      Q('According to the writer, the most important part of the work is…', ['cooking soup', 'washing dishes', 'talking to people', 'collecting money'], 2, '«the most important part is talking to people».'),
-      Q('Frank taught the writer to cook.', TFE, 1, '«He taught me how to play chess.»'),
-      Q('How did the writer find a new job?', ['Through an advert', 'Through a contact made in the kitchen', 'Through Frank', 'At a job fair'], 1, '«I found a new job through a contact I made in the kitchen.»'),
-      Q('What does the writer say you need to volunteer?', ['Special skills', 'A lot of free time', 'No special skills — just a few hours', 'A university degree'], 2, '«You don\'t need special skills… a few hours a month.»')
+      Q('How long has the writer volunteered at the kitchen?', ['Two months', 'One year', 'Two years', 'Ten years'], 2, '«For the last two years I have volunteered there».', 'Как долго автор работает волонтёром на кухне?', ['Два месяца', 'Один год', 'Два года', 'Десять лет']),
+      Q('Why did the writer first go to the kitchen?', ['It was part of a job', 'A neighbour suggested it', 'A school project', 'To find food'], 1, '«A neighbour suggested that I come along with her».', 'Почему автор впервые пришёл на кухню?', ['Это было частью работы', 'Предложил сосед', 'Школьный проект', 'Чтобы найти еду']),
+      Q('What was the writer\'s situation at that time?', ['Very busy at work', 'Unemployed and feeling useless', 'Studying at university', 'Living abroad'], 1, '«I had lost my job and I felt useless.»', 'В каком положении был автор в то время?', ['Был очень занят на работе', 'Был без работы и чувствовал себя бесполезным', 'Учился в университете', 'Жил за границей']),
+      Q('According to the writer, the most important part of the work is…', ['cooking soup', 'washing dishes', 'talking to people', 'collecting money'], 2, '«the most important part is talking to people».', 'По словам автора, самая важная часть работы —', ['варить суп', 'мыть посуду', 'разговаривать с людьми', 'собирать деньги']),
+      Q('Frank taught the writer to cook.', TFE, 1, '«He taught me how to play chess.»', 'Фрэнк научил автора готовить.'),
+      Q('How did the writer find a new job?', ['Through an advert', 'Through a contact made in the kitchen', 'Through Frank', 'At a job fair'], 1, '«I found a new job through a contact I made in the kitchen.»', 'Как автор нашёл новую работу?', ['По объявлению', 'Через знакомство на кухне', 'Через Фрэнка', 'На ярмарке вакансий']),
+      Q('What does the writer say you need to volunteer?', ['Special skills', 'A lot of free time', 'No special skills — just a few hours', 'A university degree'], 2, '«You don\'t need special skills… a few hours a month.»', 'Что, по словам автора, нужно, чтобы стать волонтёром?', ['Особые навыки', 'Много свободного времени', 'Никаких особых навыков — лишь несколько часов', 'Диплом университета'])
     ]),
     T('t-b1-language', 'B1', 'education', 'Is It Too Late to Learn a Language?', 'Не поздно ли учить язык?', [
       "Many adults believe that learning a foreign language is something only children can do well. 'My brain is too old,' they say. But is that true? Research suggests the answer is more complicated — and more encouraging.",
@@ -304,13 +307,13 @@
       ['native-like accent', 'акцент как у носителя'], ['of their own', 'свои собственные'], ['give up', 'сдаваться, бросать'], ['little and often', 'понемногу, но часто'],
       ['spaced repetition', 'интервальное повторение'], ['input', 'языковой материал (то, что слушаем и читаем)'], ['from the very beginning', 'с самого начала']
     ], [
-      Q('What do many adults believe about learning languages?', ['It is easy', 'Only children can do it well', 'It needs no practice', 'It is only for teachers'], 1, '«something only children can do well».'),
-      Q('Which advantage of children is mentioned?', ['They understand grammar faster', 'They copy sounds easily', 'They have more free time', 'They have bigger vocabularies'], 1, '«They copy sounds easily».'),
-      Q('In the first months, adults often progress faster than children.', TFE, 0, '«adults often make faster progress than children in the first months».'),
-      Q('According to the text, why do adults usually give up?', ['Their brain is too old', 'Wrong method and weak motivation', 'Languages are too expensive', 'They have no teachers'], 1, '«the problem is not the brain but the method and the motivation».'),
-      Q('What does "little and often" mean here?', ['Study rarely but for a long time', 'Study a short time every day', 'Learn only a few words', 'Study only on Sundays'], 1, '«fifteen minutes every day is better than two hours on Sunday».'),
-      Q('Spaced repetition means reviewing words…', ['once a year', 'just before you are likely to forget them', 'only before exams', 'every hour'], 1, 'Так прямо сказано в тексте.'),
-      Q('What is the main goal of learning a language, according to the writer?', ['To sound like a native speaker', 'To pass exams', 'To communicate and understand', 'To read grammar books'], 2, '«The goal is to communicate, to understand and to be understood.»')
+      Q('What do many adults believe about learning languages?', ['It is easy', 'Only children can do it well', 'It needs no practice', 'It is only for teachers'], 1, '«something only children can do well».', 'Что многие взрослые думают об изучении языков?', ['Это легко', 'Хорошо это получается только у детей', 'Практика не нужна', 'Это только для учителей']),
+      Q('Which advantage of children is mentioned?', ['They understand grammar faster', 'They copy sounds easily', 'They have more free time', 'They have bigger vocabularies'], 1, '«They copy sounds easily».', 'Какое преимущество детей упоминается?', ['Они быстрее понимают грамматику', 'Они легко копируют звуки', 'У них больше свободного времени', 'У них больше словарный запас']),
+      Q('In the first months, adults often progress faster than children.', TFE, 0, '«adults often make faster progress than children in the first months».', 'В первые месяцы взрослые часто продвигаются быстрее детей.'),
+      Q('According to the text, why do adults usually give up?', ['Their brain is too old', 'Wrong method and weak motivation', 'Languages are too expensive', 'They have no teachers'], 1, '«the problem is not the brain but the method and the motivation».', 'Почему, согласно тексту, взрослые обычно бросают?', ['Их мозг слишком стар', 'Неправильный метод и слабая мотивация', 'Языки слишком дорогие', 'У них нет учителей']),
+      Q('What does "little and often" mean here?', ['Study rarely but for a long time', 'Study a short time every day', 'Learn only a few words', 'Study only on Sundays'], 1, '«fifteen minutes every day is better than two hours on Sunday».', 'Что здесь означает «little and often»?', ['Заниматься редко, но долго', 'Заниматься понемногу каждый день', 'Учить всего несколько слов', 'Заниматься только по воскресеньям']),
+      Q('Spaced repetition means reviewing words…', ['once a year', 'just before you are likely to forget them', 'only before exams', 'every hour'], 1, 'Так прямо сказано в тексте.', 'Интервальное повторение — это повторять слова…', ['раз в год', 'прямо перед тем, как вы, скорее всего, их забудете', 'только перед экзаменами', 'каждый час']),
+      Q('What is the main goal of learning a language, according to the writer?', ['To sound like a native speaker', 'To pass exams', 'To communicate and understand', 'To read grammar books'], 2, '«The goal is to communicate, to understand and to be understood.»', 'Какая, по мнению автора, главная цель изучения языка?', ['Звучать как носитель', 'Сдать экзамены', 'Общаться и понимать', 'Читать учебники грамматики'])
     ]),
     T('t-b1-solo', 'B1', 'travel', 'Travelling Alone', 'Путешествовать одному', [
       "When I told my friends that I was going to travel around Vietnam on my own for three weeks, most of them were surprised. 'Won't you be lonely?' they asked. 'Isn't it dangerous?' Honestly, I was asking myself the same questions.",
@@ -322,13 +325,13 @@
       ['on my own', 'в одиночку, самостоятельно'], ['for long', 'надолго, долго'], ['hostel', 'хостел'], ['fell in love with', 'влюбился в'],
       ['compromise', 'идти на компромисс'], ['unfamiliar places', 'незнакомые места'], ['trust my instincts', 'доверять интуиции'], ['deal with', 'справляться с']
     ], [
-      Q('How did the writer\'s friends react to the plan?', ['They wanted to come too', 'They were surprised and worried', 'They were not interested', 'They were jealous'], 1, '«most of them were surprised. \'Won\'t you be lonely?\'…»'),
-      Q('What felt strange at first?', ['Taking trains', 'Eating alone in a restaurant', 'Speaking English', 'Staying in hostels'], 1, '«Eating alone in a restaurant felt strange».'),
-      Q('According to the writer, solo travellers…', ['rarely meet people', 'talk to people more than groups do', 'always feel lonely', 'must join tours'], 1, '«People talk to you much more than when you are in a group.»'),
-      Q('Why did the writer stay four extra days in Hoi An?', ['The train was cancelled', 'The writer fell in love with the town', 'The writer was ill', 'Friends asked to stay'], 1, '«When I fell in love with a small town called Hoi An, I simply stayed».'),
-      Q('The writer never took any safety precautions.', TFE, 1, 'Автор сообщал семье, где находится, хранил копии документов и избегал ночных прогулок.'),
-      Q('What was the biggest surprise for the writer?', ['How cheap Vietnam was', 'How much they learned about themselves', 'How hot the weather was', 'How difficult the food was'], 1, '«how much I learned about myself».'),
-      Q('The phrase "trust my instincts" means…', ['follow a guidebook', 'listen to my inner feelings', 'ask the police', 'check the weather'], 1, 'Доверять внутреннему чутью, интуиции.')
+      Q('How did the writer\'s friends react to the plan?', ['They wanted to come too', 'They were surprised and worried', 'They were not interested', 'They were jealous'], 1, '«most of them were surprised. \'Won\'t you be lonely?\'…»', 'Как друзья автора отреагировали на план?', ['Тоже захотели поехать', 'Удивились и забеспокоились', 'Не заинтересовались', 'Позавидовали']),
+      Q('What felt strange at first?', ['Taking trains', 'Eating alone in a restaurant', 'Speaking English', 'Staying in hostels'], 1, '«Eating alone in a restaurant felt strange».', 'Что сначала казалось странным?', ['Ездить на поездах', 'Есть одному в ресторане', 'Говорить по-английски', 'Жить в хостелах']),
+      Q('According to the writer, solo travellers…', ['rarely meet people', 'talk to people more than groups do', 'always feel lonely', 'must join tours'], 1, '«People talk to you much more than when you are in a group.»', 'По словам автора, те, кто путешествует в одиночку,…', ['редко знакомятся с людьми', 'общаются с людьми больше, чем группы', 'всегда чувствуют себя одиноко', 'должны ездить с экскурсиями']),
+      Q('Why did the writer stay four extra days in Hoi An?', ['The train was cancelled', 'The writer fell in love with the town', 'The writer was ill', 'Friends asked to stay'], 1, '«When I fell in love with a small town called Hoi An, I simply stayed».', 'Почему автор остался в Хойане ещё на четыре дня?', ['Отменили поезд', 'Автор влюбился в этот город', 'Автор заболел', 'Друзья попросили остаться']),
+      Q('The writer never took any safety precautions.', TFE, 1, 'Автор сообщал семье, где находится, хранил копии документов и избегал ночных прогулок.', 'Автор никогда не соблюдал мер безопасности.'),
+      Q('What was the biggest surprise for the writer?', ['How cheap Vietnam was', 'How much they learned about themselves', 'How hot the weather was', 'How difficult the food was'], 1, '«how much I learned about myself».', 'Что больше всего удивило автора?', ['Как дёшево во Вьетнаме', 'Как много автор узнал о себе', 'Какая жаркая погода', 'Какая непростая еда']),
+      Q('The phrase "trust my instincts" means…', ['follow a guidebook', 'listen to my inner feelings', 'ask the police', 'check the weather'], 1, 'Доверять внутреннему чутью, интуиции.', 'Выражение «trust my instincts» означает…', ['следовать путеводителю', 'прислушиваться к внутреннему чутью', 'обращаться в полицию', 'смотреть прогноз погоды'])
     ]),
     T('t-b1-waste', 'B1', 'nature', 'The Problem with Food Waste', 'Проблема пищевых отходов', [
       "Around the world, roughly a third of all the food that is produced is never eaten. It rots in fields, gets damaged during transport, is thrown away by shops or ends up in our kitchen bins. At the same time, hundreds of millions of people don't have enough to eat.",
@@ -340,13 +343,13 @@
       ['roughly a third', 'примерно треть'], ['rots', 'гниёт'], ['landfill', 'свалка, полигон отходов'], ['greenhouse gases', 'парниковые газы'],
       ['best before', 'лучше употребить до'], ['use by', 'употребить до (срок годности)'], ['leftovers', 'остатки еды'], ['breadcrumbs', 'панировочные сухари']
     ], [
-      Q('How much of the world\'s food is never eaten?', ['About a tenth', 'About a quarter', 'About a third', 'About half'], 2, '«roughly a third of all the food that is produced is never eaten».'),
-      Q('Why is food waste an environmental problem?', ['Food is too cheap', 'It wastes water, land and energy and produces methane', 'It makes shops close', 'Farmers grow too little'], 1, 'Об этом говорится во втором абзаце.'),
-      Q('What does a "best before" date mean?', ['The food is dangerous after it', 'The food is at its best quality until then', 'The food must be frozen', 'The shop must throw it away'], 1, '«it is usually safe to eat after it».'),
-      Q('"Use by" dates are about safety.', TFE, 0, '«\'Use by\'… is about safety and should be taken seriously.»'),
-      Q('Which tip is NOT given in the text?', ['Make a shopping list', 'Freeze food you can\'t eat in time', 'Buy food only online', 'Cook with leftovers'], 2, 'Совета покупать только онлайн нет.'),
-      Q('What do some apps allow restaurants to do?', ['Sell unsold meals cheaply', 'Deliver food for free', 'Order from farmers', 'Count calories'], 0, '«apps that let restaurants sell unsold meals cheaply».'),
-      Q('The word "leftovers" means…', ['fresh vegetables', 'food that remains after a meal', 'frozen meat', 'shopping lists'], 1, 'leftovers — остатки еды.')
+      Q('How much of the world\'s food is never eaten?', ['About a tenth', 'About a quarter', 'About a third', 'About half'], 2, '«roughly a third of all the food that is produced is never eaten».', 'Какую часть мировой еды так и не съедают?', ['Около десятой части', 'Около четверти', 'Около трети', 'Около половины']),
+      Q('Why is food waste an environmental problem?', ['Food is too cheap', 'It wastes water, land and energy and produces methane', 'It makes shops close', 'Farmers grow too little'], 1, 'Об этом говорится во втором абзаце.', 'Почему пищевые отходы — экологическая проблема?', ['Еда слишком дешёвая', 'Впустую тратятся вода, земля и энергия, и выделяется метан', 'Из-за этого закрываются магазины', 'Фермеры выращивают слишком мало']),
+      Q('What does a "best before" date mean?', ['The food is dangerous after it', 'The food is at its best quality until then', 'The food must be frozen', 'The shop must throw it away'], 1, '«it is usually safe to eat after it».', 'Что означает дата «best before»?', ['После неё еда опасна', 'До этой даты у продукта лучшее качество', 'Продукт нужно заморозить', 'Магазин обязан его выбросить']),
+      Q('"Use by" dates are about safety.', TFE, 0, '«\'Use by\'… is about safety and should be taken seriously.»', 'Дата «use by» касается безопасности.'),
+      Q('Which tip is NOT given in the text?', ['Make a shopping list', 'Freeze food you can\'t eat in time', 'Buy food only online', 'Cook with leftovers'], 2, 'Совета покупать только онлайн нет.', 'Какого совета НЕТ в тексте?', ['Составлять список покупок', 'Замораживать то, что не успеете съесть', 'Покупать еду только онлайн', 'Готовить из остатков']),
+      Q('What do some apps allow restaurants to do?', ['Sell unsold meals cheaply', 'Deliver food for free', 'Order from farmers', 'Count calories'], 0, '«apps that let restaurants sell unsold meals cheaply».', 'Что некоторые приложения позволяют делать ресторанам?', ['Дёшево продавать непроданные блюда', 'Бесплатно доставлять еду', 'Заказывать у фермеров', 'Считать калории']),
+      Q('The word "leftovers" means…', ['fresh vegetables', 'food that remains after a meal', 'frozen meat', 'shopping lists'], 1, 'leftovers — остатки еды.', 'Слово «leftovers» означает…', ['свежие овощи', 'еду, оставшуюся после трапезы', 'замороженное мясо', 'списки покупок'])
     ]),
 
     /* ================= B2 ================= */
@@ -360,13 +363,13 @@
       ['on the contrary', 'напротив'], ['REM sleep', 'быстрый сон (фаза БДГ)'], ['consolidating memories', 'закрепление воспоминаний'], ['go well beyond', 'выходить далеко за пределы'],
       ['chronic lack of sleep', 'хронический недосып'], ['body clock', 'биологические часы'], ['emit', 'излучать'], ['it turns out', 'оказывается']
     ], [
-      Q('What does the first paragraph say about the brain during sleep?', ['It switches off completely', 'It can be almost as active as when awake', 'It stops dreaming', 'It only rests'], 1, '«the brain is almost as active as when we are awake».'),
-      Q('How long is one sleep cycle?', ['About 30 minutes', 'About 60 minutes', 'About 90 minutes', 'About 3 hours'], 2, '«cycles of about ninety minutes».'),
-      Q('Which stage is linked mainly to physical recovery?', ['Light sleep', 'Deep sleep', 'REM sleep', 'Waking up'], 1, '«Deep sleep appears to be essential for physical recovery».'),
-      Q('People who slept after learning remembered the material better.', TFE, 0, 'Так говорится в конце второго абзаца.'),
-      Q('Which consequence of chronic sleep loss is NOT mentioned?', ['Weight gain', 'Heart disease risk', 'Poorer decisions', 'Hair loss'], 3, 'О выпадении волос в тексте нет.'),
-      Q('How does blue light from screens affect sleep?', ['It releases more melatonin', 'It delays the release of melatonin', 'It makes dreams more vivid', 'It has no effect'], 1, '«can delay the release of melatonin».'),
-      Q('In the last paragraph, the writer suggests that sleep is…', ['a waste of time', 'one of the most productive things we do', 'only important for children', 'impossible to improve'], 1, 'Последнее предложение текста.')
+      Q('What does the first paragraph say about the brain during sleep?', ['It switches off completely', 'It can be almost as active as when awake', 'It stops dreaming', 'It only rests'], 1, '«the brain is almost as active as when we are awake».', 'Что говорится в первом абзаце о мозге во время сна?', ['Он полностью отключается', 'Он может быть почти так же активен, как во время бодрствования', 'Он перестаёт видеть сны', 'Он только отдыхает']),
+      Q('How long is one sleep cycle?', ['About 30 minutes', 'About 60 minutes', 'About 90 minutes', 'About 3 hours'], 2, '«cycles of about ninety minutes».', 'Сколько длится один цикл сна?', ['Около 30 минут', 'Около 60 минут', 'Около 90 минут', 'Около 3 часов']),
+      Q('Which stage is linked mainly to physical recovery?', ['Light sleep', 'Deep sleep', 'REM sleep', 'Waking up'], 1, '«Deep sleep appears to be essential for physical recovery».', 'Какая стадия связана в основном с физическим восстановлением?', ['Лёгкий сон', 'Глубокий сон', 'Быстрый сон (REM)', 'Пробуждение']),
+      Q('People who slept after learning remembered the material better.', TFE, 0, 'Так говорится в конце второго абзаца.', 'Те, кто поспал после учёбы, лучше запомнили материал.'),
+      Q('Which consequence of chronic sleep loss is NOT mentioned?', ['Weight gain', 'Heart disease risk', 'Poorer decisions', 'Hair loss'], 3, 'О выпадении волос в тексте нет.', 'Какое последствие хронического недосыпа НЕ упоминается?', ['Набор веса', 'Риск болезней сердца', 'Худшие решения', 'Выпадение волос']),
+      Q('How does blue light from screens affect sleep?', ['It releases more melatonin', 'It delays the release of melatonin', 'It makes dreams more vivid', 'It has no effect'], 1, '«can delay the release of melatonin».', 'Как синий свет экранов влияет на сон?', ['Выделяется больше мелатонина', 'Он задерживает выработку мелатонина', 'Сны становятся ярче', 'Никак не влияет']),
+      Q('In the last paragraph, the writer suggests that sleep is…', ['a waste of time', 'one of the most productive things we do', 'only important for children', 'impossible to improve'], 1, 'Последнее предложение текста.', 'В последнем абзаце автор предполагает, что сон —', ['пустая трата времени', 'одно из самых продуктивных наших занятий', 'важен только для детей', 'невозможно улучшить'])
     ]),
     T('t-b2-cities', 'B2', 'city', 'Cities of the Future', 'Города будущего', [
       "By 2050, around two thirds of the world's population is expected to live in cities. This rapid growth brings enormous opportunities, but also serious challenges: traffic congestion, air pollution, a shortage of affordable housing and rising temperatures. Urban planners around the world are rethinking what a city should look like.",
@@ -378,13 +381,13 @@
       ['traffic congestion', 'транспортные заторы'], ['affordable housing', 'доступное жильё'], ['urban planners', 'градостроители'], ['cycle lanes', 'велодорожки'],
       ['elevated motorway', 'эстакада, надземная автомагистраль'], ['green roofs', 'зелёные крыши'], ['outskirts', 'окраины'], ['push out', 'вытеснять']
     ], [
-      Q('What proportion of people are expected to live in cities by 2050?', ['One third', 'Half', 'Two thirds', 'Almost everyone'], 2, '«around two thirds of the world\'s population».'),
-      Q('What is the main idea of the "15-minute city"?', ['Everyone drives for 15 minutes to work', 'Daily needs are within a short walk or bike ride', 'Shops close after 15 minutes', 'Buses come every 15 minutes'], 1, 'Всё необходимое — в 15 минутах пешком или на велосипеде.'),
-      Q('What happened after Seoul replaced a motorway with a stream and park?', ['Traffic chaos followed', 'The area became very popular and cooler', 'The park was closed', 'Critics were proved right'], 1, 'Место стало популярным и понизило летние температуры.'),
-      Q('According to the text, green infrastructure only makes cities look nicer.', TFE, 1, 'Деревья и парки ещё поглощают воду, очищают воздух и охлаждают улицы.'),
-      Q('What criticism is mentioned in the last paragraph?', ['Parks are too expensive to build', 'Changes may mainly benefit wealthier districts', 'People don\'t like bicycles', 'Cities are growing too slowly'], 1, '«some of these changes mainly benefit wealthier central districts».'),
-      Q('The phrase "push out the very residents they were meant to help" refers to…', ['residents leaving because of rising prices', 'residents being moved by the police', 'residents choosing to live abroad', 'residents buying more cars'], 0, 'Рост цен на жильё вытесняет жителей.'),
-      Q('The word "congestion" is closest in meaning to…', ['overcrowding', 'cleanliness', 'silence', 'speed'], 0, 'congestion — перегруженность, затор.')
+      Q('What proportion of people are expected to live in cities by 2050?', ['One third', 'Half', 'Two thirds', 'Almost everyone'], 2, '«around two thirds of the world\'s population».', 'Какая доля людей, как ожидается, будет жить в городах к 2050 году?', ['Треть', 'Половина', 'Две трети', 'Почти все']),
+      Q('What is the main idea of the "15-minute city"?', ['Everyone drives for 15 minutes to work', 'Daily needs are within a short walk or bike ride', 'Shops close after 15 minutes', 'Buses come every 15 minutes'], 1, 'Всё необходимое — в 15 минутах пешком или на велосипеде.', 'В чём главная идея «15-минутного города»?', ['Все ездят на работу 15 минут', 'Всё нужное каждый день — в пределах короткой прогулки или поездки на велосипеде', 'Магазины закрываются через 15 минут', 'Автобусы ходят каждые 15 минут']),
+      Q('What happened after Seoul replaced a motorway with a stream and park?', ['Traffic chaos followed', 'The area became very popular and cooler', 'The park was closed', 'Critics were proved right'], 1, 'Место стало популярным и понизило летние температуры.', 'Что произошло после того, как Сеул заменил автомагистраль ручьём и парком?', ['Начался транспортный хаос', 'Место стало очень популярным, и там стало прохладнее', 'Парк закрыли', 'Критики оказались правы']),
+      Q('According to the text, green infrastructure only makes cities look nicer.', TFE, 1, 'Деревья и парки ещё поглощают воду, очищают воздух и охлаждают улицы.', 'Согласно тексту, зелёная инфраструктура лишь делает города красивее.'),
+      Q('What criticism is mentioned in the last paragraph?', ['Parks are too expensive to build', 'Changes may mainly benefit wealthier districts', 'People don\'t like bicycles', 'Cities are growing too slowly'], 1, '«some of these changes mainly benefit wealthier central districts».', 'Какая критика упоминается в последнем абзаце?', ['Парки слишком дорого строить', 'Выгоду могут получить в основном богатые районы', 'Людям не нравятся велосипеды', 'Города растут слишком медленно']),
+      Q('The phrase "push out the very residents they were meant to help" refers to…', ['residents leaving because of rising prices', 'residents being moved by the police', 'residents choosing to live abroad', 'residents buying more cars'], 0, 'Рост цен на жильё вытесняет жителей.', 'Выражение «push out the very residents they were meant to help» относится к…', ['жителям, уезжающим из-за роста цен', 'жителям, которых выселяет полиция', 'жителям, решившим жить за границей', 'жителям, покупающим больше машин']),
+      Q('The word "congestion" is closest in meaning to…', ['overcrowding', 'cleanliness', 'silence', 'speed'], 0, 'congestion — перегруженность, затор.', 'Слово «congestion» ближе всего по значению к…', ['перегруженность', 'чистота', 'тишина', 'скорость'])
     ]),
     T('t-b2-social', 'B2', 'psychology', 'Social Media and Friendship', 'Соцсети и дружба', [
       "Never before have we been so connected. The average social media user has hundreds of 'friends' or followers and can message people on the other side of the world in seconds. And yet surveys in many countries suggest that loneliness is on the rise, particularly among young adults. How can both things be true at the same time?",
@@ -396,13 +399,13 @@
       ['on the rise', 'растёт, увеличивается'], ['lies in', 'заключается в'], ['scrolling through', 'пролистывание'], ['feeds', 'ленты (новостей)'],
       ['highlights', 'лучшие моменты'], ['blame', 'винить'], ['a lifeline', 'спасательный круг, жизненно важная поддержка'], ['rather than', 'а не, вместо того чтобы']
     ], [
-      Q('What paradox does the first paragraph describe?', ['People have fewer friends online', 'People are more connected but lonelier', 'Social media is getting slower', 'Young people avoid technology'], 1, 'Связей больше, а одиночество растёт.'),
-      Q('Which is an example of "active" use?', ['Scrolling through feeds', 'Arranging to meet a friend', 'Watching videos', 'Looking at holiday photos'], 1, 'Активное использование — переписка, комментарии, договорённости о встрече.'),
-      Q('Passive use is more often linked to envy and low mood.', TFE, 0, 'Так говорится во втором абзаце.'),
-      Q('Why can comparison online be harmful?', ['People share only negative news', 'We compare our reality with others\' best moments', 'Photos are low quality', 'Nobody shares anything'], 1, 'Мы сравниваем обычную жизнь с чужими «лучшими моментами».'),
-      Q('For whom can online communities be "a lifeline"?', ['Celebrities', 'Isolated people', 'Companies', 'Journalists'], 1, 'Для изолированных людей: из-за болезни, застенчивости, расстояния.'),
-      Q('What does the writer suggest in the last paragraph?', ['Deleting all social media', 'Using social media as a bridge to real contact', 'Using social media only at work', 'Posting more photos'], 1, '«treat it as a bridge rather than a destination».'),
-      Q('What is the writer\'s overall attitude?', ['Completely negative', 'Balanced', 'Completely positive', 'Indifferent'], 1, 'Автор показывает и минусы, и плюсы.')
+      Q('What paradox does the first paragraph describe?', ['People have fewer friends online', 'People are more connected but lonelier', 'Social media is getting slower', 'Young people avoid technology'], 1, 'Связей больше, а одиночество растёт.', 'Какой парадокс описан в первом абзаце?', ['У людей меньше друзей в сети', 'Люди больше на связи, но более одиноки', 'Соцсети становятся медленнее', 'Молодёжь избегает технологий']),
+      Q('Which is an example of "active" use?', ['Scrolling through feeds', 'Arranging to meet a friend', 'Watching videos', 'Looking at holiday photos'], 1, 'Активное использование — переписка, комментарии, договорённости о встрече.', 'Что является примером «активного» использования?', ['Листать ленту', 'Договориться о встрече с другом', 'Смотреть видео', 'Разглядывать фото из отпусков']),
+      Q('Passive use is more often linked to envy and low mood.', TFE, 0, 'Так говорится во втором абзаце.', 'Пассивное использование чаще связано с завистью и плохим настроением.'),
+      Q('Why can comparison online be harmful?', ['People share only negative news', 'We compare our reality with others\' best moments', 'Photos are low quality', 'Nobody shares anything'], 1, 'Мы сравниваем обычную жизнь с чужими «лучшими моментами».', 'Чем может вредить сравнение в сети?', ['Люди делятся только плохими новостями', 'Мы сравниваем свою реальность с лучшими моментами других', 'Фото плохого качества', 'Никто ничем не делится']),
+      Q('For whom can online communities be "a lifeline"?', ['Celebrities', 'Isolated people', 'Companies', 'Journalists'], 1, 'Для изолированных людей: из-за болезни, застенчивости, расстояния.', 'Для кого онлайн-сообщества могут быть «спасательным кругом»?', ['Для знаменитостей', 'Для людей в изоляции', 'Для компаний', 'Для журналистов']),
+      Q('What does the writer suggest in the last paragraph?', ['Deleting all social media', 'Using social media as a bridge to real contact', 'Using social media only at work', 'Posting more photos'], 1, '«treat it as a bridge rather than a destination».', 'Что автор предлагает в последнем абзаце?', ['Удалить все соцсети', 'Использовать соцсети как мост к живому общению', 'Пользоваться соцсетями только на работе', 'Публиковать больше фото']),
+      Q('What is the writer\'s overall attitude?', ['Completely negative', 'Balanced', 'Completely positive', 'Indifferent'], 1, 'Автор показывает и минусы, и плюсы.', 'Каково общее отношение автора?', ['Полностью негативное', 'Взвешенное', 'Полностью позитивное', 'Безразличное'])
     ]),
     T('t-b2-gig', 'B2', 'money', 'The Gig Economy', 'Экономика подработок', [
       "Deliver a pizza, drive a stranger across town, design a logo for a company on another continent — all before lunch. This is the reality of the 'gig economy', a labour market in which people work short-term, task-based jobs, usually arranged through apps and websites, rather than holding a permanent position.",
@@ -414,13 +417,13 @@
       ['gig', 'разовая подработка'], ['task-based jobs', 'работа по отдельным заданиям'], ['permanent position', 'постоянная должность'], ['extra income', 'дополнительный доход'],
       ['self-employed', 'самозанятый'], ['sick pay', 'оплата больничного'], ['customer ratings', 'оценки клиентов'], ['unions', 'профсоюзы']
     ], [
-      Q('What is the gig economy based on?', ['Permanent contracts', 'Short-term, task-based jobs', 'Government jobs', 'Family businesses'], 1, 'Краткосрочные разовые работы через приложения.'),
-      Q('Which group is mentioned as benefiting from flexibility?', ['Retired managers', 'Students and parents with young children', 'Bank directors', 'Farmers'], 1, 'Студенты, родители маленьких детей, люди, ищущие подработку.'),
-      Q('Why can companies benefit from gig work?', ['They pay higher wages', 'They can hire quickly and don\'t pay when demand falls', 'They get government money', 'They don\'t need customers'], 1, 'Об этом конец второго абзаца.'),
-      Q('Gig workers are usually entitled to paid holidays.', TFE, 1, 'Чаще всего у них нет права на отпуск и больничный.'),
-      Q('What role do algorithms play, according to the text?', ['They pay taxes', 'They decide who gets the next job', 'They train workers', 'They choose prices for customers'], 1, '«Algorithms decide who gets the next job».'),
-      Q('How have some governments and courts responded?', ['By banning apps', 'By requiring basic protections like a minimum wage', 'By lowering taxes', 'By doing nothing'], 1, 'Некоторых платформы обязали обеспечить минимальную зарплату.'),
-      Q('What is the writer\'s conclusion?', ['The gig economy will disappear soon', 'It should be reformed so flexibility doesn\'t mean insecurity', 'It is perfect as it is', 'Everyone should become a courier'], 1, 'Последний абзац.')
+      Q('What is the gig economy based on?', ['Permanent contracts', 'Short-term, task-based jobs', 'Government jobs', 'Family businesses'], 1, 'Краткосрочные разовые работы через приложения.', 'На чём основана гиг-экономика?', ['На постоянных контрактах', 'На краткосрочной работе под конкретные задачи', 'На госслужбе', 'На семейном бизнесе']),
+      Q('Which group is mentioned as benefiting from flexibility?', ['Retired managers', 'Students and parents with young children', 'Bank directors', 'Farmers'], 1, 'Студенты, родители маленьких детей, люди, ищущие подработку.', 'Какая группа названа выигрывающей от гибкости?', ['Пенсионеры-менеджеры', 'Студенты и родители маленьких детей', 'Директора банков', 'Фермеры']),
+      Q('Why can companies benefit from gig work?', ['They pay higher wages', 'They can hire quickly and don\'t pay when demand falls', 'They get government money', 'They don\'t need customers'], 1, 'Об этом конец второго абзаца.', 'Почему компаниям выгодна гиг-работа?', ['Они платят больше', 'Можно быстро нанять людей и не платить, когда спрос падает', 'Они получают деньги от государства', 'Им не нужны клиенты']),
+      Q('Gig workers are usually entitled to paid holidays.', TFE, 1, 'Чаще всего у них нет права на отпуск и больничный.', 'Гиг-работникам обычно положен оплачиваемый отпуск.'),
+      Q('What role do algorithms play, according to the text?', ['They pay taxes', 'They decide who gets the next job', 'They train workers', 'They choose prices for customers'], 1, '«Algorithms decide who gets the next job».', 'Какую роль, согласно тексту, играют алгоритмы?', ['Платят налоги', 'Решают, кто получит следующий заказ', 'Обучают работников', 'Назначают цены для клиентов']),
+      Q('How have some governments and courts responded?', ['By banning apps', 'By requiring basic protections like a minimum wage', 'By lowering taxes', 'By doing nothing'], 1, 'Некоторых платформы обязали обеспечить минимальную зарплату.', 'Как отреагировали некоторые правительства и суды?', ['Запретили приложения', 'Потребовали базовых гарантий, например минимальной оплаты', 'Снизили налоги', 'Никак']),
+      Q('What is the writer\'s conclusion?', ['The gig economy will disappear soon', 'It should be reformed so flexibility doesn\'t mean insecurity', 'It is perfect as it is', 'Everyone should become a courier'], 1, 'Последний абзац.', 'К какому выводу приходит автор?', ['Гиг-экономика скоро исчезнет', 'Её нужно реформировать, чтобы гибкость не означала незащищённость', 'Она идеальна как есть', 'Всем стоит стать курьерами'])
     ]),
     T('t-b2-tea', 'B2', 'history', 'How Tea Conquered Britain', 'Как чай покорил Британию', [
       "Few things seem more typically British than a cup of tea. The British drink tens of millions of cups every day, and 'Shall I put the kettle on?' is a standard response to almost any situation, from good news to a family crisis. Yet tea is not native to Britain at all. It arrived there only in the seventeenth century, and for a long time it was a luxury.",
@@ -432,13 +435,13 @@
       ['put the kettle on', 'поставить чайник'], ['native to', 'родом из, исконный для'], ['fond of', 'любящий (be fond of — любить)'], ['smuggling', 'контрабанда'],
       ['make it go further', 'чтобы хватило надольше'], ['overnight', 'в одночасье'], ['credited to', 'приписывается (кому-то)'], ['loose leaves', 'листовой (рассыпной) чай']
     ], [
-      Q('When did tea arrive in Britain?', ['In the 12th century', 'In the 17th century', 'In the 19th century', 'In the 20th century'], 1, '«It arrived there only in the seventeenth century».'),
-      Q('Who is linked to tea becoming fashionable in Britain?', ['Queen Victoria', 'Catherine of Braganza', 'Anna, Duchess of Bedford', 'King Henry VIII'], 1, 'Португальская принцесса, жена Карла II.'),
-      Q('Why was smuggling so common in the 18th century?', ['Tea was banned', 'Taxes on tea were very high', 'Ships could not reach Britain', 'People preferred coffee'], 1, 'Из-за очень высоких налогов.'),
-      Q('What happened after the tax was cut in 1784?', ['Smuggling increased', 'Smuggling almost disappeared', 'Tea became illegal', 'Prices went up'], 1, '«smuggling almost disappeared overnight».'),
-      Q('Afternoon tea became fashionable in the 1840s.', TFE, 0, '«In the 1840s the custom of \'afternoon tea\'… became fashionable».'),
-      Q('Why, according to the story, did the Duchess of Bedford start afternoon tea?', ['She disliked coffee', 'She felt hungry between lunch and a late dinner', 'Her doctor recommended it', 'She wanted to sell tea'], 1, 'Она жаловалась на голод между обедом и поздним ужином.'),
-      Q('What does the last paragraph suggest?', ['Tea is no longer drunk in Britain', 'Everyday habits can have complicated histories', 'Coffee is more British than tea', 'Tea bags are illegal'], 1, 'История чая напоминает о торговле и империи.')
+      Q('When did tea arrive in Britain?', ['In the 12th century', 'In the 17th century', 'In the 19th century', 'In the 20th century'], 1, '«It arrived there only in the seventeenth century».', 'Когда чай появился в Британии?', ['В XII веке', 'В XVII веке', 'В XIX веке', 'В XX веке']),
+      Q('Who is linked to tea becoming fashionable in Britain?', ['Queen Victoria', 'Catherine of Braganza', 'Anna, Duchess of Bedford', 'King Henry VIII'], 1, 'Португальская принцесса, жена Карла II.', 'С кем связывают моду на чай в Британии?', ['С королевой Викторией', 'С Екатериной Брагансской', 'С Анной, герцогиней Бедфорд', 'С королём Генрихом VIII']),
+      Q('Why was smuggling so common in the 18th century?', ['Tea was banned', 'Taxes on tea were very high', 'Ships could not reach Britain', 'People preferred coffee'], 1, 'Из-за очень высоких налогов.', 'Почему в XVIII веке была так распространена контрабанда?', ['Чай был запрещён', 'Налоги на чай были очень высокими', 'Корабли не могли доплыть до Британии', 'Люди предпочитали кофе']),
+      Q('What happened after the tax was cut in 1784?', ['Smuggling increased', 'Smuggling almost disappeared', 'Tea became illegal', 'Prices went up'], 1, '«smuggling almost disappeared overnight».', 'Что произошло после снижения налога в 1784 году?', ['Контрабанды стало больше', 'Контрабанда почти исчезла', 'Чай стал незаконным', 'Цены выросли']),
+      Q('Afternoon tea became fashionable in the 1840s.', TFE, 0, '«In the 1840s the custom of \'afternoon tea\'… became fashionable».', 'Послеобеденный чай вошёл в моду в 1840-х.'),
+      Q('Why, according to the story, did the Duchess of Bedford start afternoon tea?', ['She disliked coffee', 'She felt hungry between lunch and a late dinner', 'Her doctor recommended it', 'She wanted to sell tea'], 1, 'Она жаловалась на голод между обедом и поздним ужином.', 'Почему, согласно истории, герцогиня Бедфорд завела послеобеденный чай?', ['Она не любила кофе', 'Она проголодалась между обедом и поздним ужином', 'Так посоветовал врач', 'Она хотела продавать чай']),
+      Q('What does the last paragraph suggest?', ['Tea is no longer drunk in Britain', 'Everyday habits can have complicated histories', 'Coffee is more British than tea', 'Tea bags are illegal'], 1, 'История чая напоминает о торговле и империи.', 'Что предполагает последний абзац?', ['В Британии больше не пьют чай', 'У повседневных привычек бывает сложная история', 'Кофе более британский, чем чай', 'Чайные пакетики запрещены'])
     ]),
     T('t-b2-failure', 'B2', 'psychology', 'The Upside of Failure', 'Польза неудач', [
       "Most of us are taught from an early age that failure is something to avoid. We are praised for good grades, winning games and getting things right the first time. It is hardly surprising, then, that many adults are terrified of making mistakes. Yet a growing body of research suggests that failure, handled in the right way, is one of the most powerful drivers of learning.",
@@ -450,13 +453,13 @@
       ['it is hardly surprising', 'неудивительно'], ['a growing body of research', 'всё больше исследований'], ['drivers of learning', 'движущие силы обучения'], ['by contrast', 'напротив, в отличие от этого'],
       ['fixed mindset', 'установка на данность'], ['growth mindset', 'установка на рост'], ['were preceded by', 'им предшествовали'], ['setback', 'неудача, откат']
     ], [
-      Q('What does the first paragraph say many adults are afraid of?', ['Success', 'Making mistakes', 'Children', 'Research'], 1, '«many adults are terrified of making mistakes».'),
-      Q('Why does the writer mention a child learning to walk?', ['To show that falling is dangerous', 'To show that failures provide useful feedback', 'To show that children are lazy', 'To talk about sport'], 1, 'Каждое падение — обратная связь.'),
-      Q('A person with a "fixed mindset" believes that…', ['abilities can be developed', 'abilities cannot really change', 'effort is everything', 'failure is fun'], 1, 'Способности заданы и не меняются.'),
-      Q('People with a growth mindset tend to give up more quickly.', TFE, 1, 'Наоборот: «they tend to persist longer».'),
-      Q('What are "intelligent failures"?', ['Mistakes made by clever people', 'Small, well-designed experiments that may not work', 'Failures that are hidden', 'Expensive late mistakes'], 1, 'Небольшие продуманные эксперименты, из которых можно быстро учиться.'),
-      Q('Why do medicine and aviation analyse mistakes openly?', ['Because errors there can have serious consequences', 'Because they rarely make mistakes', 'Because it is required by customers', 'Because it saves time'], 0, 'Ошибки там могут иметь серьёзные последствия.'),
-      Q('Which question does the writer recommend asking after a failure?', ['Why am I so bad at this?', 'Who is to blame?', 'What can I learn from this?', 'Should I stop trying?'], 2, 'Последний абзац.')
+      Q('What does the first paragraph say many adults are afraid of?', ['Success', 'Making mistakes', 'Children', 'Research'], 1, '«many adults are terrified of making mistakes».', 'Чего, согласно первому абзацу, боятся многие взрослые?', ['Успеха', 'Ошибок', 'Детей', 'Исследований']),
+      Q('Why does the writer mention a child learning to walk?', ['To show that falling is dangerous', 'To show that failures provide useful feedback', 'To show that children are lazy', 'To talk about sport'], 1, 'Каждое падение — обратная связь.', 'Зачем автор упоминает ребёнка, который учится ходить?', ['Чтобы показать, что падать опасно', 'Чтобы показать, что неудачи дают полезную обратную связь', 'Чтобы показать, что дети ленивы', 'Чтобы поговорить о спорте']),
+      Q('A person with a "fixed mindset" believes that…', ['abilities can be developed', 'abilities cannot really change', 'effort is everything', 'failure is fun'], 1, 'Способности заданы и не меняются.', 'Человек с «фиксированным мышлением» считает, что…', ['способности можно развить', 'способности на самом деле не меняются', 'усилия решают всё', 'неудача — это весело']),
+      Q('People with a growth mindset tend to give up more quickly.', TFE, 1, 'Наоборот: «they tend to persist longer».', 'Люди с мышлением роста обычно сдаются быстрее.'),
+      Q('What are "intelligent failures"?', ['Mistakes made by clever people', 'Small, well-designed experiments that may not work', 'Failures that are hidden', 'Expensive late mistakes'], 1, 'Небольшие продуманные эксперименты, из которых можно быстро учиться.', 'Что такое «разумные неудачи» (intelligent failures)?', ['Ошибки умных людей', 'Небольшие продуманные эксперименты, которые могут не сработать', 'Скрытые неудачи', 'Дорогие поздние ошибки']),
+      Q('Why do medicine and aviation analyse mistakes openly?', ['Because errors there can have serious consequences', 'Because they rarely make mistakes', 'Because it is required by customers', 'Because it saves time'], 0, 'Ошибки там могут иметь серьёзные последствия.', 'Почему в медицине и авиации ошибки разбирают открыто?', ['Потому что ошибки там могут иметь серьёзные последствия', 'Потому что там редко ошибаются', 'Потому что этого требуют клиенты', 'Потому что это экономит время']),
+      Q('Which question does the writer recommend asking after a failure?', ['Why am I so bad at this?', 'Who is to blame?', 'What can I learn from this?', 'Should I stop trying?'], 2, 'Последний абзац.', 'Какой вопрос автор советует задавать себе после неудачи?', ['Почему у меня так плохо получается?', 'Кто виноват?', 'Чему это меня учит?', 'Не бросить ли мне?'])
     ]),
 
     /* ================= C1 ================= */
@@ -471,14 +474,14 @@
       ['stopping points', 'точки остановки'], ['slot machines', 'игровые автоматы'], ['cognitive cost', 'когнитивная цена, нагрузка на мозг'], ['engagement', 'вовлечённость'],
       ['the entire burden', 'всё бремя (ответственности)']
     ], [
-      Q('What did Herbert Simon predict in 1971?', ['That computers would replace workers', 'That abundant information would make attention scarce', 'That advertising would disappear', 'That smartphones would be invented'], 1, '«a wealth of information creates a poverty of attention».'),
-      Q('According to the text, what do many free platforms actually sell?', ['Software licences', 'Access to users\' attention', 'Hardware', 'Subscriptions'], 1, 'Доступ к нашему вниманию для рекламодателей.'),
-      Q('Which design feature is described as removing "natural stopping points"?', ['Autoplay', 'Infinite scrolling', 'Red notifications', 'Dark mode'], 1, '«Infinite scrolling removes natural stopping points».'),
-      Q('Why are slot machines mentioned?', ['Because apps are used for gambling', 'Because unpredictable rewards are especially compelling', 'Because designers dislike them', 'Because they use red colours'], 1, 'Непредсказуемые награды особенно затягивают.'),
-      Q('The writer claims that technology is inherently harmful.', TFE, 1, '«Critics are not arguing that technology is inherently harmful».'),
-      Q('Why might algorithms favour outrage-provoking content?', ['It is cheaper to produce', 'Strong emotions keep people clicking', 'Advertisers demand it', 'It is more accurate'], 1, '«strong emotions keep people clicking».'),
-      Q('What is the writer\'s view on relying only on individual willpower?', ['It is the only solution', 'It is somewhat naive', 'It is unnecessary', 'It is too expensive'], 1, '«placing the entire burden on individual willpower seems somewhat naive».'),
-      Q('The word "prescient" is closest in meaning to…', ['outdated', 'far-sighted', 'careless', 'mistaken'], 1, 'prescient — предвидящий будущее.')
+      Q('What did Herbert Simon predict in 1971?', ['That computers would replace workers', 'That abundant information would make attention scarce', 'That advertising would disappear', 'That smartphones would be invented'], 1, '«a wealth of information creates a poverty of attention».', 'Что предсказал Герберт Саймон в 1971 году?', ['Что компьютеры заменят работников', 'Что изобилие информации сделает внимание дефицитным', 'Что реклама исчезнет', 'Что изобретут смартфоны']),
+      Q('According to the text, what do many free platforms actually sell?', ['Software licences', 'Access to users\' attention', 'Hardware', 'Subscriptions'], 1, 'Доступ к нашему вниманию для рекламодателей.', 'Что, согласно тексту, на самом деле продают многие бесплатные платформы?', ['Лицензии на ПО', 'Доступ к вниманию пользователей', 'Оборудование', 'Подписки']),
+      Q('Which design feature is described as removing "natural stopping points"?', ['Autoplay', 'Infinite scrolling', 'Red notifications', 'Dark mode'], 1, '«Infinite scrolling removes natural stopping points».', 'Какая функция дизайна, по описанию, убирает «естественные точки остановки»?', ['Автовоспроизведение', 'Бесконечная лента', 'Красные уведомления', 'Тёмная тема']),
+      Q('Why are slot machines mentioned?', ['Because apps are used for gambling', 'Because unpredictable rewards are especially compelling', 'Because designers dislike them', 'Because they use red colours'], 1, 'Непредсказуемые награды особенно затягивают.', 'Зачем упоминаются игровые автоматы?', ['Потому что приложения используют для азартных игр', 'Потому что непредсказуемые награды особенно затягивают', 'Потому что дизайнеры их не любят', 'Потому что в них используют красный цвет']),
+      Q('The writer claims that technology is inherently harmful.', TFE, 1, '«Critics are not arguing that technology is inherently harmful».', 'Автор утверждает, что технологии вредны по своей природе.'),
+      Q('Why might algorithms favour outrage-provoking content?', ['It is cheaper to produce', 'Strong emotions keep people clicking', 'Advertisers demand it', 'It is more accurate'], 1, '«strong emotions keep people clicking».', 'Почему алгоритмы могут отдавать предпочтение контенту, вызывающему возмущение?', ['Его дешевле производить', 'Сильные эмоции заставляют людей кликать дальше', 'Этого требуют рекламодатели', 'Он точнее']),
+      Q('What is the writer\'s view on relying only on individual willpower?', ['It is the only solution', 'It is somewhat naive', 'It is unnecessary', 'It is too expensive'], 1, '«placing the entire burden on individual willpower seems somewhat naive».', 'Что автор думает о том, чтобы полагаться только на личную силу воли?', ['Это единственное решение', 'Это несколько наивно', 'Это не нужно', 'Это слишком дорого']),
+      Q('The word "prescient" is closest in meaning to…', ['outdated', 'far-sighted', 'careless', 'mistaken'], 1, 'prescient — предвидящий будущее.', 'Слово «prescient» ближе всего по значению к…', ['устаревший', 'дальновидный', 'небрежный', 'ошибочный'])
     ]),
     T('t-c1-machines', 'C1', 'work', 'Will Machines Take Our Jobs?', 'Отнимут ли машины нашу работу?', [
       "Anxiety about machines replacing human workers is hardly new. In early nineteenth-century England, the Luddites famously smashed textile machinery they blamed for destroying their livelihoods. In the 1960s, commentators warned that automation would soon leave millions permanently unemployed. Each time, the gloomiest predictions failed to materialise: technology eliminated some jobs, but it also created new ones, many of which could scarcely have been imagined beforehand.",
@@ -490,14 +493,14 @@
       ['Luddites', 'луддиты (противники машин в XIX веке)'], ['failed to materialise', 'не сбылись'], ['exclusive domain', 'исключительная сфера'], ['a bundle of different tasks', 'набор разных задач'],
       ['augment', 'дополнять, усиливать'], ['supersede', 'заменять, вытеснять'], ['accruing largely to', 'достающийся в основном (кому-то)'], ['safety nets', 'системы социальной защиты'], ['cushion', 'смягчать']
     ], [
-      Q('Why does the writer mention the Luddites and the 1960s?', ['To show that such fears have a long history', 'To prove that machines are dangerous', 'To praise textile workers', 'To criticise economists'], 0, 'Страх перед автоматизацией — не новость.'),
-      Q('According to economists, how is AI different from earlier automation?', ['It only affects factory work', 'It can perform cognitive tasks done by professionals', 'It is cheaper', 'It creates no new jobs'], 1, 'ИИ выполняет когнитивную работу.'),
-      Q('What point does the radiologist example illustrate?', ['Radiologists will disappear soon', 'Jobs consist of many tasks, only some automatable', 'Doctors dislike technology', 'Images are hard to analyse'], 1, 'Профессия — это набор задач.'),
-      Q('The writer believes entire professions will vanish overnight.', TFE, 1, 'Точнее говорить об автоматизации отдельных задач.'),
-      Q('Why might the transition be painful even if new jobs appear?', ['New jobs pay more', 'New jobs may require different skills and be in different places', 'People don\'t want new jobs', 'Governments forbid retraining'], 1, 'Четвёртый абзац.'),
-      Q('In the text, "augment" is closest in meaning to…', ['replace', 'enhance', 'destroy', 'delay'], 1, 'augment — усиливать, дополнять.'),
-      Q('What, according to the conclusion, will largely determine the outcome?', ['The speed of computers', 'How societies manage the change', 'The number of engineers', 'Consumer preferences'], 1, '«how societies will manage the change».'),
-      Q('What is the overall tone of the article?', ['Alarmist', 'Measured and analytical', 'Humorous', 'Dismissive'], 1, 'Автор взвешенно разбирает аргументы.')
+      Q('Why does the writer mention the Luddites and the 1960s?', ['To show that such fears have a long history', 'To prove that machines are dangerous', 'To praise textile workers', 'To criticise economists'], 0, 'Страх перед автоматизацией — не новость.', 'Зачем автор упоминает луддитов и 1960-е?', ['Чтобы показать, что у таких страхов долгая история', 'Чтобы доказать, что машины опасны', 'Чтобы похвалить ткачей', 'Чтобы покритиковать экономистов']),
+      Q('According to economists, how is AI different from earlier automation?', ['It only affects factory work', 'It can perform cognitive tasks done by professionals', 'It is cheaper', 'It creates no new jobs'], 1, 'ИИ выполняет когнитивную работу.', 'Чем, по мнению экономистов, ИИ отличается от прежней автоматизации?', ['Он затрагивает только работу на заводах', 'Он может выполнять интеллектуальные задачи специалистов', 'Он дешевле', 'Он не создаёт новых рабочих мест']),
+      Q('What point does the radiologist example illustrate?', ['Radiologists will disappear soon', 'Jobs consist of many tasks, only some automatable', 'Doctors dislike technology', 'Images are hard to analyse'], 1, 'Профессия — это набор задач.', 'Что иллюстрирует пример с рентгенологом?', ['Рентгенологи скоро исчезнут', 'Работа состоит из многих задач, и автоматизировать можно лишь часть', 'Врачи не любят технологии', 'Снимки трудно анализировать']),
+      Q('The writer believes entire professions will vanish overnight.', TFE, 1, 'Точнее говорить об автоматизации отдельных задач.', 'Автор считает, что целые профессии исчезнут в одночасье.'),
+      Q('Why might the transition be painful even if new jobs appear?', ['New jobs pay more', 'New jobs may require different skills and be in different places', 'People don\'t want new jobs', 'Governments forbid retraining'], 1, 'Четвёртый абзац.', 'Почему переход может быть болезненным, даже если появятся новые рабочие места?', ['На новых местах платят больше', 'Новые места могут требовать других навыков и находиться в других местах', 'Люди не хотят новой работы', 'Правительства запрещают переобучение']),
+      Q('In the text, "augment" is closest in meaning to…', ['replace', 'enhance', 'destroy', 'delay'], 1, 'augment — усиливать, дополнять.', 'В тексте слово «augment» ближе всего по значению к…', ['заменять', 'усиливать', 'разрушать', 'откладывать']),
+      Q('What, according to the conclusion, will largely determine the outcome?', ['The speed of computers', 'How societies manage the change', 'The number of engineers', 'Consumer preferences'], 1, '«how societies will manage the change».', 'Что, согласно выводу, во многом определит исход?', ['Скорость компьютеров', 'То, как общества будут управлять переменами', 'Количество инженеров', 'Предпочтения потребителей']),
+      Q('What is the overall tone of the article?', ['Alarmist', 'Measured and analytical', 'Humorous', 'Dismissive'], 1, 'Автор взвешенно разбирает аргументы.', 'Каков общий тон статьи?', ['Паникёрский', 'Взвешенный и аналитический', 'Юмористический', 'Пренебрежительный'])
     ]),
     T('t-c1-choice', 'C1', 'psychology', 'The Paradox of Choice', 'Парадокс выбора', [
       "Conventional wisdom holds that more choice is always better. If one type of jam is good, surely twenty-four are better still: whatever your taste, you are bound to find something that suits you. Yet a body of psychological research, popularised by the American psychologist Barry Schwartz, suggests that beyond a certain point an abundance of options can leave us less satisfied rather than more.",
@@ -509,14 +512,14 @@
       ['conventional wisdom', 'общепринятое мнение'], ['you are bound to', 'вы обязательно (непременно)'], ['upmarket', 'дорогой, престижный'], ['tasting stand', 'дегустационный стенд'],
       ['anticipated regret', 'предвосхищаемое сожаление'], ['settle for', 'довольствоваться'], ['replicate', 'воспроизвести (исследование)'], ['curated choices', 'тщательно отобранные варианты']
     ], [
-      Q('What does "conventional wisdom" hold about choice?', ['Less choice is better', 'More choice is always better', 'Choice doesn\'t matter', 'Only experts should choose'], 1, 'Первое предложение текста.'),
-      Q('What was the key finding of the jam study?', ['More people bought jam from the large display', 'The small display led to far more purchases', 'Nobody bought any jam', 'Prices affected sales most'], 1, 'Покупали гораздо чаще при шести вариантах.'),
-      Q('Why might many options reduce satisfaction even after choosing?', ['Products are of lower quality', 'We imagine rejected options would have been better', 'Choosing takes too little time', 'Shops raise prices'], 1, 'Предвосхищаемое сожаление.'),
-      Q('How do "satisficers" behave?', ['They search until they find the best option', 'They accept an option that meets their criteria', 'They never choose', 'They let others decide'], 1, 'Довольствуются тем, что отвечает их критериям.'),
-      Q('Maximisers usually feel happier with their decisions.', TFE, 1, 'Они часто менее довольны результатом.'),
-      Q('What does the writer say about attempts to replicate the jam study?', ['They confirmed it exactly', 'They produced mixed results', 'They were never made', 'They proved it false'], 1, '«produced mixed results».'),
-      Q('Which piece of advice follows from the text?', ['Always consider every option', 'Set "good enough" criteria', 'Avoid all decisions', 'Choose randomly'], 1, 'Последний абзац.'),
-      Q('The word "daunting" is closest in meaning to…', ['intimidating', 'boring', 'cheap', 'pleasant'], 0, 'daunting — пугающий (своей сложностью).')
+      Q('What does "conventional wisdom" hold about choice?', ['Less choice is better', 'More choice is always better', 'Choice doesn\'t matter', 'Only experts should choose'], 1, 'Первое предложение текста.', 'Что гласит общепринятое мнение о выборе?', ['Чем меньше выбора, тем лучше', 'Больше выбора — всегда лучше', 'Выбор не важен', 'Выбирать должны только эксперты']),
+      Q('What was the key finding of the jam study?', ['More people bought jam from the large display', 'The small display led to far more purchases', 'Nobody bought any jam', 'Prices affected sales most'], 1, 'Покупали гораздо чаще при шести вариантах.', 'Каков главный результат исследования с джемом?', ['Больше людей купили джем с большого стенда', 'Маленький стенд привёл к гораздо большему числу покупок', 'Никто не купил джем', 'На продажи больше всего повлияли цены']),
+      Q('Why might many options reduce satisfaction even after choosing?', ['Products are of lower quality', 'We imagine rejected options would have been better', 'Choosing takes too little time', 'Shops raise prices'], 1, 'Предвосхищаемое сожаление.', 'Почему большое количество вариантов может снижать удовлетворённость даже после выбора?', ['Товары хуже по качеству', 'Мы представляем, что отвергнутые варианты были бы лучше', 'Выбор занимает слишком мало времени', 'Магазины поднимают цены']),
+      Q('How do "satisficers" behave?', ['They search until they find the best option', 'They accept an option that meets their criteria', 'They never choose', 'They let others decide'], 1, 'Довольствуются тем, что отвечает их критериям.', 'Как ведут себя «satisficers» (довольствующиеся)?', ['Ищут, пока не найдут лучший вариант', 'Соглашаются на вариант, который отвечает их критериям', 'Никогда не выбирают', 'Позволяют решать другим']),
+      Q('Maximisers usually feel happier with their decisions.', TFE, 1, 'Они часто менее довольны результатом.', 'Максимизаторы обычно довольнее своими решениями.'),
+      Q('What does the writer say about attempts to replicate the jam study?', ['They confirmed it exactly', 'They produced mixed results', 'They were never made', 'They proved it false'], 1, '«produced mixed results».', 'Что автор говорит о попытках повторить исследование с джемом?', ['Они полностью его подтвердили', 'Они дали неоднозначные результаты', 'Их не проводили', 'Они его опровергли']),
+      Q('Which piece of advice follows from the text?', ['Always consider every option', 'Set "good enough" criteria', 'Avoid all decisions', 'Choose randomly'], 1, 'Последний абзац.', 'Какой совет следует из текста?', ['Всегда рассматривать все варианты', 'Задать критерии «достаточно хорошего»', 'Избегать любых решений', 'Выбирать наугад']),
+      Q('The word "daunting" is closest in meaning to…', ['intimidating', 'boring', 'cheap', 'pleasant'], 0, 'daunting — пугающий (своей сложностью).', 'Слово «daunting» ближе всего по значению к…', ['пугающий', 'скучный', 'дешёвый', 'приятный'])
     ]),
     T('t-c1-rewilding', 'C1', 'nature', 'Rewilding the City', 'Возвращение дикой природы в город', [
       "For most of modern history, cities were defined in opposition to nature. Wilderness was something to be tamed, drained or paved over; progress meant straight roads, tidy lawns and rivers confined to concrete channels. In recent decades, however, a quiet reversal has been under way. Urban planners, ecologists and local communities are increasingly asking not how to keep nature out of cities, but how to invite it back in.",
@@ -529,14 +532,14 @@
       ['daylighting', 'вскрытие подземных рек (возвращение их на поверхность)'], ['stepping stones', 'перевалочные пункты, «ступеньки»'], ['impermeable surfaces', 'водонепроницаемые покрытия'],
       ['detractors', 'критики, противники'], ['deeply ingrained', 'глубоко укоренившийся']
     ], [
-      Q('How were cities traditionally related to nature, according to the text?', ['They were built to protect wilderness', 'They were defined in opposition to it', 'They ignored rivers', 'They copied natural forms'], 1, 'Первое предложение.'),
-      Q('Which is an example of a "modest intervention"?', ['Daylighting a buried river', 'Leaving roadside verges unmown', 'Converting a railway line', 'Building a new park district'], 1, 'Скромные меры — некошеные обочины, скворечники, местные растения.'),
-      Q('Why are linked patches of habitat important?', ['They are cheaper to maintain', 'They act as stepping stones for species', 'They attract tourists', 'They stop traffic'], 1, '«can provide vital stepping stones».'),
-      Q('According to the text, vegetation can reduce flooding.', TFE, 0, '«Vegetation absorbs stormwater, mitigating the flooding».'),
-      Q('What objection do some residents raise?', ['Wildflowers are too expensive', 'Overgrown areas look neglected', 'Birds are too noisy', 'Rivers smell bad'], 1, 'Воспринимают как запущенность.'),
-      Q('What does a neatly mown border around a meadow signal?', ['That the council has no money', 'That the wildness is intentional', 'That the meadow will be removed', 'That entry is forbidden'], 1, 'Что «дикость» — намеренная.'),
-      Q('What does the final sentence suggest?', ['Cities should be walled off from nature', 'The boundary between human and wild spaces may become gradual', 'Nature will replace cities', 'Rewilding will fail'], 1, 'Граница — не стена, а плавный переход.'),
-      Q('In the text, "exacerbate" means…', ['make worse', 'prevent', 'measure', 'ignore'], 0, 'exacerbate — усугублять.')
+      Q('How were cities traditionally related to nature, according to the text?', ['They were built to protect wilderness', 'They were defined in opposition to it', 'They ignored rivers', 'They copied natural forms'], 1, 'Первое предложение.', 'Как, согласно тексту, города традиционно соотносились с природой?', ['Их строили, чтобы защищать дикую природу', 'Они определялись через противопоставление ей', 'Они не замечали рек', 'Они копировали природные формы']),
+      Q('Which is an example of a "modest intervention"?', ['Daylighting a buried river', 'Leaving roadside verges unmown', 'Converting a railway line', 'Building a new park district'], 1, 'Скромные меры — некошеные обочины, скворечники, местные растения.', 'Что является примером «скромного вмешательства»?', ['Вернуть на поверхность подземную реку', 'Не косить обочины', 'Переделать железнодорожную ветку', 'Построить новый парковый район']),
+      Q('Why are linked patches of habitat important?', ['They are cheaper to maintain', 'They act as stepping stones for species', 'They attract tourists', 'They stop traffic'], 1, '«can provide vital stepping stones».', 'Почему важны связанные участки природной среды?', ['Их дешевле содержать', 'Они служат «ступеньками» для видов', 'Они привлекают туристов', 'Они останавливают транспорт']),
+      Q('According to the text, vegetation can reduce flooding.', TFE, 0, '«Vegetation absorbs stormwater, mitigating the flooding».', 'Согласно тексту, растительность может уменьшать наводнения.'),
+      Q('What objection do some residents raise?', ['Wildflowers are too expensive', 'Overgrown areas look neglected', 'Birds are too noisy', 'Rivers smell bad'], 1, 'Воспринимают как запущенность.', 'Какое возражение высказывают некоторые жители?', ['Полевые цветы слишком дорогие', 'Заросшие участки выглядят заброшенными', 'Птицы слишком шумят', 'Реки плохо пахнут']),
+      Q('What does a neatly mown border around a meadow signal?', ['That the council has no money', 'That the wildness is intentional', 'That the meadow will be removed', 'That entry is forbidden'], 1, 'Что «дикость» — намеренная.', 'Что показывает аккуратно скошенная кайма вокруг луга?', ['Что у муниципалитета нет денег', 'Что дикость здесь намеренная', 'Что луг уберут', 'Что вход запрещён']),
+      Q('What does the final sentence suggest?', ['Cities should be walled off from nature', 'The boundary between human and wild spaces may become gradual', 'Nature will replace cities', 'Rewilding will fail'], 1, 'Граница — не стена, а плавный переход.', 'Что предполагает последнее предложение?', ['Города нужно отгородить от природы', 'Граница между человеческим и диким пространством может стать плавной', 'Природа заменит города', 'Ревайлдинг провалится']),
+      Q('In the text, "exacerbate" means…', ['make worse', 'prevent', 'measure', 'ignore'], 0, 'exacerbate — усугублять.', 'В тексте слово «exacerbate» означает…', ['ухудшать', 'предотвращать', 'измерять', 'игнорировать'])
     ]),
     T('t-c1-memory', 'C1', 'science', 'The Unreliable Witness', 'Ненадёжный свидетель', [
       "We tend to think of memory as a kind of video recording: an event happens, the brain stores it, and when we remember, we simply press 'play'. Decades of research have shown this intuitive model to be profoundly misleading. Memory is not a recording but a reconstruction, assembled anew each time we recall an event — and, crucially, it is susceptible to distortion along the way.",
@@ -549,14 +552,14 @@
       ['eyewitness testimony', 'показания очевидцев'], ['wrongful convictions', 'ошибочные приговоры'], ['leading questions', 'наводящие вопросы'], ['line-up', 'опознание (подозреваемых)'],
       ['a measure of humility', 'некоторая доля скромности']
     ], [
-      Q('What model of memory does the writer reject?', ['Memory as reconstruction', 'Memory as a video recording', 'Memory as emotion', 'Memory as a muscle'], 1, 'Память — не видеозапись, а реконструкция.'),
-      Q('In Loftus\'s experiment, what effect did the word "smashed" have?', ['Lower speed estimates', 'Higher speed estimates and false memories of glass', 'No effect', 'Participants refused to answer'], 1, 'Оценки скорости выше, а через неделю — «вспоминали» битое стекло.'),
-      Q('There was broken glass in the film.', TFE, 1, '«even though there had been none in the film».'),
-      Q('What did later studies demonstrate?', ['Memories cannot be changed', 'Memories of entire false events can be implanted', 'Children remember better than adults', 'Shopping centres cause stress'], 1, 'Можно внедрить воспоминание о целом событии.'),
-      Q('Why is this research important for courts?', ['Judges have poor memories', 'Mistaken identification contributes to wrongful convictions', 'DNA evidence is unreliable', 'Witnesses always lie'], 1, 'Ошибочное опознание — фактор ошибочных приговоров.'),
-      Q('According to the writer, confidence is…', ['a reliable sign of accuracy', 'a poor guide to accuracy', 'unrelated to memory', 'a result of training'], 1, '«confidence… is a poor guide to accuracy».'),
-      Q('What practical change has the research prompted?', ['Banning witnesses', 'Reforms in police interviewing and identification', 'More video cameras in homes', 'Shorter trials'], 1, 'Последний абзац.'),
-      Q('"Susceptible to distortion" means…', ['immune to change', 'easily affected by distortion', 'impossible to recall', 'recorded accurately'], 1, 'Подверженный искажениям.')
+      Q('What model of memory does the writer reject?', ['Memory as reconstruction', 'Memory as a video recording', 'Memory as emotion', 'Memory as a muscle'], 1, 'Память — не видеозапись, а реконструкция.', 'Какую модель памяти автор отвергает?', ['Память как реконструкция', 'Память как видеозапись', 'Память как эмоция', 'Память как мышца']),
+      Q('In Loftus\'s experiment, what effect did the word "smashed" have?', ['Lower speed estimates', 'Higher speed estimates and false memories of glass', 'No effect', 'Participants refused to answer'], 1, 'Оценки скорости выше, а через неделю — «вспоминали» битое стекло.', 'Как в эксперименте Лофтус подействовало слово «smashed»?', ['Оценки скорости стали ниже', 'Оценки скорости стали выше, появились ложные воспоминания о стекле', 'Никак', 'Участники отказались отвечать']),
+      Q('There was broken glass in the film.', TFE, 1, '«even though there had been none in the film».', 'В фильме было разбитое стекло.'),
+      Q('What did later studies demonstrate?', ['Memories cannot be changed', 'Memories of entire false events can be implanted', 'Children remember better than adults', 'Shopping centres cause stress'], 1, 'Можно внедрить воспоминание о целом событии.', 'Что показали более поздние исследования?', ['Воспоминания нельзя изменить', 'Можно внушить воспоминания о целых событиях, которых не было', 'Дети помнят лучше взрослых', 'Торговые центры вызывают стресс']),
+      Q('Why is this research important for courts?', ['Judges have poor memories', 'Mistaken identification contributes to wrongful convictions', 'DNA evidence is unreliable', 'Witnesses always lie'], 1, 'Ошибочное опознание — фактор ошибочных приговоров.', 'Почему эти исследования важны для судов?', ['У судей плохая память', 'Ошибочное опознание приводит к несправедливым приговорам', 'Анализ ДНК ненадёжен', 'Свидетели всегда лгут']),
+      Q('According to the writer, confidence is…', ['a reliable sign of accuracy', 'a poor guide to accuracy', 'unrelated to memory', 'a result of training'], 1, '«confidence… is a poor guide to accuracy».', 'По словам автора, уверенность —', ['надёжный признак точности', 'плохой ориентир точности', 'не связана с памятью', 'результат тренировки']),
+      Q('What practical change has the research prompted?', ['Banning witnesses', 'Reforms in police interviewing and identification', 'More video cameras in homes', 'Shorter trials'], 1, 'Последний абзац.', 'Какие практические изменения повлекли исследования?', ['Запрет свидетелей', 'Реформы допросов и опознания в полиции', 'Больше видеокамер в домах', 'Более короткие процессы']),
+      Q('"Susceptible to distortion" means…', ['immune to change', 'easily affected by distortion', 'impossible to recall', 'recorded accurately'], 1, 'Подверженный искажениям.', '«Susceptible to distortion» означает…', ['не поддаётся изменениям', 'легко искажается', 'невозможно вспомнить', 'записано точно'])
     ]),
     T('t-c1-overwork', 'C1', 'society', 'The Cult of Busyness', 'Культ занятости', [
       "Ask someone how they are these days and there is a good chance they will reply, with a mixture of complaint and pride, that they are 'crazy busy'. Busyness has quietly become a status symbol. Whereas leisure once signalled wealth and privilege, today being overscheduled suggests that one is in demand, important, indispensable.",
@@ -568,14 +571,14 @@
       ['crazy busy', 'безумно занят'], ['overscheduled', 'с перегруженным графиком'], ['in demand', 'востребованный'], ['out of reach', 'вне досягаемости'],
       ['punctuated by', 'прерываемый'], ['diminishing returns', 'убывающая отдача'], ['four-day working week', 'четырёхдневная рабочая неделя'], ['in the first place', 'изначально, вообще']
     ], [
-      Q('What does being busy signal today, according to the writer?', ['Poverty', 'Status and importance', 'Laziness', 'Illness'], 1, 'Занятость стала символом статуса.'),
-      Q('What contrast does the writer draw with the past?', ['People worked less then', 'Leisure once signalled wealth', 'Nobody had jobs', 'Offices were bigger'], 1, '«leisure once signalled wealth and privilege».'),
-      Q('Why do people feel short of time even though working hours have fallen?', ['They sleep more', 'Time is more fragmented and boundaries are blurred', 'Commutes are longer', 'Holidays are shorter'], 1, 'Время раздроблено, границы размыты.'),
-      Q('Research suggests that extra hours always increase productivity.', TFE, 1, 'После определённого порога отдача резко падает.'),
-      Q('What have trials of a four-day week often reported?', ['Productivity collapsed', 'Productivity was maintained and well-being improved', 'Employees disliked it', 'Costs doubled'], 1, 'Четвёртый абзац.'),
-      Q('"Diminishing returns" means…', ['growing profits', 'less benefit from each additional effort', 'free time', 'higher salaries'], 1, 'Убывающая отдача.'),
-      Q('What is the writer\'s main argument in the last paragraph?', ['Rest is a sign of failure', 'Reclaiming time for rest may help us do our best work', 'Everyone should work more', 'Idleness is dangerous'], 1, 'Отдых — не лень, а условие хорошей работы.'),
-      Q('Which word best describes the writer\'s attitude to the "cult of busyness"?', ['Admiring', 'Critical', 'Neutral', 'Enthusiastic'], 1, 'Автор критически относится к культу занятости.')
+      Q('What does being busy signal today, according to the writer?', ['Poverty', 'Status and importance', 'Laziness', 'Illness'], 1, 'Занятость стала символом статуса.', 'Что, по мнению автора, сегодня сигнализирует занятость?', ['Бедность', 'Статус и важность', 'Лень', 'Болезнь']),
+      Q('What contrast does the writer draw with the past?', ['People worked less then', 'Leisure once signalled wealth', 'Nobody had jobs', 'Offices were bigger'], 1, '«leisure once signalled wealth and privilege».', 'Какое противопоставление с прошлым проводит автор?', ['Раньше люди работали меньше', 'Когда-то признаком богатства был досуг', 'Ни у кого не было работы', 'Офисы были больше']),
+      Q('Why do people feel short of time even though working hours have fallen?', ['They sleep more', 'Time is more fragmented and boundaries are blurred', 'Commutes are longer', 'Holidays are shorter'], 1, 'Время раздроблено, границы размыты.', 'Почему людям не хватает времени, хотя рабочих часов стало меньше?', ['Они больше спят', 'Время раздроблено, а границы размыты', 'Дорога на работу стала дольше', 'Отпуска стали короче']),
+      Q('Research suggests that extra hours always increase productivity.', TFE, 1, 'После определённого порога отдача резко падает.', 'Исследования говорят, что дополнительные часы всегда повышают продуктивность.'),
+      Q('What have trials of a four-day week often reported?', ['Productivity collapsed', 'Productivity was maintained and well-being improved', 'Employees disliked it', 'Costs doubled'], 1, 'Четвёртый абзац.', 'О чём часто сообщали эксперименты с четырёхдневной неделей?', ['Продуктивность рухнула', 'Продуктивность сохранилась, а самочувствие улучшилось', 'Сотрудникам не понравилось', 'Расходы удвоились']),
+      Q('"Diminishing returns" means…', ['growing profits', 'less benefit from each additional effort', 'free time', 'higher salaries'], 1, 'Убывающая отдача.', '«Diminishing returns» означает…', ['растущую прибыль', 'всё меньшую отдачу от каждого дополнительного усилия', 'свободное время', 'более высокие зарплаты']),
+      Q('What is the writer\'s main argument in the last paragraph?', ['Rest is a sign of failure', 'Reclaiming time for rest may help us do our best work', 'Everyone should work more', 'Idleness is dangerous'], 1, 'Отдых — не лень, а условие хорошей работы.', 'В чём главный аргумент автора в последнем абзаце?', ['Отдых — признак неудачи', 'Если вернуть время для отдыха, это поможет работать лучше всего', 'Всем нужно работать больше', 'Безделье опасно']),
+      Q('Which word best describes the writer\'s attitude to the "cult of busyness"?', ['Admiring', 'Critical', 'Neutral', 'Enthusiastic'], 1, 'Автор критически относится к культу занятости.', 'Какое слово лучше всего описывает отношение автора к «культу занятости»?', ['Восхищённое', 'Критическое', 'Нейтральное', 'Восторженное'])
     ])
   ];
 
