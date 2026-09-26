@@ -450,19 +450,12 @@ button.chip:hover:not(:disabled) { border-color: var(--accent); }
 .reading-bar { margin-bottom: 12px; gap: 10px; }
 .text-card.done { border-color: color-mix(in srgb, var(--good) 45%, var(--border)); }
 .reading-text { padding: 22px 24px; max-width: 760px; }
-.reading-para + .reading-para { margin-top: 14px; }
+.reading-para + .reading-para { margin-top: 1em; }
 .reading-p { font-size: 1.12rem; line-height: 1.75; margin: 0; }
-.reading-tools { margin-top: 2px; }
-.reading-tools .link-btn .ic { width: 14px; height: 14px; vertical-align: -2px; }
 .w { cursor: pointer; border-radius: 4px; transition: background .12s; }
 .w:hover, .w:focus-visible { background: var(--accent-soft); outline: none; }
 .w.active { background: var(--accent); color: #fff; }
 :root[data-theme="dark"] .w.active { color: #0f1117; }
-.w-new { text-decoration: underline dotted var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
-.w-learn { text-decoration: underline solid var(--warn); text-decoration-thickness: 2px; text-underline-offset: 4px; }
-.w-gl { background: color-mix(in srgb, var(--warn) 10%, transparent); }
-.w-new.demo { cursor: default; }
-.switch-row { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); cursor: pointer; }
 .gloss-list { display: flex; flex-direction: column; gap: 6px; }
 .gloss-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 6px 0; border-bottom: 1px solid var(--border); }
 .gloss-row:last-child { border-bottom: 0; }
@@ -754,7 +747,6 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   .danger-zone { border-color: var(--bad); }
   .item-info { border-top-color: var(--border); }
   .unit-tile.done, .text-card.done { border-color: var(--good); }
-  .w-gl { background: var(--warn-soft); }
 }
 
 /* ---------- баннер о проблемах с сохранением ---------- */

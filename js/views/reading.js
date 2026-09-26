@@ -76,7 +76,6 @@
     var keyHandler = null;
     var added = {};
     var tokenSpans = [];
-    var highlight = EG.storage.get('readHighlight');
 
     function onKey(e) {
       if (e.key === 'Escape' && !pop.hidden) { closePop(); return; }
@@ -107,7 +106,6 @@
           EG.wordTrainer.addToLearning(w.id).then(function () {
             added[w.id] = true;
             EG.ui.toast('«' + w.en + '» — в тренажёре слов', 'good');
-            refreshHighlight();
             if (activeSpan) showPop(activeSpan);
           }).catch(function () { EG.ui.toast('Не удалось сохранить', 'bad'); });
         } }, icon('plus'), 'Учить');
@@ -145,17 +143,6 @@
     }
 
     /* ---------- текст с кликабельными словами ---------- */
-    function classFor(span) {
-      var w = span._word;
-      if (!w) return '';
-      var st = EG.wordTrainer.status(w.id);
-      if (st === 'learning') return ' w-learn';
-      if (highlight && st === 'new' && EG.util.levelIndex(w.level) >= lvl) return ' w-new';
-      return '';
-    }
-    function refreshHighlight() {
-      tokenSpans.forEach(function (s) { s.className = 'w' + (s._info.gloss ? ' w-gl' : '') + classFor(s) + (s === activeSpan ? ' active' : ''); });
-    }
 
     function renderParagraph(text) {
       var p = h('p', { class: 'reading-p', lang: 'en' });
@@ -210,16 +197,12 @@
       var article = h('article', { class: 'card reading-text' },
         t.paragraphs.map(function (para) {
           var p = renderParagraph(para);
-          return h('div', { class: 'reading-para' }, p, EG.ui.canSpeak() ? h('div', { class: 'reading-tools' },
-            h('button', { class: 'link-btn small', type: 'button', onclick: function () { EG.ui.speak(para); } }, icon('speaker'), ' прослушать абзац')) : null);
+          return h('div', { class: 'reading-para' }, p);
         }));
-      refreshHighlight();
-      var hl = h('label', { class: 'switch-row small' },
-        h('input', { type: 'checkbox', checked: highlight || null, onchange: function (e) {
-          highlight = e.target.checked;
-          EG.storage.set('readHighlight', highlight);
-          refreshHighlight();
-        } }), ' Подсвечивать новые слова уровня ' + t.level + ' и выше');
+      // озвучка — одной кнопкой над текстом, чтобы в самом тексте не было ничего лишнего
+      var listen = EG.ui.canSpeak() ? h('button', { class: 'btn ghost sm', type: 'button', onclick: function () {
+        EG.ui.speak(t.paragraphs.join(' '));
+      } }, icon('speaker'), 'Прослушать текст') : null;
       var glossary = t.glossary.length ? h('section', { class: 'card' },
         h('h3', { class: 'card-title' }, 'Полезные выражения из текста'),
         h('div', { class: 'gloss-list' }, t.glossary.map(function (g) {
@@ -227,8 +210,8 @@
         }))) : null;
       body.replaceChildren(
         h('div', { class: 'row between wrap reading-bar' },
-          h('span', { class: 'muted small' }, 'Нажмите на слово — появится перевод. ', h('span', { class: 'w-new demo' }, 'Подчёркнутые'), ' — новые для вас слова этого уровня.'),
-          hl),
+          h('span', { class: 'muted small' }, 'Нажмите на любое слово — появится перевод.'),
+          listen),
         article,
         glossary,
         h('div', { class: 'row gap wrap story-actions' },

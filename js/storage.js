@@ -22,7 +22,6 @@
     chatFeedback: false,  // в мессенджере показывать разбор сразу после ответа
     chatHintShown: false, // подсказка про значок разбора уже показана
     wordLevel: '',        // уровень в тренажёре слов ('' — по уровню пользователя)
-    readHighlight: true,  // «Чтение»: подсвечивать новые слова уровня текста
     wordMode: 'mix',      // режим свободной тренировки: mix | ru-en | en-ru | type | listen
     onboarded: false
   };
