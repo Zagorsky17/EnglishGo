@@ -16,7 +16,7 @@ const ctx = {
 };
 ctx.window = ctx;
 vm.createContext(ctx);
-const files = ['data/vocabulary.js', 'data/registers.js', 'data/dialogues.js', 'data/stories.js', 'data/chats.js', 'data/lessons.js', 'js/storage.js', 'js/database.js', 'js/state.js', 'js/srs.js', 'js/progress.js', 'js/exercises.js', 'js/dialogues.js', 'js/chat.js', 'js/games.js'];
+const files = ['data/vocabulary.js', 'data/registers.js', 'data/dialogues.js', 'data/stories.js', 'data/chats.js', 'data/lessons.js', 'data/wordbank.js', 'js/storage.js', 'js/database.js', 'js/state.js', 'js/srs.js', 'js/progress.js', 'js/exercises.js', 'js/dialogues.js', 'js/chat.js', 'js/games.js', 'js/wordtrainer.js'];
 const warns=[]; const ow=console.warn; console.warn=(...a)=>{warns.push(a.join(' '));};
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx, { filename: f });
 const EG = ctx.EG;
@@ -121,5 +121,29 @@ const pr=EG.games.pairsRound(6); console.log('  pairs round:', pr.map(p=>p.left+
 // упражнения
 let cnt={}; for(const v of EG.data.vocab){ for(const t of ['slangify','formalize','decode','texting']){ const ex=EG.exercises.make(t,v); if(ex){cnt[t]=(cnt[t]||0)+1; if(ex.options && new Set(ex.options).size!==ex.options.length) err('dup options',t,v.en); if(ex.answers){ const m=EG.text.matchAny(ex.answer, ex.answers, .8); if(!m.ok) err('texting self fail', v.en, ex.answer);} } } }
 console.log('  exercise availability:', JSON.stringify(cnt));
+// тренажёр слов: уникальность, варианты ответа, интервалы
+{
+  const W = EG.data.words, seenEn = new Set(), pos = {};
+  for (const w of W) {
+    const k = w.en.toLowerCase();
+    if (seenEn.has(k)) err('word dup', w.en); seenEn.add(k);
+    if (!w.ru || !w.en || !w.senses.length) err('word empty', w.en);
+    if (!EG.data.wordPos[w.pos]) err('word pos', w.en, w.pos);
+    if (!EG.LEVELS.includes(w.level)) err('word level', w.en);
+    pos[w.pos] = (pos[w.pos] || 0) + 1;
+  }
+  ctx.EG.state.words = new Map();
+  for (const w of W) for (const dir of ['ru-en', 'en-ru']) {
+    const q = EG.wordTrainer.question(w, dir);
+    if (q.options.length !== 4) err('word options < 4', w.en, dir);
+    if (new Set(q.options).size !== q.options.length) err('word dup options', w.en, dir, q.options.join('|'));
+    if (q.options.filter(o => o === q.answer).length !== 1) err('word answer missing', w.en, dir);
+  }
+  let r = null, t = 0; const boxes = [];
+  for (const ok of [true, true, true, true, false, true]) { r = EG.wordTrainer.schedule(r, ok, 6000, t); boxes.push(r.box); t = r.due; }
+  if (boxes.join() !== '1,2,3,4,1,2') err('word boxes', boxes.join());
+  if (EG.wordTrainer.schedule(null, true, 2000, 0).box !== 3) err('known word should jump');
+  console.log('words', W.length, JSON.stringify(pos), '| boxes', boxes.join(','));
+}
 console.log(errors ? `\n${errors} ERRORS` : '\nOK');
 process.exitCode = errors ? 1 : 0;

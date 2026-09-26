@@ -65,6 +65,7 @@
     });
     // карточки без контента не показываем (в базе оставляем — контент может вернуться)
     S.cards.forEach(function (c, id) { if (!EG.data.byId[id]) S.cards.delete(id); });
+    if (EG.data.wordsById) S.words.forEach(function (w, id) { if (!EG.data.wordsById[id]) S.words.delete(id); });
     // переписки: несуществующий эпизод или узел — начинаем эпизод заново, а не «зависаем»
     S.chats.forEach(function (rec, id) {
       var ep = EG.data.episodesById[id];
@@ -91,11 +92,12 @@
     stats: new Map(),
     games: new Map(),
     chats: new Map(),
+    words: new Map(), // прогресс тренажёра «Словарный запас»
     meta: Object.assign({}, META_DEFAULTS),
     recent: [], // последние ответы {correct, ts}
 
     load: function () {
-      var names = ['cards', 'mistakes', 'lessons', 'dialogues', 'stats', 'meta', 'games', 'chats'];
+      var names = ['cards', 'mistakes', 'lessons', 'dialogues', 'stats', 'meta', 'games', 'chats', 'words'];
       return Promise.all(names.map(EG.db.getAll).concat([EG.db.lastAnswers(60)])).then(function (r) {
         S.cards = new Map(r[0].map(function (c) { return [c.id, c]; }));
         S.mistakes = new Map(r[1].map(function (m) { return [m.itemId, m]; }));
@@ -104,6 +106,7 @@
         S.stats = new Map(r[4].map(function (s) { return [s.date, s]; }));
         S.games = new Map(r[6].map(function (g) { return [g.id, g]; }));
         S.chats = new Map(r[7].map(function (c) { return [c.id, c]; }));
+        S.words = new Map(r[8].map(function (w) { return [w.id, w]; }));
         S.meta = Object.assign({}, META_DEFAULTS);
         S.hasUndoImport = false;
         r[5].forEach(function (m) {
@@ -112,7 +115,7 @@
           if (v !== undefined) S.meta[m.key] = v;
         });
         if (!S.meta.createdAt) { S.meta.createdAt = Date.now(); EG.db.put('meta', { key: 'createdAt', value: S.meta.createdAt }).catch(noop); }
-        S.recent = r[8].map(function (a) { return { correct: !!a.correct, ts: a.ts }; });
+        S.recent = r[9].map(function (a) { return { correct: !!a.correct, ts: a.ts }; });
         heal();
         // история ответов не растёт бесконечно
         EG.db.pruneAnswers(5000).catch(noop);
@@ -136,6 +139,7 @@
     saveDialogue: function (d) { S.dialogues.set(d.id, d); return EG.db.put('dialogues', d); },
     saveGame: function (g) { S.games.set(g.id, g); return EG.db.put('games', g); },
     saveChat: function (c) { S.chats.set(c.id, c); return EG.db.put('chats', c); },
+    saveWord: function (w) { S.words.set(w.id, w); return EG.db.put('words', w); },
 
     today: function () {
       var key = EG.util.dateKey();

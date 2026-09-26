@@ -21,6 +21,8 @@
     compact: false,       // компактный интерфейс
     chatFeedback: false,  // в мессенджере показывать разбор сразу после ответа
     chatHintShown: false, // подсказка про значок разбора уже показана
+    wordLevel: '',        // уровень в тренажёре слов ('' — по уровню пользователя)
+    wordMode: 'mix',      // направление: ru-en | en-ru | mix
     onboarded: false
   };
 
@@ -33,6 +35,8 @@
       if (k in obj && typeof obj[k] === typeof DEFAULTS[k]) out[k] = obj[k];
     });
     if (out.level && EG.LEVELS.indexOf(out.level) === -1) delete out.level;
+    if (out.wordLevel && EG.LEVELS.indexOf(out.wordLevel) === -1) delete out.wordLevel;
+    if (out.wordMode && ['ru-en', 'en-ru', 'mix'].indexOf(out.wordMode) === -1) delete out.wordMode;
     if (out.theme && ['auto', 'light', 'dark'].indexOf(out.theme) === -1) delete out.theme;
     if ('dailyGoal' in out) out.dailyGoal = Math.min(500, Math.max(10, Math.round(out.dailyGoal) || DEFAULTS.dailyGoal));
     if ('newPerDay' in out) out.newPerDay = Math.min(40, Math.max(0, Math.round(out.newPerDay) || 0));
