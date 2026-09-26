@@ -272,7 +272,7 @@
         var b = hintsBox.querySelectorAll('.option')[n - 1];
         if (b) { e.preventDefault(); b.click(); }
       };
-      controls.replaceChildren(
+      EG.ui.fill(controls,
         isRetry ? h('p', { class: 'muted small' }, 'Попробуйте ещё раз — используйте более естественный вариант.') : null,
         EG.storage.get('talkHints') && turn.intent ? h('p', { class: 'intent' }, h('span', { class: 'muted' }, 'Задача: '), turn.intent) : null,
         input,

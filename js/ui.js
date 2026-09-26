@@ -27,6 +27,13 @@
     el.appendChild(c instanceof Node ? c : document.createTextNode(String(c)));
   }
 
+  // замена детей с пропуском null/false (нативный replaceChildren превращает null в текст «null»)
+  function fill(el) {
+    el.replaceChildren();
+    for (var i = 1; i < arguments.length; i++) append(el, arguments[i]);
+    return el;
+  }
+
   /* ---------- иконки (inline SVG) ---------- */
   var ICONS = {
     home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
@@ -298,7 +305,7 @@
   }
 
   EG.ui = {
-    h: h, icon: icon, toast: toast, modal: modal, confirm: confirmDialog,
+    h: h, fill: fill, icon: icon, toast: toast, modal: modal, confirm: confirmDialog,
     speak: speak, autoSpeak: autoSpeak, stopSpeech: stopSpeech, canSpeak: canSpeak, speakBtn: speakBtn,
     voices: function () { return allVoices; },
     usableVoices: usableVoices,
