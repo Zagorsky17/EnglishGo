@@ -700,6 +700,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .pair-btn.sel { border-color: var(--accent); background: var(--accent-soft); }
 .pair-btn.matched { border-color: var(--good); background: var(--good-soft); opacity: .45; }
 .pair-btn.mismatch { border-color: var(--bad); background: var(--bad-soft); animation: shake .35s; }
+.pairs-review { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 16px; text-align: left; }
+.pairs-review-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 4px 10px; align-items: baseline; padding: 8px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); }
+.pairs-review-ru { grid-column: 1 / -1; }
 .finish { position: relative; overflow: hidden; }
 .confetti { position: absolute; inset: 0; pointer-events: none; }
 .confetti i { position: absolute; top: -10px; width: 8px; height: 14px; border-radius: 2px; animation: fall 1.6s ease-in forwards; }

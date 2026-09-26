@@ -35,6 +35,8 @@
     var st = { score: 0, lives: g.lives, combo: 0, best: 0, right: 0, wrong: 0, xp: 0, over: false, graded: {} };
     var started = Date.now();
     var deadline = g.time ? Date.now() + g.time * 1000 : 0;
+    var pausedAt = 0; // пауза общего таймера (разбор раунда «Сленг-пар»)
+    var seenPairs = []; // пары, собранные за игру, — для списка с переводами в конце
 
     var heartsEl = h('span', { class: 'hearts' });
     var scoreEl = h('strong', { class: 'game-score' }, '0');
@@ -68,6 +70,7 @@
     var ticker = null;
     function tick() {
       if (!alive || st.over) { clearInterval(ticker); return; }
+      if (pausedAt) return;
       var now = Date.now();
       if (deadline) {
         var left = Math.max(0, deadline - now);
@@ -233,9 +236,10 @@
           if (ok) {
             [a.btn, b.btn].forEach(function (x) { x.classList.remove('sel'); x.classList.add('matched'); x.disabled = true; });
             left++;
+            seenPairs.push(a.p);
             score(true, a.p.id, { ms: Date.now() - shownAt, points: 10 });
             shownAt = Date.now();
-            if (left === round.length) later(pairsGame, 600);
+            if (left === round.length) later(function () { pairsReview(round); }, 600);
           } else {
             [a.btn, b.btn].forEach(function (x) { x.classList.remove('sel'); x.classList.add('mismatch'); setTimeout(function () { x.classList.remove('mismatch'); }, 500); });
             score(false, a.p.id, { user: a.p.left + ' ↔ ' + b.p.right, expected: a.p.left + ' ↔ ' + a.p.right });
@@ -245,6 +249,33 @@
       stage.replaceChildren(h('div', { class: 'card enter' },
         h('p', { class: 'prompt' }, 'Соедините обычную фразу (слева) с разговорной / сленговой (справа)'),
         h('div', { class: 'pairs' }, colL, colR)));
+    }
+
+    /** Список пар с переводами. */
+    function pairsList(list) {
+      return h('div', { class: 'pairs-review' }, list.map(function (p) {
+        return h('div', { class: 'pairs-review-row' },
+          h('span', null, p.left), h('span', { class: 'muted' }, '↔'), h('strong', null, p.right),
+          h('span', { class: 'muted small pairs-review-ru' }, p.ru));
+      }));
+    }
+
+    /** Разбор собранного раунда: переводы пар, общий таймер на паузе. */
+    function pairsReview(round) {
+      pausedAt = Date.now();
+      timeText.textContent = 'Пауза';
+      function next() {
+        if (st.over || !pausedAt) return;
+        if (deadline) deadline += Date.now() - pausedAt;
+        pausedAt = 0; keyHandler = null;
+        pairsGame();
+      }
+      keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); next(); } };
+      stage.replaceChildren(h('div', { class: 'card enter' },
+        h('p', { class: 'prompt' }, 'Раунд собран! Переводы пар:'),
+        pairsList(round),
+        h('div', { class: 'row gap wrap center' },
+          h('button', { class: 'btn primary', type: 'button', onclick: next }, 'Следующий раунд'))));
     }
 
     /* ---------- конец игры ---------- */
@@ -266,6 +297,7 @@
               h('div', null, h('strong', null, st.right + '/' + total), h('span', null, 'верно')),
               h('div', null, h('strong', null, st.best), h('span', null, 'лучшая серия')),
               h('div', null, h('strong', null, '+' + st.xp), h('span', null, 'XP')))),
+          seenPairs.length ? h('div', { class: 'learn-list' }, h('span', { class: 'metric-label' }, 'Собранные пары'), pairsList(seenPairs)) : null,
           h('div', { class: 'row gap wrap center' },
             h('button', { class: 'btn primary', onclick: function () { EG.router.refresh(); } }, 'Ещё раз'),
             h('a', { class: 'btn ghost', href: '#/games' }, 'Другие игры'))));
