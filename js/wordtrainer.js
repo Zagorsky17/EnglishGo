@@ -11,6 +11,8 @@
   var KNOWN_BOX = 3;     // слово угадано с первого раза и быстро — уже знакомо, сразу в коробку 3
   var FAST_MS = 4000;
   var SESSION_SIZE = 20;
+  var UNIT_SIZE = 20;    // слов в блоке «класса»
+  var REVIEW_SIZE = 25;  // слов в общем повторении
   var NEW_MIN = 6, NEW_MAX = 10; // новых слов за сессию: интенсивное пополнение, но без перегруза
 
   function S() { return EG.state; }
@@ -107,8 +109,10 @@
 
   /* ---------- вопросы ---------- */
 
+  /** Общий перевод или однокоренные переводы — такие слова не годятся в неверные варианты друг для друга. */
   function overlaps(a, b) {
-    return a.senses.some(function (s) { return b.senses.indexOf(s) >= 0; });
+    return a.senses.some(function (s) { return b.senses.indexOf(s) >= 0; }) ||
+      (a.stems || []).some(function (s) { return (b.stems || []).indexOf(s) >= 0; });
   }
 
   /** 3 неверных варианта: та же часть речи, близкий уровень, без общих переводов. */
@@ -155,9 +159,175 @@
     return r;
   }
 
+  /* ---------- классы (уровни) и блоки ---------- */
+
+  var unitCache = {};
+
+  /** Блоки уровня по UNIT_SIZE слов: сначала частотные, части речи вперемешку. */
+  function units(level) {
+    if (unitCache[level]) return unitCache[level];
+    var list = W().filter(function (w) { return w.level === level; })
+      .sort(function (a, b) { return a.rank - b.rank || a.order - b.order; });
+    var out = [];
+    for (var i = 0; i < list.length; i += UNIT_SIZE) {
+      out.push({ level: level, n: out.length + 1, words: list.slice(i, i + UNIT_SIZE) });
+    }
+    // короткий хвост присоединяем к предыдущему блоку
+    if (out.length > 1 && out[out.length - 1].words.length < UNIT_SIZE / 2) {
+      var tail = out.pop();
+      out[out.length - 1].words = out[out.length - 1].words.concat(tail.words);
+    }
+    unitCache[level] = out;
+    return out;
+  }
+
+  function unit(level, n) { return units(level)[n - 1] || null; }
+
+  /** Состояние блока: сколько новых, изучаемых, выученных; mastery — 0…1 по «коробкам». */
+  function unitStats(u, now) {
+    now = now || Date.now();
+    var r = { total: u.words.length, fresh: 0, learning: 0, learned: 0, due: 0, mastery: 0 };
+    var sum = 0;
+    u.words.forEach(function (w) {
+      var x = rec(w.id);
+      if (!x) { r.fresh++; return; }
+      if (x.box >= LEARNED_BOX) r.learned++; else r.learning++;
+      if (x.due <= now) r.due++;
+      sum += Math.min(x.box, LEARNED_BOX);
+    });
+    r.mastery = r.total ? sum / (r.total * LEARNED_BOX) : 0;
+    r.started = r.fresh < r.total;
+    r.done = r.fresh === 0;
+    return r;
+  }
+
+  /** Текущий блок уровня: первый, где остались новые слова (или null — все пройдены). */
+  function currentUnit(level) {
+    var list = units(level);
+    for (var i = 0; i < list.length; i++) if (unitStats(list[i]).fresh) return list[i];
+    return null;
+  }
+
+  /** Уровень-«класс», который сейчас проходится: первый от A1 с непройденными словами. */
+  function currentClass() {
+    for (var i = 0; i < EG.LEVELS.length; i++) if (currentUnit(EG.LEVELS[i])) return EG.LEVELS[i];
+    return EG.LEVELS[EG.LEVELS.length - 1];
+  }
+
+  /** Следующий блок курса A1 → C1. */
+  function nextUnit() { return currentUnit(currentClass()); }
+
+  /** Все слова к повторению (любых уровней): сначала невыученные и самые просроченные. */
+  function dueAll(now) {
+    now = now || Date.now();
+    var out = [];
+    S().words.forEach(function (r) {
+      if (r.due <= now && EG.data.wordsById[r.id]) out.push(r);
+    });
+    out.sort(function (a, b) { return (a.box >= LEARNED_BOX) - (b.box >= LEARNED_BOX) || a.due - b.due; });
+    return out.map(function (r) { return EG.data.wordsById[r.id]; });
+  }
+
+  /** Сколько новых слов начато сегодня (для дневной сводки). */
+  function startedToday() {
+    var start = new Date(); start.setHours(0, 0, 0, 0);
+    var n = 0;
+    S().words.forEach(function (r) { if (r.firstTs >= start.getTime()) n++; });
+    return n;
+  }
+
+  /** Отметить слово «на изучение» (например, из текста для чтения): появится в ближайшем повторении. */
+  function addToLearning(id) {
+    if (rec(id) || !EG.data.wordsById[id]) return Promise.resolve(false);
+    var now = Date.now();
+    var r = { id: id, box: 0, correct: 0, wrong: 0, streak: 0, firstTs: now, lastTs: now, learnedTs: 0, due: now };
+    return S().saveWord(r).then(function () { EG.bus.emit('words'); return true; });
+  }
+
+  /* ---------- написание ---------- */
+
+  /** Нормализация для сравнения написания: регистр, апострофы, британские/американские варианты. */
+  function spell(s) {
+    return String(s || '').toLowerCase()
+      .replace(/[’‘`´]/g, "'").replace(/…|\.\.\./g, ' ')
+      .replace(/[^a-z0-9'\s-]/g, ' ').replace(/-/g, ' ')
+      .replace(/\s+/g, ' ').trim()
+      .replace(/our\b/g, 'or').replace(/our(?=[a-z])/g, 'or')
+      .replace(/([^aeiou])re\b/g, '$1er')
+      .replace(/is(e|ed|es|ing|ation)\b/g, 'iz$1').replace(/yse\b/g, 'yze')
+      .replace(/ogue\b/g, 'og').replace(/ll(ed|ing|er)\b/g, 'l$1');
+  }
+
+  var bySpelling = null;
+  /** Другое слово с тем же переводом (синоним), которое ввёл ученик, или null. */
+  function synonymTyped(w, a) {
+    if (!bySpelling) {
+      bySpelling = Object.create(null);
+      W().forEach(function (x) { (bySpelling[spell(x.en)] = bySpelling[spell(x.en)] || []).push(x); });
+    }
+    return (bySpelling[a] || []).filter(function (x) {
+      return x.id !== w.id && x.senses.some(function (s) { return w.senses.indexOf(s) >= 0; });
+    })[0] || null;
+  }
+
+  /** Проверка написанного слова: 'exact' | 'typo' (одна-две опечатки) | 'synonym' (другое слово с тем же переводом) | 'wrong'. */
+  function checkSpelling(w, typed) {
+    var a = spell(typed), b = spell(w.en);
+    if (!a) return 'wrong';
+    if (a === b) return 'exact';
+    if (synonymTyped(w, a)) return 'synonym';
+    var d = EG.text.lev(a, b);
+    if (b.length >= 5 && d <= (b.length >= 9 ? 2 : 1)) return 'typo';
+    return 'wrong';
+  }
+
+  /** Подсказка к написанию: открыты первые n букв, остальные — «_» (пробелы и дефисы сохраняются). */
+  function mask(en, n) {
+    var k = 0;
+    return en.split('').map(function (ch) {
+      if (!/[a-z]/i.test(ch)) return ch;
+      return k++ < n ? ch : '_';
+    }).join('');
+  }
+
+  function letterCount(en) { return (en.match(/[a-z]/gi) || []).length; }
+
+  /* ---------- примеры употребления ---------- */
+
+  var exIndex = null;
+  function buildExIndex() {
+    exIndex = [];
+    (EG.data.vocab || []).forEach(function (v) {
+      if (v.example) exIndex.push({ en: v.example, ru: v.exampleRu || '', low: ' ' + v.example.toLowerCase().replace(/[^a-z']+/g, ' ') + ' ' });
+    });
+    (EG.data.texts || []).forEach(function (t) {
+      t.paragraphs.forEach(function (p) {
+        p.replace(/([.!?])\s+/g, '$1\n').split('\n').forEach(function (sent) {
+          if (sent.length < 30 || sent.length > 160) return;
+          exIndex.push({ en: sent, ru: '', src: t.title, low: ' ' + sent.toLowerCase().replace(/[^a-z']+/g, ' ') + ' ' });
+        });
+      });
+    });
+  }
+
+  /** До n предложений, где встречается слово (из выражений курса и текстов для чтения). */
+  function examples(w, n) {
+    if (!exIndex) buildExIndex();
+    var key = ' ' + w.en.toLowerCase().replace(/[^a-z']+/g, ' ').trim() + ' ';
+    if (key.trim().length < 2) return [];
+    var out = [];
+    for (var i = 0; i < exIndex.length && out.length < (n || 1); i++) {
+      if (exIndex[i].low.indexOf(key) >= 0) out.push(exIndex[i]);
+    }
+    // предложения с переводом — вперёд
+    return out.sort(function (a, b) { return (b.ru ? 1 : 0) - (a.ru ? 1 : 0); });
+  }
+
   EG.wordTrainer = {
     LEARNED_BOX: LEARNED_BOX,
     SESSION_SIZE: SESSION_SIZE,
+    UNIT_SIZE: UNIT_SIZE,
+    REVIEW_SIZE: REVIEW_SIZE,
     rec: rec,
     status: status,
     isLearned: isLearned,
@@ -168,6 +338,19 @@
     buildSession: buildSession,
     distractors: distractors,
     question: question,
-    counts: counts
+    counts: counts,
+    units: units,
+    unit: unit,
+    unitStats: unitStats,
+    currentUnit: currentUnit,
+    currentClass: currentClass,
+    nextUnit: nextUnit,
+    dueAll: dueAll,
+    startedToday: startedToday,
+    addToLearning: addToLearning,
+    checkSpelling: checkSpelling,
+    mask: mask,
+    letterCount: letterCount,
+    examples: examples
   };
 })(window.EG = window.EG || {});
