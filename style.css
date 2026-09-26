@@ -367,6 +367,10 @@ a.tile:hover { border-color: var(--accent); }
 .option.correct { border-color: var(--good); background: var(--good-soft); }
 .option.wrong { border-color: var(--bad); background: var(--bad-soft); }
 .options.en .opt-text { font-weight: 500; }
+.opt-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.opt-ru { color: var(--muted); font-size: .85rem; }
+.q-ru { display: block; color: var(--muted); margin: -4px 0 8px; }
+.quiz-links { gap: 16px; }
 .opt-key { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; border-radius: 8px; background: var(--surface-2); color: var(--muted); font-size: .8rem; font-weight: 700; flex-shrink: 0; padding: 0 4px; }
 
 .typed { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
