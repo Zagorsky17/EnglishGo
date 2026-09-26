@@ -65,8 +65,9 @@
 
     /* ---------- общий таймер игры ---------- */
     var qTimer = null, qDeadline = 0;
+    var ticker = null;
     function tick() {
-      if (!alive || st.over) return;
+      if (!alive || st.over) { clearInterval(ticker); return; }
       var now = Date.now();
       if (deadline) {
         var left = Math.max(0, deadline - now);
@@ -79,7 +80,6 @@
         timeText.textContent = Math.ceil(ql / 1000) + ' с на ответ';
         if (ql <= 0 && qTimer) { var f = qTimer; qTimer = null; f(); }
       }
-      later(tick, 100);
     }
 
     function popXp(text, good) {
@@ -91,6 +91,7 @@
     /** Засчитать ответ: очки, жизни, комбо, запись в статистику. */
     function score(correct, itemId, opts) {
       opts = opts || {};
+      if (st.over || st.lives <= 0) return false; // игра уже закончилась — ответы больше не засчитываются
       if (correct) {
         st.combo++; st.right++;
         st.best = Math.max(st.best, st.combo);
@@ -221,7 +222,7 @@
       btnsL.forEach(function (b) { colL.appendChild(b); });
       btnsR.forEach(function (b) { colR.appendChild(b); });
       function choose(side, p, btn) {
-        if (btn.disabled) return;
+        if (btn.disabled || st.over || st.lives <= 0) return;
         if (side === 'L') { if (selL) selL.btn.classList.remove('sel'); selL = { p: p, btn: btn }; }
         else { if (selR) selR.btn.classList.remove('sel'); selR = { p: p, btn: btn }; }
         btn.classList.add('sel');
@@ -274,7 +275,12 @@
     hud();
     if (g.id === 'pairs') pairsGame(); else nextQuestion();
     tick();
+    ticker = setInterval(tick, 100);
 
-    return function () { alive = false; timers.forEach(clearTimeout); document.removeEventListener('keydown', onKey); };
+    return function () {
+      // досрочный выход: результат сыгранной части тоже засчитываем
+      if (!st.over && (st.right + st.wrong) > 0) { st.over = true; EG.games.saveResult(g.id, st.score).catch(function () {}); EG.progress.addMinutes(Date.now() - started); }
+      alive = false; clearInterval(ticker); timers.forEach(clearTimeout); document.removeEventListener('keydown', onKey);
+    };
   };
 })(window.EG = window.EG || {});

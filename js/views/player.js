@@ -81,7 +81,7 @@
     var idx = 0, locked = false, shownAt = 0, keyHandler = null;
     var timers = [];
     var graded = {};
-    var results = { correct: 0, wrong: 0, xp: 0, items: {} };
+    var results = { correct: 0, wrong: 0, xp: 0 };
     var started = Date.now(), minutesSaved = false;
 
     var progressEl = h('div', { class: 'bar thin' }, h('span'));
@@ -169,7 +169,6 @@
       }
 
       if (res.correct && !res.partial) results.correct++; else results.wrong++;
-      if (itemId) results.items[itemId] = (results.items[itemId] || true) && res.correct;
 
       // ошибку повторяем в конце сессии (retrieval practice)
       if (!res.correct && !ex.retry) {
@@ -365,6 +364,7 @@
         var timerBar = h('div', { class: 'timer' }, h('span'));
         var fill = timerBar.firstChild;
         var t0 = Date.now();
+        fill.style.setProperty('--timer-ms', total + 'ms');
         requestAnimationFrame(function () {
           fill.style.transition = 'transform ' + total + 'ms linear';
           fill.style.transform = 'scaleX(0)';

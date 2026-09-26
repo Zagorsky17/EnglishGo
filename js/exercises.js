@@ -26,13 +26,14 @@
     tbh: 'to be honest', ngl: 'not going to lie', imo: 'in my opinion', imho: 'in my opinion', btw: 'by the way',
     fyi: 'for your information', asap: 'as soon as possible', jk: 'just kidding', ikr: 'i know right', smh: 'shaking my head',
     ppl: 'people', msg: 'message', sry: 'sorry', srry: 'sorry', abt: 'about', bday: 'birthday', tho: 'though', thru: 'through',
-    prob: 'probably', prolly: 'probably', def: 'definitely', rly: 'really', sm: 'so much', k: 'ok', kk: 'ok', okie: 'ok',
+    prob: 'probably', prolly: 'probably', rly: 'really', k: 'ok', kk: 'ok', okie: 'ok',
     tmrw: 'tomorrow', tmr: 'tomorrow', '2morrow': 'tomorrow', '2day': 'today', '2nite': 'tonight', tonite: 'tonight',
     b4: 'before', l8r: 'later', gr8: 'great', pic: 'picture', pics: 'pictures', convo: 'conversation', gf: 'girlfriend', bf: 'boyfriend',
     bro: 'brother', ty4: 'thank you for', dm: 'message', txt: 'text', ur: 'your', u: 'you',
     // апострофы в чатах часто опускают
     im: 'i am', ive: 'i have', dont: 'do not', doesnt: 'does not', didnt: 'did not', cant: 'can not', wont: 'will not',
-    isnt: 'is not', arent: 'are not', wasnt: 'was not', thats: 'that is', whats: 'what is', youre: 'you are', theyre: 'they are', lets: 'let us'
+    isnt: 'is not', arent: 'are not', wasnt: 'was not', thats: 'that is', whats: 'what is', youre: 'you are', theyre: 'they are'
+    // не раскрываем: lets («he lets me»), def, sm — слишком часто это обычные слова
   };
   var TEXTING_RE = new RegExp('(^|[^a-z0-9\'])(' + Object.keys(TEXTING).sort(function (a, b) { return b.length - a.length; }).join('|') + ')(?=$|[^a-z0-9\'])', 'g');
 

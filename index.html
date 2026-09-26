@@ -2,23 +2,16 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
+  <!-- CSP: только собственные файлы, никаких сетевых запросов, встроенных скриптов и плагинов -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="EnglishGo — офлайн-приложение для разговорного английского">
   <meta name="theme-color" content="#4f46e5">
   <title>EnglishGo</title>
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  <script>
-    // тема до загрузки стилей — без мигания
-    (function () {
-      try {
-        var s = JSON.parse(localStorage.getItem('eg.settings') || '{}');
-        var t = s.theme || 'auto';
-        if (t === 'auto') t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', t);
-      } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
-    })();
-  </script>
+  <script src="js/theme-boot.js"></script>
 </head>
 <body class="loading">
   <div class="app">
@@ -50,7 +43,7 @@
   <div id="toast-root" class="toast-root" aria-live="polite"></div>
   <div id="modal-root"></div>
 
-  <noscript><p style="padding:20px">Для работы EnglishGo включите JavaScript.</p></noscript>
+  <noscript><p class="noscript">Для работы EnglishGo включите JavaScript.</p></noscript>
 
   <!-- Учебные данные -->
   <script src="data/vocabulary.js"></script>
@@ -72,6 +65,7 @@
   <script src="js/games.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/router.js"></script>
+  <script src="js/instance.js"></script>
 
   <!-- Экраны -->
   <script src="js/views/player.js"></script>

@@ -39,6 +39,13 @@
     window.addEventListener('hashchange', function () { sheet.hidden = true; });
   }
 
+  var badgesQueued = false;
+  function scheduleBadges() {
+    if (badgesQueued) return;
+    badgesQueued = true;
+    requestAnimationFrame(function () { badgesQueued = false; updateBadges(); });
+  }
+
   function updateBadges() {
     var review = EG.srs.getDue().filter(function (c) { return c.state !== 'new'; }).length;
     var mistakes = EG.progress.unresolvedMistakes().length;
@@ -85,16 +92,79 @@
     });
   }
 
-  function init() {
-    h = EG.ui.h; icon = EG.ui.icon;
-    applyTheme();
-    if (window.matchMedia) {
-      var mq = matchMedia('(prefers-color-scheme: dark)');
-      var f = function () { if (EG.storage.get('theme') === 'auto') applyTheme(); };
-      if (mq.addEventListener) mq.addEventListener('change', f); else if (mq.addListener) mq.addListener(f);
-    }
-    buildNav();
+  /* ---------- состояние хранилища: баннер поверх интерфейса ---------- */
+  var banner = null;
+  function showBanner(kind, text, actions) {
+    if (banner) banner.remove();
+    banner = h('div', { class: 'app-banner ' + kind, role: 'alert' },
+      h('span', null, text),
+      h('span', { class: 'row gap' }, actions || []));
+    document.body.appendChild(banner);
+  }
 
+  var lastErrorToast = 0;
+  function errorToast(msg) {
+    var now = Date.now();
+    if (now - lastErrorToast < 4000) return; // не заваливать уведомлениями
+    lastErrorToast = now;
+    EG.ui.toast(msg, 'bad');
+  }
+
+  function installGuards() {
+    // любая неперехваченная ошибка сохранения — пользователь должен о ней узнать
+    window.addEventListener('unhandledrejection', function (e) {
+      var r = e.reason || {};
+      if (r.name === 'InactiveTab' || r.name === 'DbLost') { e.preventDefault(); return; }
+      console.error('[EnglishGo]', r);
+      errorToast('Что-то пошло не так: ' + (r.message || r.name || 'ошибка') + '. Прогресс мог не сохраниться.');
+    });
+    window.addEventListener('error', function (e) {
+      if (!e.filename || e.filename.indexOf('file:') !== 0 && e.filename.indexOf(location.origin) !== 0) return;
+      errorToast('Ошибка в приложении: ' + e.message);
+    });
+
+    EG.bus.on('db-error', function (d) {
+      if (d.quota) {
+        showBanner('bad', 'Недостаточно места в хранилище браузера — прогресс не сохраняется.', [
+          h('button', { class: 'btn sm', onclick: function () { EG.db.pruneAnswers(1000).then(function () { EG.ui.toast('Старая история ответов очищена', 'good'); banner.remove(); banner = null; }).catch(function () {}); } }, 'Очистить старую историю'),
+          h('a', { class: 'btn sm primary', href: '#/settings' }, 'Сделать экспорт')]);
+      } else {
+        showBanner('bad', 'Не удалось сохранить прогресс (' + (d.error && (d.error.name || d.error.message)) + '). Сделайте экспорт на всякий случай.', [
+          h('a', { class: 'btn sm primary', href: '#/settings' }, 'Экспорт'),
+          h('button', { class: 'btn sm', onclick: function () { banner.remove(); banner = null; } }, 'Скрыть')]);
+      }
+    });
+    EG.bus.on('db-lost', function () {
+      showBanner('bad', 'EnglishGo обновлён в другой вкладке. Перезагрузите страницу, чтобы продолжить и не потерять прогресс.', [
+        h('button', { class: 'btn sm primary', onclick: function () { location.reload(); } }, 'Перезагрузить')]);
+    });
+    EG.bus.on('db-blocked', function () {
+      var boot = document.querySelector('.boot');
+      if (boot) boot.textContent = 'Ожидание базы данных… Закройте другие вкладки с EnglishGo.';
+    });
+    EG.bus.on('instance-inactive', function () {
+      // другая вкладка забрала управление — эта больше ничего не пишет
+      document.body.appendChild(h('div', { class: 'overlay show instance-lock' },
+        h('div', { class: 'modal' },
+          h('h3', { class: 'modal-title' }, 'EnglishGo открыт в другой вкладке'),
+          h('p', null, 'Чтобы вкладки не перезаписывали прогресс друг друга, работать можно только в одной. Эта вкладка приостановлена.'),
+          h('div', { class: 'modal-actions' }, h('button', { class: 'btn primary', onclick: function () { EG.instance.takeover(); } }, 'Работать здесь')))));
+    });
+    // настройки изменили в другой вкладке (или после перехвата) — перечитать
+    window.addEventListener('storage', function (e) {
+      if (e.key === 'eg.settings') { EG.storage.reload(); applyTheme(); }
+    });
+  }
+
+  function showAlreadyOpen() {
+    document.body.classList.remove('loading');
+    var view = document.getElementById('view');
+    view.replaceChildren(EG.ui.empty('chat', 'EnglishGo уже открыт в другой вкладке',
+      'Перейдите в ту вкладку. Или продолжите здесь — тогда другая вкладка будет приостановлена, чтобы прогресс не перезаписывался.',
+      h('button', { class: 'btn primary', onclick: function () { EG.instance.takeover(); } }, 'Работать здесь')));
+  }
+
+  function boot() {
     EG.db.open()
       .then(function () { return EG.state.load(); })
       .catch(function (e) { console.error(e); EG.ui.toast('Ошибка загрузки данных: ' + e.message, 'bad'); })
@@ -103,13 +173,17 @@
         EG.router.start(document.getElementById('view'));
         updateBadges();
         onboarding();
+        if (EG.chat && EG.chat.completePending) EG.chat.completePending();
       });
 
-    ['cards', 'answer', 'xp', 'loaded', 'settings', 'streak'].forEach(function (e) { EG.bus.on(e, updateBadges); });
-    window.addEventListener('hashchange', function () { setTimeout(updateBadges, 50); });
+    ['cards', 'answer', 'xp', 'loaded', 'settings', 'streak'].forEach(function (e) { EG.bus.on(e, scheduleBadges); });
+    window.addEventListener('hashchange', scheduleBadges);
     EG.bus.on('goal', function () { EG.ui.toast('Дневная цель выполнена! 🎉', 'good'); });
     EG.bus.on('streak', function (n) { if (n > 1) EG.ui.toast('Серия: ' + n + ' ' + EG.util.plural(n, 'день', 'дня', 'дней') + ' подряд 🔥', 'good'); });
-    EG.bus.on('voices', function () { if (/^#\/settings/.test(location.hash)) EG.router.refresh(); });
+    EG.bus.on('voices', function (list) {
+      // голоса появились позже (Safari) — перерисовать экран, чтобы показать кнопки озвучки
+      if (list && list.length && !voicesSeen) { voicesSeen = true; if (EG.router && location.hash && !/^#\/(game|chat|session|lesson\/[^/]+\/start|review\/start|mistakes\/train)/.test(location.hash)) EG.router.refresh(); }
+    });
 
     // смена дня, пока приложение открыто
     var day = EG.util.dateKey();
@@ -119,11 +193,27 @@
 
     // запрос на постоянное хранилище, чтобы браузер не очищал данные
     if (navigator.storage && navigator.storage.persist) {
-      navigator.storage.persist().catch(function () { /* не критично */ });
+      navigator.storage.persist().then(function (ok) { EG.app.persisted = !!ok; }).catch(function () { EG.app.persisted = false; });
     }
   }
 
-  EG.app = { applyTheme: applyTheme, updateBadges: updateBadges };
+  var voicesSeen = false;
+
+  function init() {
+    h = EG.ui.h; icon = EG.ui.icon;
+    applyTheme();
+    if (window.matchMedia) {
+      var mq = matchMedia('(prefers-color-scheme: dark)');
+      var f = function () { if (EG.storage.get('theme') === 'auto') applyTheme(); };
+      if (mq.addEventListener) mq.addEventListener('change', f); else if (mq.addListener) mq.addListener(f);
+    }
+    buildNav();
+    installGuards();
+    voicesSeen = EG.ui.voices().length > 0;
+    EG.instance.start().then(function (active) { if (active) boot(); else showAlreadyOpen(); });
+  }
+
+  EG.app = { applyTheme: applyTheme, updateBadges: scheduleBadges, persisted: null };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

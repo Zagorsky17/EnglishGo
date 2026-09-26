@@ -119,6 +119,10 @@
         h('span', { class: 'msg-text', lang: 'en' }, m.text),
         h('span', { class: 'msg-meta' }, timeStr(m.ts)),
         extra);
+      el.setAttribute('role', 'button');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('aria-label', 'Сообщение: ' + m.text + '. Нажмите, чтобы увидеть перевод');
+      el.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target === el) { e.preventDefault(); el.click(); } });
       el.addEventListener('click', function (e) {
         if (e.target.closest('button')) return;
         if (!extra.childNodes.length) {
@@ -220,23 +224,27 @@
       rec.nodeId = nodeId;
       Array.prototype.push.apply(rec.messages, incoming);
       rec.phase = node.end ? 'done' : 'reply';
+      var completion = null;
       if (node.end) {
         rec.done = true;
         rec.score = rec.turns ? Math.round(rec.scoreSum / rec.turns) : 0;
       }
       rec.readTs = Date.now() + 60000;
       save();
+      // награду начисляем сразу — даже если пользователь уйдёт во время «печатает…»
+      if (node.end) completion = EG.chat.completeEpisode(ep, rec).catch(function () { return 0; });
       busy = true;
       setComposer(false);
       playThem(incoming, function () {
         busy = false;
-        if (node.end) finishEpisode(); else setComposer(true);
+        if (node.end) finishEpisode(completion); else setComposer(true);
       });
     }
 
-    function finishEpisode() {
+    function finishEpisode(completion) {
       var ids = (ep.learn || []).map(EG.data.resolve).filter(Boolean);
-      Promise.all([EG.progress.completeDialogue(ep.id, 'chat', rec.score), EG.srs.addItems(ids)]).then(function (r) {
+      Promise.resolve(completion).then(function (xp) {
+        var r = [xp];
         var next = EG.chat.currentEpisode(contact.id);
         msgs.appendChild(h('div', { class: 'chat-summary' },
           h('strong', null, 'Переписка завершена · ' + rec.score + '%'),

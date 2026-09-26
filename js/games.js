@@ -146,7 +146,7 @@
     { id: 'build', emoji: '🧱', title: 'Собери фразу', desc: 'Соберите фразу из слов на время. Серия без ошибок умножает очки.', lives: 3, perQ: 25 },
     { id: 'truefalse', emoji: '✅', title: 'Правда или нет', desc: '45 секунд: правда ли, что «ngl» значит «не буду врать»? Решайте мгновенно.', time: 45, lives: 3 }
   ];
-  var byId = {};
+  var byId = Object.create(null);
   GAMES.forEach(function (g) { byId[g.id] = g; });
 
   function multiplier(combo) { return combo >= 6 ? 3 : combo >= 3 ? 2 : 1; }

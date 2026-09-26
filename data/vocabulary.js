@@ -779,11 +779,14 @@
   /* ---------- индексы ---------- */
   D.slug = slug;
   D.vocab = list;
-  D.byId = {};
+  D.byId = Object.create(null); // без прототипа: id «constructor» из backup не найдёт Object
   list.forEach(function (v) {
     if (D.byId[v.id]) console.warn('[EnglishGo] Повтор id в словаре:', v.id);
     D.byId[v.id] = v;
   });
+  // Переименования выражений: { 'старый-id': 'новый-id' }. При загрузке прогресс переносится на новый id
+  // (js/state.js → heal). Меняете текст en у существующей фразы — добавьте сюда запись.
+  D.idAliases = Object.create(null);
   D.resolve = function (en) {
     var id = slug(en);
     if (D.byId[id]) return id;

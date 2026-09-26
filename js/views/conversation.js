@@ -72,7 +72,6 @@
     var run = EG.dialogue.createRun(dlg);
     var log = h('div', { class: 'chat' });
     var controls = h('div', { class: 'chat-controls' });
-    var timers = [];
     var started = Date.now();
     var keyHandler = null;
     function onKey(e) { if (keyHandler && !e.metaKey && !e.ctrlKey) keyHandler(e); }
@@ -157,7 +156,7 @@
     }
 
     showNode();
-    return function () { timers.forEach(clearTimeout); document.removeEventListener('keydown', onKey); };
+    return function () { document.removeEventListener('keydown', onKey); };
   };
 
   /* ================= Разговор ================= */
@@ -205,10 +204,12 @@
       var input = h('textarea', { class: 'input big', rows: 2, placeholder: 'Ответьте по-английски…', lang: 'en', autocapitalize: 'sentences', spellcheck: 'false' });
       var hintsBox = h('div', { class: 'options en hidden' });
       var usedHint = false;
+      var sent = false; // защита от двойной отправки (двойной клик, зажатый Enter)
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
       });
       function submit() {
+        if (sent) return;
         var ev = EG.dialogue.evaluateTurn(turn, input.value);
         if (ev.verdict === 'empty' || ev.verdict === 'russian') { EG.ui.toast(ev.message, 'warn'); input.focus(); return; }
         done(input.value.trim(), ev);
@@ -231,6 +232,10 @@
         done('(не знаю)', { verdict: 'miss', correct: false, naturalness: 0, message: 'Ничего страшного — вот как можно ответить. Попробуйте повторить вслух.' });
       }
       function done(text, ev) {
+        if (sent) return;
+        sent = true;
+        input.disabled = true;
+        controls.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
         keyHandler = null;
         var ms = Date.now() - shownAt;
         var tone = ev.correct ? (ev.naturalness >= 75 ? 'good' : 'ok') : ev.partial ? 'warn' : 'bad';

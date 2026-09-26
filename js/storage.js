@@ -13,6 +13,7 @@
     newPerDay: 8,         // новых выражений в день
     speech: true,         // озвучка (кнопки прослушивания)
     autoSpeak: false,     // автоматически произносить фразы при появлении
+    onlineVoices: false,  // разрешить сетевые голоса (текст уходит на сервер голосового движка)
     rate: 0.95,           // скорость речи
     voice: '',            // имя голоса
     name: '',             // имя пользователя
@@ -36,6 +37,8 @@
     if ('dailyGoal' in out) out.dailyGoal = Math.min(500, Math.max(10, Math.round(out.dailyGoal) || DEFAULTS.dailyGoal));
     if ('newPerDay' in out) out.newPerDay = Math.min(40, Math.max(0, Math.round(out.newPerDay) || 0));
     if ('rate' in out) out.rate = Math.min(1.5, Math.max(0.5, out.rate || 1));
+    if ('name' in out) out.name = out.name.slice(0, 30);
+    if ('voice' in out) out.voice = out.voice.slice(0, 120);
     return out;
   }
 
@@ -64,6 +67,7 @@
     all: function () { return Object.assign({}, load()); },
     replace: function (obj) { cache = Object.assign({}, DEFAULTS, sanitize(obj)); persist(); },
     reset: function () { cache = Object.assign({}, DEFAULTS); persist(); },
+    reload: function () { cache = null; load(); if (EG.bus) EG.bus.emit('settings', {}); },
     sanitize: sanitize
   };
 })(window.EG = window.EG || {});

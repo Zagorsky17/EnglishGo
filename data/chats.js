@@ -500,9 +500,9 @@
   ];
 
   /* ---------- индексы и подготовка ---------- */
-  D.contactsById = {};
+  D.contactsById = Object.create(null); // без прототипа: id «constructor» из backup не найдёт Object
   D.contacts.forEach(function (c) { D.contactsById[c.id] = c; });
-  D.episodesById = {};
+  D.episodesById = Object.create(null); // без прототипа: id «constructor» из backup не найдёт Object
   D.episodes.forEach(function (e) {
     D.episodesById[e.id] = e;
     Object.keys(e.nodes).forEach(function (nid) {

@@ -10,9 +10,8 @@
         var v = attrs[k];
         if (v == null || v === false) return;
         if (k === 'class') el.className = v;
-        else if (k === 'html') el.innerHTML = v; // только для доверенных строк (иконки)
         else if (k === 'text') el.textContent = v;
-        else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+        else if (k === 'style') { if (typeof v === 'object') Object.assign(el.style, v); } // строковый style не поддерживаем (CSP)
         else if (k.slice(0, 2) === 'on' && typeof v === 'function') el.addEventListener(k.slice(2), v);
         else if (v === true) el.setAttribute(k, '');
         else el.setAttribute(k, v);
@@ -70,7 +69,9 @@
     var span = document.createElement('span');
     span.className = 'ic' + (cls ? ' ' + cls : '');
     span.setAttribute('aria-hidden', 'true');
-    span.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[name] || '') + '</svg>';
+    // единственный innerHTML в приложении: только константы из ICONS, никаких данных пользователя
+    var paths = Object.prototype.hasOwnProperty.call(ICONS, name) ? ICONS[name] : '';
+    span.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
     return span;
   }
 
@@ -99,7 +100,15 @@
         resolve(val);
       }
       function onKey(e) {
-        if (e.key === 'Escape') { e.stopPropagation(); close(null); }
+        if (e.key === 'Escape') { e.stopPropagation(); close(null); return; }
+        if (e.key === 'Tab') {
+          // удерживаем фокус внутри окна
+          var f = box.querySelectorAll('button, a[href], input, select, textarea, summary, [tabindex="0"]');
+          if (!f.length) return;
+          var first = f[0], last = f[f.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
       }
       var actions = (opts.actions || [{ label: 'Закрыть', value: null }]).map(function (a) {
         return h('button', { class: 'btn ' + (a.kind || (a.primary ? 'primary' : 'ghost')), onclick: function () { close(a.value); } }, a.label);
@@ -128,31 +137,48 @@
   }
 
   /* ---------- озвучка (speechSynthesis, офлайн-голоса ОС) ---------- */
-  var voices = [];
+  var allVoices = [];
   var synth = window.speechSynthesis || null;
+  var activated = false; // было ли действие пользователя (браузеры не дают говорить без него)
 
   function loadVoices() {
     if (!synth) return;
-    voices = synth.getVoices().filter(function (v) { return /^en[-_]/i.test(v.lang) || v.lang === 'en'; });
-    EG.bus && EG.bus.emit('voices', voices);
-  }
-  if (synth) {
-    loadVoices();
-    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', loadVoices);
+    var before = allVoices.length;
+    try { allVoices = synth.getVoices().filter(function (v) { return /^en[-_]/i.test(v.lang) || v.lang === 'en'; }); } catch (e) { allVoices = []; }
+    if (allVoices.length !== before && EG.bus) EG.bus.emit('voices', allVoices);
   }
 
+  /** Доступные голоса: по умолчанию только локальные (офлайн, текст не уходит в сеть). */
+  function usableVoices() {
+    if (EG.storage.get('onlineVoices')) return allVoices;
+    return allVoices.filter(function (v) { return v.localService !== false; });
+  }
+
+  if (synth) {
+    loadVoices();
+    if (synth.addEventListener) synth.addEventListener('voiceschanged', loadVoices);
+    else synth.onvoiceschanged = loadVoices;
+    // Safari/iOS часто отдаёт голоса позже и без события — проверяем ещё несколько раз
+    [300, 1000, 3000, 7000].forEach(function (ms) { setTimeout(loadVoices, ms); });
+  }
+  ['pointerdown', 'keydown', 'touchstart'].forEach(function (evt) {
+    window.addEventListener(evt, function once() {
+      activated = true;
+      loadVoices();
+      window.removeEventListener(evt, once, true);
+    }, true);
+  });
+
   function pickVoice() {
+    var pool = usableVoices();
     var name = EG.storage.get('voice');
-    var v = voices.filter(function (x) { return x.name === name; })[0];
+    var v = pool.filter(function (x) { return x.name === name; })[0];
     if (v) return v;
-    // предпочитаем локальные en-US / en-GB голоса
-    var local = voices.filter(function (x) { return x.localService; });
-    var pool = local.length ? local : voices;
     return pool.filter(function (x) { return /en[-_]US/i.test(x.lang); })[0] ||
       pool.filter(function (x) { return /en[-_]GB/i.test(x.lang); })[0] || pool[0] || null;
   }
 
-  function canSpeak() { return !!synth && voices.length > 0 && EG.storage.get('speech'); }
+  function canSpeak() { return !!synth && usableVoices().length > 0 && EG.storage.get('speech'); }
 
   function speak(text, onEnd, rate) {
     if (!canSpeak()) { if (onEnd) onEnd(false); return false; }
@@ -160,7 +186,8 @@
       synth.cancel();
       var u = new SpeechSynthesisUtterance(text);
       var v = pickVoice();
-      if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'en-US';
+      if (!v) { if (onEnd) onEnd(false); return false; } // сетевые голоса без разрешения не используем
+      u.voice = v; u.lang = v.lang;
       u.rate = rate || EG.storage.get('rate') || 1;
       if (onEnd) { u.onend = function () { onEnd(true); }; u.onerror = function () { onEnd(false); }; }
       synth.speak(u);
@@ -168,9 +195,10 @@
     } catch (e) { if (onEnd) onEnd(false); return false; }
   }
 
-  /** Автоозвучка: только если пользователь включил её в настройках. */
+  /** Автоозвучка: только если включена в настройках и пользователь уже взаимодействовал со страницей. */
   function autoSpeak(text) {
-    if (!EG.storage.get('autoSpeak') || !canSpeak()) return false;
+    var active = activated || (navigator.userActivation && navigator.userActivation.hasBeenActive);
+    if (!active || !EG.storage.get('autoSpeak') || !canSpeak()) return false;
     return speak(text);
   }
 
@@ -183,12 +211,22 @@
   }
 
   /* ---------- визуальные компоненты ---------- */
+  /** SVG-элемент без innerHTML: значения попадают только в атрибуты и текстовые узлы. */
+  function svg(tag, attrs, children) {
+    var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.keys(attrs || {}).forEach(function (k) { el.setAttribute(k, String(attrs[k])); });
+    (children || []).forEach(function (c) { if (c != null) el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return el;
+  }
+
   function ring(pct, label, sub) {
-    pct = EG.util.clamp(pct || 0, 0, 100);
+    pct = EG.util.clamp(Number(pct) || 0, 0, 100);
     var r = 52, c = 2 * Math.PI * r;
     var wrap = h('div', { class: 'ring' });
-    wrap.innerHTML = '<svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-bg" cx="60" cy="60" r="' + r + '"/>' +
-      '<circle class="ring-fg" cx="60" cy="60" r="' + r + '" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - pct / 100)).toFixed(1) + '"/></svg>';
+    wrap.appendChild(svg('svg', { viewBox: '0 0 120 120', 'aria-hidden': 'true' }, [
+      svg('circle', { class: 'ring-bg', cx: 60, cy: 60, r: r }),
+      svg('circle', { class: 'ring-fg', cx: 60, cy: 60, r: r, 'stroke-dasharray': c.toFixed(1), 'stroke-dashoffset': (c * (1 - pct / 100)).toFixed(1) })
+    ]));
     wrap.appendChild(h('div', { class: 'ring-label' }, h('strong', null, label), sub ? h('span', null, sub) : null));
     return wrap;
   }
@@ -202,23 +240,27 @@
   function barChart(data, opts) {
     opts = opts || {};
     var W = 640, H = 180, padB = 26, padT = 18, padL = 6;
-    var max = Math.max.apply(null, data.map(function (d) { return d.value; }).concat([opts.min || 1]));
+    var vals = data.map(function (d) { return Number(d.value) || 0; });
+    var max = Math.max.apply(null, vals.concat([opts.min || 1]));
     var n = data.length, gap = 6;
     var bw = (W - padL * 2 - gap * (n - 1)) / n;
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="chart" role="img" aria-label="' + (opts.label || '') + '">';
+    var kids = [];
     if (opts.goal) {
       var gy = padT + (H - padT - padB) * (1 - Math.min(1, opts.goal / max));
-      svg += '<line x1="0" x2="' + W + '" y1="' + gy.toFixed(1) + '" y2="' + gy.toFixed(1) + '" class="chart-goal"/>';
+      kids.push(svg('line', { x1: 0, x2: W, y1: gy.toFixed(1), y2: gy.toFixed(1), class: 'chart-goal' }));
     }
     data.forEach(function (d, i) {
-      var hgt = (H - padT - padB) * (d.value / max);
+      var v = vals[i];
+      var hgt = (H - padT - padB) * (v / max);
       var x = padL + i * (bw + gap), y = H - padB - hgt;
-      svg += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max(hgt, d.value ? 2 : 0).toFixed(1) + '" rx="4" class="chart-bar' + (d.hi ? ' hi' : '') + '"><title>' + d.label + ': ' + d.value + '</title></rect>';
-      if (d.value && n <= 16) svg += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 4).toFixed(1) + '" class="chart-val">' + d.value + '</text>';
-      svg += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 8) + '" class="chart-lbl">' + d.label + '</text>';
+      kids.push(svg('rect', { x: x.toFixed(1), y: y.toFixed(1), width: bw.toFixed(1), height: Math.max(hgt, v ? 2 : 0).toFixed(1), rx: 4, class: 'chart-bar' + (d.hi ? ' hi' : '') },
+        [svg('title', null, [d.label + ': ' + v])]));
+      if (v && n <= 16) kids.push(svg('text', { x: (x + bw / 2).toFixed(1), y: (y - 4).toFixed(1), class: 'chart-val' }, [String(v)]));
+      kids.push(svg('text', { x: (x + bw / 2).toFixed(1), y: H - 8, class: 'chart-lbl' }, [String(d.label)]));
     });
-    svg += '</svg>';
-    return h('div', { class: 'chart-wrap', html: svg });
+    var wrap = h('div', { class: 'chart-wrap' });
+    wrap.appendChild(svg('svg', { viewBox: '0 0 ' + W + ' ' + H, class: 'chart', role: 'img', 'aria-label': opts.label || '' }, kids));
+    return wrap;
   }
 
   function levelBadge(level) { return h('span', { class: 'badge lvl lvl-' + level }, level); }
@@ -258,7 +300,8 @@
   EG.ui = {
     h: h, icon: icon, toast: toast, modal: modal, confirm: confirmDialog,
     speak: speak, autoSpeak: autoSpeak, stopSpeech: stopSpeech, canSpeak: canSpeak, speakBtn: speakBtn,
-    voices: function () { return voices; },
+    voices: function () { return allVoices; },
+    usableVoices: usableVoices,
     ring: ring, bar: bar, barChart: barChart, levelBadge: levelBadge, registerBadge: registerBadge,
     REGISTER: REGISTER, TYPES: TYPES, empty: empty, pageHead: pageHead, highlight: highlight,
     formatDate: formatDate, relDue: relDue

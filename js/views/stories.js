@@ -13,6 +13,9 @@
       h('span', { lang: 'en' }, line.en),
       h('span', { class: 'bubble-tools' }, EG.ui.speakBtn(line.en, true)),
       tr);
+    bubble.setAttribute('role', 'button');
+    bubble.setAttribute('tabindex', '0');
+    bubble.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target === bubble) { e.preventDefault(); tr.classList.toggle('hidden'); } });
     bubble.addEventListener('click', function (e) {
       if (e.target.closest('button')) return;
       tr.classList.toggle('hidden');

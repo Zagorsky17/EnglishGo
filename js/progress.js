@@ -9,7 +9,8 @@
   /* ---------- серия дней ---------- */
   function touchStreak() {
     var m = S().meta, today = EG.util.dateKey();
-    if (m.lastActiveDate === today) return Promise.resolve();
+    // дата последнего занятия «в будущем» (часы перевели назад, перелёт на запад) — серию не сбрасываем
+    if (m.lastActiveDate === today || (m.lastActiveDate && m.lastActiveDate > today)) return Promise.resolve();
     var streak = m.lastActiveDate === EG.util.addDays(today, -1) ? (m.streak || 0) + 1 : 1;
     return Promise.all([
       S().setMeta('streak', streak),
@@ -20,7 +21,7 @@
 
   function currentStreak() {
     var m = S().meta, today = EG.util.dateKey();
-    if (m.lastActiveDate === today || m.lastActiveDate === EG.util.addDays(today, -1)) return m.streak || 0;
+    if (m.lastActiveDate === today || m.lastActiveDate === EG.util.addDays(today, -1) || m.lastActiveDate > today) return m.streak || 0;
     return 0;
   }
 
@@ -225,6 +226,12 @@
     if (mistakes >= 3) {
       recs.push({ icon: 'mistakes', tone: 'warn', title: 'Разберите ошибки (' + mistakes + ')',
         text: 'Повторение ошибок — самый быстрый способ перестать их делать.', href: '#/mistakes' });
+    }
+    // резервная копия: прогресс живёт только в браузере — раз в неделю напоминаем
+    var lastExport = S().meta.lastExportTs || 0;
+    if ((S().meta.totalAnswers || 0) >= 20 && Date.now() - lastExport > 7 * EG.util.DAY) {
+      recs.push({ icon: 'download', tone: 'warn', title: lastExport ? 'Обновите резервную копию' : 'Сделайте резервную копию',
+        text: 'Прогресс хранится только в этом браузере. Экспорт займёт секунду и защитит от потери данных.', href: '#/settings' });
     }
     // новое сообщение в мессенджере
     var unreadContact = EG.data.contacts.filter(function (c) { return EG.chat.status(c).unread; })[0];

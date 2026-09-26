@@ -190,11 +190,21 @@
 
   /* ================= Ошибки ================= */
 
+  /** Реплика сценария по ссылке из ошибки: по индексу, а если контент изменился — по тексту реплики. */
+  function findTurn(ref, prompt) {
+    var sc = EG.data.scenariosById[ref.scenarioId];
+    if (!sc) return null;
+    var t = sc.turns[ref.turnIdx];
+    if (t && (!prompt || t.npc === prompt)) return { sc: sc, turn: t };
+    var byText = prompt ? sc.turns.filter(function (x) { return x.npc === prompt; })[0] : null;
+    return byText ? { sc: sc, turn: byText } : (t ? { sc: sc, turn: t } : null);
+  }
+
   function mistakeExercise(m) {
     var ref = m.ref || {};
     if (m.kind === 'turn') {
-      var sc = EG.data.scenariosById[ref.scenarioId];
-      var turn = sc && sc.turns[ref.turnIdx];
+      var ft = findTurn(ref, m.prompt);
+      var sc = ft && ft.sc, turn = ft && ft.turn;
       if (!turn) return null;
       return { type: 'turn', turn: turn, itemId: m.itemId, kind: 'turn', ref: ref, setting: sc.setting, noSrs: true, answer: turn.better || turn.accepted[0].t, mistakePrompt: turn.npc };
     }
@@ -229,8 +239,8 @@
   function mistakeTitle(m) {
     var ref = m.ref || {};
     if (m.kind === 'turn') {
-      var sc = EG.data.scenariosById[ref.scenarioId];
-      return { title: sc ? '«' + sc.turns[ref.turnIdx].npc + '»' : m.prompt, where: sc ? 'Разговор · ' + sc.title : 'Разговор' };
+      var f = findTurn(ref, m.prompt);
+      return { title: f ? '«' + f.turn.npc + '»' : (m.prompt ? '«' + m.prompt + '»' : 'Реплика больше не существует'), where: f ? 'Разговор · ' + f.sc.title : 'Разговор' };
     }
     if (m.kind === 'chat') {
       var ep = EG.data.episodesById[ref.episodeId];

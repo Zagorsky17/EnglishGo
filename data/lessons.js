@@ -210,6 +210,6 @@
   lessons.sort(function (a, b) { return a.order - b.order; });
 
   D.lessons = lessons;
-  D.lessonsById = {};
+  D.lessonsById = Object.create(null); // без прототипа: id «constructor» из backup не найдёт Object
   lessons.forEach(function (l) { D.lessonsById[l.id] = l; });
 })(window.EG = window.EG || {});

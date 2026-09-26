@@ -44,6 +44,39 @@
     emit: function (evt, data) { (handlers[evt] || []).slice().forEach(function (f) { try { f(data); } catch (e) { console.error(e); } }); }
   };
 
+  function noop() { /* ошибка уже показана пользователю через db-error */ }
+
+  /**
+   * «Лечение» состояния после загрузки: данные могли прийти из старой версии,
+   * повреждённого backup или ссылаться на изменённый контент.
+   */
+  function heal() {
+    var aliases = (EG.data && EG.data.idAliases) || {};
+    // переименованные выражения: переносим прогресс на новый id
+    Object.keys(aliases).forEach(function (oldId) {
+      var newId = aliases[oldId];
+      var c = S.cards.get(oldId);
+      if (c && !S.cards.has(newId)) {
+        var moved = Object.assign({}, c, { id: newId });
+        S.cards.set(newId, moved);
+        EG.db.put('cards', moved).then(function () { return EG.db.del('cards', oldId); }).catch(noop);
+      }
+      S.cards.delete(oldId);
+    });
+    // карточки без контента не показываем (в базе оставляем — контент может вернуться)
+    S.cards.forEach(function (c, id) { if (!EG.data.byId[id]) S.cards.delete(id); });
+    // переписки: несуществующий эпизод или узел — начинаем эпизод заново, а не «зависаем»
+    S.chats.forEach(function (rec, id) {
+      var ep = EG.data.episodesById[id];
+      if (!ep) { S.chats.delete(id); return; }
+      if (!rec.done && (!ep.nodes[rec.nodeId] || (rec.phase === 'reply' && !ep.nodes[rec.nodeId].reply))) {
+        console.warn('[EnglishGo] Переписка', id, 'ссылается на несуществующий шаг — начинаем заново');
+        S.chats.delete(id);
+        EG.db.del('chats', id).catch(noop);
+      }
+    });
+  }
+
   /* ---------- состояние ---------- */
   var META_DEFAULTS = {
     totalXp: 0, streak: 0, bestStreak: 0, lastActiveDate: '', skill: 0,
@@ -62,20 +95,27 @@
     recent: [], // последние ответы {correct, ts}
 
     load: function () {
-      var names = ['cards', 'mistakes', 'lessons', 'dialogues', 'stats', 'meta', 'answers', 'games', 'chats'];
-      return Promise.all(names.map(EG.db.getAll)).then(function (r) {
+      var names = ['cards', 'mistakes', 'lessons', 'dialogues', 'stats', 'meta', 'games', 'chats'];
+      return Promise.all(names.map(EG.db.getAll).concat([EG.db.lastAnswers(60)])).then(function (r) {
         S.cards = new Map(r[0].map(function (c) { return [c.id, c]; }));
         S.mistakes = new Map(r[1].map(function (m) { return [m.itemId, m]; }));
         S.lessons = new Map(r[2].map(function (l) { return [l.id, l]; }));
         S.dialogues = new Map(r[3].map(function (d) { return [d.id, d]; }));
         S.stats = new Map(r[4].map(function (s) { return [s.date, s]; }));
-        S.games = new Map(r[7].map(function (g) { return [g.id, g]; }));
-        S.chats = new Map(r[8].map(function (c) { return [c.id, c]; }));
+        S.games = new Map(r[6].map(function (g) { return [g.id, g]; }));
+        S.chats = new Map(r[7].map(function (c) { return [c.id, c]; }));
         S.meta = Object.assign({}, META_DEFAULTS);
-        r[5].forEach(function (m) { S.meta[m.key] = m.value; });
-        if (!S.meta.createdAt) { S.meta.createdAt = Date.now(); EG.db.put('meta', { key: 'createdAt', value: S.meta.createdAt }); }
-        S.recent = r[6].sort(function (a, b) { return a.ts - b.ts; }).slice(-60)
-          .map(function (a) { return { correct: a.correct, ts: a.ts }; });
+        S.hasUndoImport = false;
+        r[5].forEach(function (m) {
+          if (m.key === 'preImportBackup') { S.hasUndoImport = true; return; } // большую копию в памяти не держим
+          var v = EG.db.sanitizeMeta(m.key, m.value);
+          if (v !== undefined) S.meta[m.key] = v;
+        });
+        if (!S.meta.createdAt) { S.meta.createdAt = Date.now(); EG.db.put('meta', { key: 'createdAt', value: S.meta.createdAt }).catch(noop); }
+        S.recent = r[8].map(function (a) { return { correct: !!a.correct, ts: a.ts }; });
+        heal();
+        // история ответов не растёт бесконечно
+        EG.db.pruneAnswers(5000).catch(noop);
         EG.bus.emit('loaded');
       });
     },
@@ -106,7 +146,8 @@
       }
       return s;
     },
-    saveToday: function () { return EG.db.put('stats', S.today()); }
+    saveToday: function () { return EG.db.put('stats', S.today()); },
+    heal: heal
   };
 
   EG.state = S;

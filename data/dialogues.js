@@ -1011,8 +1011,8 @@
   ];
 
   /* ---------- индексы ---------- */
-  D.dialoguesById = {};
+  D.dialoguesById = Object.create(null); // без прототипа: id «constructor» из backup не найдёт Object
   D.dialogues.forEach(function (d) { D.dialoguesById[d.id] = d; });
-  D.scenariosById = {};
+  D.scenariosById = Object.create(null); // без прототипа: id «constructor» из backup не найдёт Object
   D.scenarios.forEach(function (s) { D.scenariosById[s.id] = s; });
 })(window.EG = window.EG || {});

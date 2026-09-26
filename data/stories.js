@@ -350,6 +350,6 @@
     }
   ];
 
-  D.storiesById = {};
+  D.storiesById = Object.create(null); // без прототипа: id «constructor» из backup не найдёт Object
   D.stories.forEach(function (s) { D.storiesById[s.id] = s; });
 })(window.EG = window.EG || {});

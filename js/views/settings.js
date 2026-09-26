@@ -5,7 +5,7 @@
   var h = EG.ui.h, icon = EG.ui.icon;
   EG.views = EG.views || {};
 
-  var MAX_FILE = 50 * 1024 * 1024;
+  var MAX_FILE = 5 * 1024 * 1024; // реальный backup — десятки килобайт; большой JSON «замораживает» телефон
 
   function field(label, control, hint) {
     return h('label', { class: 'field' }, h('span', { class: 'field-label' }, label), control, hint ? h('span', { class: 'muted small' }, hint) : null);
@@ -44,12 +44,14 @@
     var a = h('a', { href: url, download: filename });
     document.body.appendChild(a);
     a.click();
-    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    // на медленных мобильных браузерах скачивание стартует не сразу — не отзываем ссылку раньше времени
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 60000);
   }
 
   function doExport() {
     return EG.db.exportAll().then(function (data) {
       download('english-app-backup.json', JSON.stringify(data, null, 1));
+      EG.state.setMeta('lastExportTs', Date.now()).catch(function () {});
       EG.ui.toast('Резервная копия сохранена', 'good');
     }).catch(function (e) { EG.ui.toast('Не удалось экспортировать: ' + e.message, 'bad'); });
   }
@@ -74,10 +76,17 @@
         return;
       }
       var s = res.summary;
+      // защита от случайного импорта старой копии поверх свежего прогресса
+      var warnOld = [];
+      var fileDay = res.exportedAt ? res.exportedAt.slice(0, 10) : '';
+      var lastActive = EG.state.meta.lastActiveDate || '';
+      if (fileDay && lastActive && fileDay < lastActive) warnOld.push('Файл сохранён ' + new Date(res.exportedAt).toLocaleDateString('ru-RU') + ', а вы занимались позже — последние занятия будут потеряны.');
+      if (s.answers < (EG.state.meta.totalAnswers || 0) && s.answers < 5000) warnOld.push('В файле меньше ответов (' + s.answers + '), чем сейчас (' + EG.state.meta.totalAnswers + ').');
       EG.ui.modal({
         title: 'Восстановить прогресс?',
         body: h('div', null,
-          h('p', null, 'Текущие данные будут полностью заменены данными из файла' + (res.exportedAt ? ' от ' + new Date(res.exportedAt).toLocaleString('ru-RU') : '') + '.'),
+          h('p', null, 'Текущие данные будут полностью заменены данными из файла' + (res.exportedAt ? ' от ' + new Date(res.exportedAt).toLocaleString('ru-RU') : '') + '. Импорт можно будет отменить.'),
+          warnOld.length ? h('div', { class: 'notice warn' }, icon('mistakes'), h('div', null, warnOld.map(function (w) { return h('p', { class: 'small' }, w); }))) : null,
           h('ul', { class: 'plain' },
             h('li', null, 'Карточек SRS: ', h('strong', null, s.cards)),
             h('li', null, 'Ответов в истории: ', h('strong', null, s.answers)),
@@ -90,11 +99,10 @@
         actions: [{ label: 'Отмена', value: false }, { label: 'Восстановить', value: true, primary: true }]
       }).then(function (ok) {
         if (!ok) return;
-        EG.db.importValidated(res)
-          .then(function () { return EG.state.load(); })
+        replaceWithUndo(function () { return EG.db.importValidated(res); })
           .then(function () {
             EG.app.applyTheme();
-            EG.ui.toast('Прогресс восстановлен', 'good');
+            EG.ui.toast('Прогресс восстановлен. Отменить можно в настройках.', 'good');
             EG.router.go('home');
           })
           .catch(function (e) { EG.ui.toast('Ошибка импорта: ' + e.message + '. Данные не изменены.', 'bad'); });
@@ -103,13 +111,34 @@
     reader.readAsText(file);
   }
 
+  /** Заменить все данные, сохранив текущие для «Отменить». */
+  function replaceWithUndo(replace) {
+    return EG.db.exportAll().then(function (snapshot) {
+      return replace().then(function () {
+        return EG.db.put('meta', { key: 'preImportBackup', value: snapshot });
+      });
+    }).then(function () { return EG.state.load(); });
+  }
+
+  function undoReplace() {
+    return EG.db.get('meta', 'preImportBackup').then(function (rec) {
+      if (!rec) throw new Error('Нет сохранённой копии');
+      var res = EG.db.validateBackup(rec.value);
+      if (!res.ok) throw new Error(res.errors.join(' '));
+      return EG.db.importValidated(res); // заменяет всё, включая служебную копию
+    }).then(function () { return EG.state.load(); });
+  }
+
+  function dateLabel(ts) { return ts ? new Date(ts).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : 'ещё не делали'; }
+
   EG.views.settings = function (root) {
     var fileInput = h('input', { type: 'file', accept: 'application/json,.json', class: 'visually-hidden', onchange: function () { doImport(fileInput.files[0]); fileInput.value = ''; } });
 
-    var voices = EG.ui.voices();
+    var voices = EG.ui.usableVoices();
+    var hasOnline = EG.ui.voices().some(function (v) { return v.localService === false; });
     var voiceSelect = h('select', { class: 'input', onchange: function () { EG.storage.set('voice', voiceSelect.value); } },
       h('option', { value: '' }, 'Автоматически'),
-      voices.map(function (v) { return h('option', { value: v.name }, v.name + ' (' + v.lang + ')' + (v.localService ? '' : ' · онлайн')); }));
+      voices.map(function (v) { return h('option', { value: v.name }, v.name + ' (' + v.lang + ')' + (v.localService === false ? ' · онлайн' : '')); }));
     voiceSelect.value = EG.storage.get('voice');
     var rate = h('input', { type: 'range', min: 0.6, max: 1.3, step: 0.05, value: EG.storage.get('rate'), onchange: function () { EG.storage.set('rate', Number(rate.value)); } });
     var testVoice = h('button', { class: 'btn ghost sm', type: 'button', onclick: function () { EG.ui.speak('Hi! How are you doing today?'); } }, icon('speaker'), 'Проверить голос');
@@ -135,27 +164,43 @@
           toggle('speech', 'Озвучка английских фраз', function () { EG.router.refresh(); }),
           voices.length && EG.storage.get('speech') ? toggle('autoSpeak', 'Автоматически произносить фразы', null,
             'Реплики собеседника, новые выражения и задания на аудирование будут звучать сразу при появлении. Если выключено — только по кнопке с динамиком.') : null,
+          hasOnline ? toggle('onlineVoices', 'Разрешить сетевые голоса', function () { EG.router.refresh(); },
+            'Сетевые голоса звучат лучше, но текст фраз отправляется на сервер голосового движка и без интернета они не работают.') : null,
           voices.length ? h('div', null,
-            field('Голос', voiceSelect, 'Голоса берутся из системы и работают офлайн (кроме помеченных «онлайн»).'),
+            field('Голос', voiceSelect, 'Используются голоса системы. Офлайн-голоса работают без интернета.'),
             field('Скорость речи', rate),
             testVoice) :
-            h('p', { class: 'notice warn small' }, icon('speaker'), 'В системе нет английских голосов для озвучки. Задания на аудирование будут показывать фразу на несколько секунд.'))),
+            h('p', { class: 'notice warn small' }, icon('speaker'), hasOnline
+              ? 'В системе есть только сетевые английские голоса. Включите «Разрешить сетевые голоса» или установите офлайн-голос в настройках системы.'
+              : 'В системе нет английских голосов для озвучки. Задания на аудирование будут показывать фразу на несколько секунд.'))),
       h('section', { class: 'card' },
         h('h3', { class: 'card-title' }, 'Резервное копирование'),
         h('p', { class: 'muted' }, 'Весь прогресс хранится в браузере (IndexedDB) на этом устройстве. Сохраните копию, чтобы перенести его на другое устройство или не потерять при очистке браузера.'),
         !EG.db.persistent ? h('p', { class: 'notice warn' }, icon('mistakes'), 'IndexedDB недоступна: данные живут только до закрытия вкладки. Обязательно сделайте экспорт.') : null,
+        h('ul', { class: 'plain small' },
+          h('li', null, 'Последняя резервная копия: ', h('strong', null, dateLabel(EG.state.meta.lastExportTs))),
+          h('li', null, 'Постоянное хранилище: ', h('strong', null, EG.app.persisted === true ? 'да — браузер не удалит данные сам' : EG.app.persisted === false ? 'нет — браузер может очистить данные при нехватке места' : 'неизвестно'))),
         h('div', { class: 'row gap wrap' },
           h('button', { class: 'btn primary', onclick: doExport }, icon('download'), 'Экспорт прогресса'),
           h('button', { class: 'btn ghost', onclick: function () { fileInput.click(); } }, icon('upload'), 'Импорт прогресса'),
+          EG.state.hasUndoImport ? h('button', { class: 'btn ghost', onclick: function () {
+            EG.ui.confirm('Отменить последний импорт или сброс?', 'Будут восстановлены данные, которые были до него.', 'Отменить импорт').then(function (ok) {
+              if (!ok) return;
+              undoReplace().then(function () { EG.app.applyTheme(); EG.ui.toast('Данные восстановлены', 'good'); EG.router.go('home'); })
+                .catch(function (e) { EG.ui.toast('Не удалось отменить: ' + e.message, 'bad'); });
+            });
+          } }, 'Отменить последний импорт / сброс') : null,
           fileInput),
-        h('p', { class: 'muted small' }, 'Файл english-app-backup.json. При импорте проверяются формат, версия и каждая запись — повреждённый файл не затронет текущие данные.')),
+        h('p', { class: 'muted small' }, 'Файл english-app-backup.json. При импорте проверяются формат, версия и каждая запись — повреждённый файл не затронет текущие данные.'),
+        h('p', { class: 'muted small' }, '🔒 В файле — ваша история ответов и имя. Не публикуйте его и не пересылайте посторонним.')),
       h('section', { class: 'card danger-zone' },
         h('h3', { class: 'card-title' }, 'Сброс'),
         h('p', { class: 'muted' }, 'Удалит весь прогресс: карточки, историю, ошибки, статистику. Настройки сохранятся.'),
         h('button', { class: 'btn danger', onclick: function () {
-          EG.ui.confirm('Сбросить весь прогресс?', 'Это действие нельзя отменить. Рекомендуем сначала сделать экспорт.', 'Сбросить', true).then(function (ok) {
+          EG.ui.confirm('Сбросить весь прогресс?', 'Сброс можно будет отменить сразу после него, но надёжнее сначала сделать экспорт.', 'Сбросить', true).then(function (ok) {
             if (!ok) return;
-            EG.db.wipe().then(function () { return EG.state.load(); }).then(function () { EG.ui.toast('Прогресс сброшен'); EG.router.go('home'); });
+            replaceWithUndo(EG.db.wipe).then(function () { EG.ui.toast('Прогресс сброшен. Отменить можно в настройках.'); EG.router.go('home'); })
+              .catch(function (e) { EG.ui.toast('Не удалось сбросить: ' + e.message, 'bad'); });
           });
         } }, icon('trash'), 'Сбросить прогресс')),
       h('p', { class: 'muted small center' }, 'EnglishGo · работает полностью офлайн · формат данных v' + EG.db.SCHEMA_VERSION));

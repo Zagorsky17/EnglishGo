@@ -29,18 +29,6 @@
     return { id: ep.id, contactId: ep.contactId, nodeId: ep.start, phase: 'enter', messages: [], turns: 0, scoreSum: 0, done: false, score: 0, startedTs: Date.now(), lastTs: Date.now(), readTs: 0 };
   }
 
-  /** Все сообщения переписки с контактом (завершённые эпизоды + текущий). */
-  function history(contactId) {
-    var out = [];
-    episodesFor(contactId).forEach(function (ep) {
-      var r = record(ep);
-      if (!r) return;
-      if (out.length) out.push({ sep: true, text: ep.title });
-      r.messages.forEach(function (m) { out.push(m); });
-    });
-    return out;
-  }
-
   /** Статус для списка чатов. */
   function status(contact) {
     var eps = episodesFor(contact.id);
@@ -126,12 +114,41 @@
     return out;
   }
 
+  /**
+   * Завершение эпизода (XP, статистика, выражения в повторение) — выполняется один раз,
+   * сразу при переходе к последнему шагу, а не после анимации: уход с экрана не теряет награду.
+   */
+  function completeEpisode(ep, rec) {
+    if (rec.completed) return Promise.resolve(rec.xp || 0);
+    var ids = (ep.learn || []).map(EG.data.resolve).filter(Boolean);
+    rec.completed = true; // защита от повторного начисления при двойном вызове
+    return Promise.all([EG.progress.completeDialogue(ep.id, 'chat', rec.score), EG.srs.addItems(ids)]).then(function (r) {
+      rec.xp = r[0] || 0;
+      return EG.state.saveChat(Object.assign({}, rec)).then(function () { return rec.xp; });
+    }, function (e) { rec.completed = false; throw e; });
+  }
+
+  /** Эпизоды, помеченные завершёнными, но без начисления (старые версии, закрытие вкладки). */
+  function completePending() {
+    EG.state.chats.forEach(function (rec) {
+      var ep = EG.data.episodesById[rec.id];
+      if (!ep || !rec.done || rec.completed) return;
+      if (EG.state.dialogues.has(ep.id)) { // уже начислено старой версией
+        rec.completed = true;
+        EG.state.saveChat(Object.assign({}, rec)).catch(function () {});
+      } else {
+        completeEpisode(ep, rec).catch(function () {});
+      }
+    });
+  }
+
   EG.chat = {
+    completeEpisode: completeEpisode,
+    completePending: completePending,
     episodesFor: episodesFor,
     currentEpisode: currentEpisode,
     record: record,
     newRecord: newRecord,
-    history: history,
     status: status,
     unreadTotal: unreadTotal,
     evaluate: evaluate,

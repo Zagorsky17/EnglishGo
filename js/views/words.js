@@ -44,6 +44,8 @@
     });
   }
 
+  var searchTimer = null;
+
   EG.views.words = function (root) {
     var listEl = h('div', { class: 'word-list' });
     var countEl = h('span', { class: 'muted small' });
@@ -56,7 +58,7 @@
     }
 
     var search = h('input', { class: 'input', type: 'search', placeholder: 'Поиск по-английски или по-русски…', value: filters.q,
-      oninput: function () { filters.q = search.value; draw(); } });
+      oninput: function () { filters.q = search.value; clearTimeout(searchTimer); searchTimer = setTimeout(draw, 150); } }); // не перерисовываем список на каждую букву
 
     var bar = h('div', { class: 'filters' },
       h('div', { class: 'search' }, icon('search'), search),
