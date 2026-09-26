@@ -3,8 +3,8 @@
   'use strict';
 
   var DB_NAME = 'englishgo';
-  var DB_VERSION = 2;     // v2: + games, chats
-  var SCHEMA_VERSION = 2; // версия формата backup-файла
+  var DB_VERSION = 3;     // v2: + games, chats; v3: + words
+  var SCHEMA_VERSION = 3; // версия формата backup-файла
   var APP_ID = 'EnglishGo';
 
   var STORES = {
@@ -16,7 +16,8 @@
     stats:     { keyPath: 'date' },
     meta:      { keyPath: 'key' },
     games:     { keyPath: 'id' },
-    chats:     { keyPath: 'id' }
+    chats:     { keyPath: 'id' },
+    words:     { keyPath: 'id' }
   };
   var STORE_NAMES = Object.keys(STORES);
 
@@ -394,6 +395,14 @@
         turns: num(r.turns, 0), scoreSum: num(r.scoreSum, 0), done: !!r.done, score: clampNum(r.score, 0, 100, 0),
         completed: !!r.completed, xp: num(r.xp, 0), startedTs: num(r.startedTs, 0), lastTs: num(r.lastTs, 0), readTs: num(r.readTs, 0)
       };
+    },
+    words: function (r) {
+      if (!isStr(r.id) || !isNum(r.due)) return null;
+      return {
+        id: r.id, due: r.due, box: Math.round(clampNum(r.box, 0, 7, 0)),
+        correct: num(r.correct, 0), wrong: num(r.wrong, 0), streak: num(r.streak, 0),
+        firstTs: num(r.firstTs, 0), lastTs: num(r.lastTs, 0), learnedTs: num(r.learnedTs, 0)
+      };
     }
   };
 
@@ -403,6 +412,11 @@
     1: function (data) {
       data.stores.games = data.stores.games || [];
       data.stores.chats = data.stores.chats || [];
+      return data;
+    },
+    // v2 → v3: тренажёр словарного запаса
+    2: function (data) {
+      data.stores.words = data.stores.words || [];
       return data;
     }
   };

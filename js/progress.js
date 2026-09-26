@@ -223,6 +223,13 @@
       recs.push({ icon: 'review', tone: 'accent', title: 'Повторите ' + reviewDue + ' ' + EG.util.plural(reviewDue, 'выражение', 'выражения', 'выражений'),
         text: 'Интервальное повторение закрепляет фразы в долгой памяти. Лучше всего — именно сегодня.', href: '#/review' });
     }
+    var words = EG.wordTrainer && EG.wordTrainer.counts(EG.storage.get('wordLevel'));
+    if (words && (words.due > 0 || words.fresh > 0)) {
+      recs.push({ icon: 'vocab', tone: 'accent',
+        title: words.due ? 'Слова: ' + words.due + ' ' + EG.util.plural(words.due, 'слово ждёт', 'слова ждут', 'слов ждут') + ' повторения' : 'Пополните словарный запас',
+        text: words.due ? 'Короткая сессия с выбором перевода из 4 вариантов — выученные слова появляются всё реже.' : 'Ещё ' + words.fresh + ' новых слов вашего уровня. 20 слов — около пяти минут.',
+        href: '#/vocab' });
+    }
     if (mistakes >= 3) {
       recs.push({ icon: 'mistakes', tone: 'warn', title: 'Разберите ошибки (' + mistakes + ')',
         text: 'Повторение ошибок — самый быстрый способ перестать их делать.', href: '#/mistakes' });

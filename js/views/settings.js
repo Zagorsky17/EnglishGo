@@ -93,7 +93,8 @@
             h('li', null, 'Ошибок: ', h('strong', null, s.mistakes)),
             h('li', null, 'Уроков и диалогов: ', h('strong', null, s.lessons + s.dialogues)),
             h('li', null, 'Дней статистики: ', h('strong', null, s.stats)),
-            h('li', null, 'Переписок и игр: ', h('strong', null, (s.chats || 0) + ' / ' + (s.games || 0)))),
+            h('li', null, 'Переписок и игр: ', h('strong', null, (s.chats || 0) + ' / ' + (s.games || 0))),
+            h('li', null, 'Слов в тренажёре: ', h('strong', null, s.words || 0))),
           res.warnings.length ? h('details', null, h('summary', null, 'Предупреждения (' + res.warnings.length + ')'),
             h('ul', { class: 'plain small' }, res.warnings.map(function (w) { return h('li', null, w); }))) : null),
         actions: [{ label: 'Отмена', value: false }, { label: 'Восстановить', value: true, primary: true }]

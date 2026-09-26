@@ -730,3 +730,17 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .app-banner.bad { background: var(--bad-soft); }
 .instance-lock { z-index: 300; }
 .noscript { padding: 20px; }
+
+/* ---------- словарный запас ---------- */
+.vocab-summary { display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; }
+.level-seg button { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.2; }
+.seg-sub { font-size: .7rem; font-weight: 500; opacity: .75; }
+.vocab-hint { margin-top: 10px; }
+.vocab-modes { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--gap); margin-bottom: var(--gap); }
+.vocab-mode.last { border-color: var(--accent); }
+.vocab-mode-emoji { font-size: 1.5rem; }
+.vocab-filters { margin-bottom: 8px; }
+.vocab-row.learned strong::after { content: ' ✓'; color: var(--good); }
+.word-prompt { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; text-align: center; font-size: 1.9rem; font-weight: 700; line-height: 1.25; margin: 18px 0 4px; }
+.word-q .badges { margin-bottom: 0; }
+.dont-know { margin: 12px 0 0; }
