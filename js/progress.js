@@ -105,8 +105,10 @@
       S().saveToday()
     ];
 
-    var m = S().mistakes.get(opts.itemId);
-    if (!opts.correct) {
+    var m = opts.noMistake ? null : S().mistakes.get(opts.itemId);
+    if (opts.noMistake) {
+      // ответ учитывается в статистике и XP, но не попадает в «Ошибки»
+    } else if (!opts.correct) {
       m = Object.assign(m || { itemId: opts.itemId, count: 0, firstTs: now }, {
         count: (m ? m.count : 0) + 1, lastTs: now, resolved: false, rightStreak: 0,
         kind: opts.kind || 'vocab', type: opts.type, lastUserAnswer: String(opts.userAnswer || ''),
@@ -180,7 +182,7 @@
     var lessonsDone = 0;
     EG.data.lessons.forEach(function (l) { if (S().lessons.has(l.id)) lessonsDone++; });
     var dlgDone = S().dialogues.size;
-    var dlgTotal = EG.data.dialogues.length + EG.data.scenarios.length;
+    var dlgTotal = EG.data.dialogues.length + EG.data.scenarios.length + EG.data.stories.length + EG.data.episodes.length;
     // вес: словарь 60%, уроки 20%, диалоги 20%
     var pct = total ? (learned / total) * 60 + (lessonsDone / EG.data.lessons.length) * 20 + (Math.min(dlgDone, dlgTotal) / dlgTotal) * 20 : 0;
     return { pct: Math.round(pct), learned: learned, total: total, lessonsDone: lessonsDone, dlgDone: dlgDone, dlgTotal: dlgTotal };
@@ -224,6 +226,13 @@
       recs.push({ icon: 'mistakes', tone: 'warn', title: 'Разберите ошибки (' + mistakes + ')',
         text: 'Повторение ошибок — самый быстрый способ перестать их делать.', href: '#/mistakes' });
     }
+    // новое сообщение в мессенджере
+    var unreadContact = EG.data.contacts.filter(function (c) { return EG.chat.status(c).unread; })[0];
+    if (unreadContact) {
+      var cs = EG.chat.status(unreadContact);
+      recs.push({ icon: 'chat', tone: 'good', title: 'Новое сообщение от ' + unreadContact.name,
+        text: '«' + (cs.last ? cs.last.text : '') + '» — ответьте, как в настоящем мессенджере.', href: '#/chat/' + unreadContact.id });
+    }
     var sug = levelSuggestion();
     if (sug && S().meta.levelHintShown !== EG.util.dateKey()) {
       recs.push({ icon: 'bolt', tone: 'good',
@@ -245,12 +254,19 @@
       recs.push({ icon: 'today', tone: 'accent', title: 'Учите новое',
         text: 'Повторений нет — отличное время добавить новые выражения.', href: '#/today' });
     }
+    var story = nextOf(EG.data.stories, 'story');
+    if (story) {
+      recs.push({ icon: 'book', tone: 'accent', title: 'Прочитайте: ' + story.title,
+        text: (story.kind === 'chat' ? 'Переписка со сленгом' : 'Полный диалог') + ' и ' + story.questions.length + ' вопросов на понимание.', href: '#/story/' + story.id });
+    }
+    var gd = EG.games.gameOfDay();
+    recs.push({ icon: 'game', tone: 'warn', title: 'Игра дня: ' + gd.title + ' (×2 XP)', text: gd.desc, href: '#/game/' + gd.id });
     var dlg = nextOf(EG.data.dialogues, 'dialogue');
     if (dlg) {
       recs.push({ icon: 'dialogues', tone: 'accent', title: 'Диалог: ' + dlg.title,
         text: 'Интерактивная сцена с выбором реплик и разбором.', href: '#/dialogue/' + dlg.id });
     }
-    return recs.slice(0, 4);
+    return recs.slice(0, 5);
   }
 
   EG.progress = {

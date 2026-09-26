@@ -33,7 +33,9 @@
       h('span', { class: 'scene-body' },
         h('strong', null, obj.title),
         h('span', { class: 'scene-setting', lang: 'en' }, obj.setting),
-        h('span', { class: 'muted small' }, kind === 'talk' ? obj.turns.length + ' ' + EG.util.plural(obj.turns.length, 'реплика', 'реплики', 'реплик') + ' · свободный ответ' : (topic.title || ''))),
+        h('span', { class: 'muted small' }, kind === 'talk' ? obj.turns.length + ' ' + EG.util.plural(obj.turns.length, 'реплика', 'реплики', 'реплик') + ' · свободный ответ'
+          : kind === 'story' ? (obj.kind === 'chat' ? '📱 переписка' : '💬 диалог') + ' · ' + obj.questions.length + ' вопросов на понимание'
+          : (topic.title || ''))),
       h('span', { class: 'scene-meta' }, EG.ui.levelBadge(obj.level), statusBadge(obj.id)));
   }
 
@@ -50,10 +52,18 @@
 
   /* ================= Диалоги ================= */
 
-  EG.views.dialogues = function (root) {
+  EG.views.dialogues = function (root, params) {
+    var read = params[0] === 'read';
+    var tabs = h('div', { class: 'segmented tabs', role: 'tablist' },
+      h('a', { class: read ? '' : 'active', href: '#/dialogues', role: 'tab' }, 'Интерактивные'),
+      h('a', { class: read ? 'active' : '', href: '#/dialogues/read', role: 'tab' }, 'Читать и понять'));
     root.append(
-      EG.ui.pageHead('Диалоги', 'Интерактивные сцены: выбирайте реплики и смотрите, как на них реагирует собеседник. После каждой — разбор естественности.'),
-      groupedList(EG.data.dialogues, function (d) { return '#/dialogue/' + d.id; }, 'dialogue'));
+      EG.ui.pageHead('Диалоги', read
+        ? 'Полные диалоги и переписки. Прочитайте (перевод — по нажатию на реплику) и ответьте на вопросы на понимание.'
+        : 'Интерактивные сцены: выбирайте реплики и смотрите, как на них реагирует собеседник. После каждой — разбор естественности.'),
+      tabs,
+      read ? groupedList(EG.data.stories, function (d) { return '#/story/' + d.id; }, 'story')
+        : groupedList(EG.data.dialogues, function (d) { return '#/dialogue/' + d.id; }, 'dialogue'));
   };
 
   EG.views.dialogue = function (root, params) {

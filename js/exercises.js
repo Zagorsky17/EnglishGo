@@ -17,10 +17,35 @@
     [/\bu\b/g, 'you'], [/\bur\b/g, 'your'], [/\bcuz\b|\b'cause\b/g, 'because'], [/\byeah\b|\byep\b|\byup\b/g, 'yes']
   ];
 
+  // Сокращения из мессенджеров → полная форма (чтобы «r u coming 2day» ≈ «are you coming today»)
+  var TEXTING = {
+    r: 'are', ya: 'you', u2: 'you too', idk: 'i do not know', ik: 'i know', ty: 'thank you', tysm: 'thank you so much',
+    np: 'no problem', omw: 'on my way', lmk: 'let me know', hbu: 'how about you', wbu: 'what about you',
+    wyd: 'what are you doing', wya: 'where are you', rn: 'right now', brb: 'be right back', gtg: 'got to go', g2g: 'got to go',
+    cya: 'see you', cu: 'see you', ttyl: 'talk to you later', nvm: 'never mind', ofc: 'of course', bc: 'because',
+    tbh: 'to be honest', ngl: 'not going to lie', imo: 'in my opinion', imho: 'in my opinion', btw: 'by the way',
+    fyi: 'for your information', asap: 'as soon as possible', jk: 'just kidding', ikr: 'i know right', smh: 'shaking my head',
+    ppl: 'people', msg: 'message', sry: 'sorry', srry: 'sorry', abt: 'about', bday: 'birthday', tho: 'though', thru: 'through',
+    prob: 'probably', prolly: 'probably', def: 'definitely', rly: 'really', sm: 'so much', k: 'ok', kk: 'ok', okie: 'ok',
+    tmrw: 'tomorrow', tmr: 'tomorrow', '2morrow': 'tomorrow', '2day': 'today', '2nite': 'tonight', tonite: 'tonight',
+    b4: 'before', l8r: 'later', gr8: 'great', pic: 'picture', pics: 'pictures', convo: 'conversation', gf: 'girlfriend', bf: 'boyfriend',
+    bro: 'brother', ty4: 'thank you for', dm: 'message', txt: 'text', ur: 'your', u: 'you',
+    // апострофы в чатах часто опускают
+    im: 'i am', ive: 'i have', dont: 'do not', doesnt: 'does not', didnt: 'did not', cant: 'can not', wont: 'will not',
+    isnt: 'is not', arent: 'are not', wasnt: 'was not', thats: 'that is', whats: 'what is', youre: 'you are', theyre: 'they are', lets: 'let us'
+  };
+  var TEXTING_RE = new RegExp('(^|[^a-z0-9\'])(' + Object.keys(TEXTING).sort(function (a, b) { return b.length - a.length; }).join('|') + ')(?=$|[^a-z0-9\'])', 'g');
+
+  function expandTexting(s) {
+    return s.replace(/\bw\/o\b/g, 'without').replace(/\bw\//g, 'with ').replace(/\bb\/c\b/g, 'because')
+      .replace(TEXTING_RE, function (m, pre, w) { return pre + TEXTING[w]; });
+  }
+
   function normalize(s) {
     s = String(s || '').toLowerCase()
       .replace(/[’‘`´]/g, "'").replace(/[“”]/g, '"')
       .replace(/…/g, ' ');
+    s = expandTexting(s);
     CONTRACTIONS.forEach(function (c) { s = s.replace(c[0], c[1]); });
     return s.replace(/'s\b/g, ' s').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
   }
@@ -53,7 +78,7 @@
     return lev(a, b) <= (Math.max(a.length, b.length) >= 7 ? 2 : 1);
   }
 
-  var FILLER = { please: 1, um: 1, uh: 1, oh: 1, well: 1, so: 1, just: 1, like: 0, hi: 1, hey: 1, thanks: 1, thank: 1, you: 0 };
+  var FILLER = { please: 1, um: 1, uh: 1, oh: 1, well: 1, so: 1, just: 1, like: 0, hi: 1, hey: 1, thanks: 1, thank: 1, you: 0, lol: 1, haha: 1, lmao: 1, omg: 1, yay: 1, hehe: 1, ok: 1 };
 
   /** Коэффициент Дайса по словам (с учётом опечаток). */
   function dice(ta, tb) {
@@ -114,9 +139,18 @@
 
   function hasCyrillic(s) { return /[а-яё]/i.test(s); }
 
+  var SLANG_MARKERS = /(^|[^a-z0-9'])(u|ur|r|ya|idk|lol|lmao|omg|ngl|tbh|wyd|hbu|wbu|lmk|brb|gtg|cya|cu|omw|ttyl|nvm|rn|np|ty|thx|tysm|pls|plz|k|kk|gonna|wanna|gotta|kinda|sorta|2day|2nite|l8r|gr8|b4|tmrw|jk|ikr|smh|bro|dude|w\/)(?=$|[^a-z0-9'])/g;
+  /** Сленговые/чатовые маркеры в тексте (для оценки уместности регистра). */
+  function slangMarkers(s) {
+    var out = [];
+    String(s || '').toLowerCase().replace(SLANG_MARKERS, function (m, pre, w) { if (out.indexOf(w) < 0) out.push(w); return m; });
+    return out;
+  }
+
   EG.text = {
     normalize: normalize, lev: lev, similarity: similarity, dice: dice,
-    phraseSim: phraseSim, matchAny: matchAny, hasKeyword: hasKeyword, hasCyrillic: hasCyrillic
+    phraseSim: phraseSim, matchAny: matchAny, hasKeyword: hasKeyword, hasCyrillic: hasCyrillic,
+    expandTexting: expandTexting, slangMarkers: slangMarkers, TEXTING: TEXTING
   };
 
   /* =========================================================
@@ -257,6 +291,66 @@
       };
     },
 
+    // Скажите то же самое неформально
+    slangify: function (item) {
+      var f = item.forms;
+      if (!f || !f.slang || item.register === 'casual') return null;
+      var pool = EG.data.vocab.filter(function (v) { return v.forms && v.forms.slang && v.id !== item.id; })
+        .map(function (v) { return { en: v.forms.slang, id: v.id, topic: v.topic, level: v.level, type: v.type }; });
+      return {
+        type: 'slangify', item: item, prompt: 'Как сказать это неформально — другу?',
+        options: options(f.slang, distractors({ id: item.id, en: f.slang, topic: item.topic, level: item.level, type: item.type }, 3, 'en', pool)),
+        answer: f.slang, note: f.note
+      };
+    },
+
+    // Скажите то же самое нейтрально (для сленга и разговорных фраз)
+    formalize: function (item) {
+      var f = item.forms;
+      if (!f || !f.neutral) return null;
+      var pool = EG.data.vocab.filter(function (v) { return v.forms && v.forms.neutral && v.id !== item.id; })
+        .map(function (v) { return { en: v.forms.neutral, id: v.id, topic: v.topic, level: v.level, type: v.type }; });
+      return {
+        type: 'formalize', item: item, prompt: 'Как сказать это нейтрально — коллеге или незнакомому человеку?',
+        options: options(f.neutral, distractors({ id: item.id, en: f.neutral, topic: item.topic, level: item.level, type: item.type }, 3, 'en', pool)),
+        answer: f.neutral, note: f.note
+      };
+    },
+
+    // Расшифруй сообщение из мессенджера
+    decode: function (item) {
+      // для темы «Язык переписки» расшифровываем целое сообщение-пример
+      if (item.topic === 'texting') {
+        return {
+          type: 'decode', item: item, message: item.example, prompt: 'Вам пишут в мессенджере. Что это значит?',
+          options: options(item.exampleRu, distractors(item, 3, 'exampleRu')), answer: item.exampleRu
+        };
+      }
+      var msg = textForm(item);
+      if (!msg || !EG.text.slangMarkers(msg).length) return null;
+      return {
+        type: 'decode', item: item, message: msg, prompt: 'Вам пишут в мессенджере. Что это значит?',
+        options: options(item.ru, distractors(item, 3, 'ru')), answer: item.ru
+      };
+    },
+
+    // Напишите как в чате
+    texting: function (item) {
+      if (item.topic === 'texting') {
+        return {
+          type: 'texting', item: item, prompt: 'Напишите другу в мессенджере — коротко, как в чате', hintRu: item.exampleRu,
+          answers: [item.example], answer: item.example
+        };
+      }
+      var msg = textForm(item);
+      if (!msg || !EG.text.slangMarkers(msg).length) return null;
+      return {
+        type: 'texting', item: item, prompt: 'Напишите это другу в мессенджере — коротко, как в чате',
+        answers: [item.en].concat(textForms(item), item.alt || [], item.forms.slang ? [item.forms.slang] : []),
+        answer: msg
+      };
+    },
+
     // Собери фразу из слов
     build: function (item) {
       var target = item.example && item.example.split(/\s+/).length <= 11 ? item.example : item.en;
@@ -272,6 +366,13 @@
     }
   };
 
+  /** Формы из поля text: «cya / l8r / ttyl» → ['cya', 'l8r', 'ttyl'] */
+  function textForms(item) {
+    if (!item.forms || !item.forms.text) return [];
+    return item.forms.text.split(' / ').map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+  function textForm(item) { return textForms(item)[0] || null; }
+
   function make(type, item) {
     var fn = MAKERS[type];
     return fn ? fn(item) : null;
@@ -283,10 +384,10 @@
     var hard = card && card.difficulty > 0.5;
     var high = U.levelIndex(item.level) >= 2;
     var pools = [
-      ['context', 'meaning', 'listen', 'register'],
-      ['context', 'reaction', 'build', 'listen', 'meaning'],
-      ['recall', 'reaction', 'build', 'context', high ? 'dictation' : 'listen'],
-      ['recall', 'reaction', 'recall', high ? 'dictation' : 'build']
+      ['context', 'meaning', 'listen', 'register', 'decode'],
+      ['context', 'reaction', 'build', 'listen', 'meaning', 'slangify', 'formalize', 'decode'],
+      ['recall', 'reaction', 'build', 'context', high ? 'dictation' : 'listen', 'slangify', 'formalize', 'texting'],
+      ['recall', 'reaction', 'recall', high ? 'dictation' : 'build', 'texting', 'slangify']
     ];
     var pool = pools[hard ? Math.max(0, stage - 1) : stage].slice();
     pool = U.shuffle(pool);
@@ -345,6 +446,7 @@
     forLesson: forLesson,
     forReview: forReview,
     findInExample: findInExample,
+    textForms: textForms,
     stripEnd: stripEnd
   };
 })(window.EG = window.EG || {});

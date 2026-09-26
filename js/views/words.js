@@ -5,7 +5,7 @@
   var h = EG.ui.h, icon = EG.ui.icon;
   EG.views = EG.views || {};
 
-  var filters = { q: '', level: '', topic: '', type: '', status: '' };
+  var filters = { q: '', level: '', topic: '', type: '', status: '', forms: '' };
 
   function statusOf(id) {
     var c = EG.state.cards.get(id);
@@ -31,6 +31,7 @@
       it.cue ? h('p', { class: 'small' }, h('span', { class: 'muted' }, 'Ответ на реплику: '), h('em', { lang: 'en' }, it.cue), it.cueRu ? h('span', { class: 'muted' }, ' — ' + it.cueRu) : null) : null,
       it.example ? h('div', { class: 'context-box' }, h('p', { class: 'example', lang: 'en' }, EG.ui.highlight(it), ' ', EG.ui.speakBtn(it.example, true)), h('p', { class: 'muted' }, it.exampleRu)) : null,
       it.usage ? h('p', { class: 'usage' }, icon('bulb'), it.usage) : null,
+      EG.player.formsBlock(it),
       it.alt && it.alt.length ? h('p', { class: 'small' }, h('span', { class: 'muted' }, 'Также говорят: '), it.alt.join(' · ')) : null,
       srsInfo);
 
@@ -62,6 +63,7 @@
       select('level', 'Все уровни', EG.LEVELS.map(function (l) { return [l, l]; })),
       select('topic', 'Все темы', Object.keys(EG.data.topics).map(function (k) { return [k, EG.data.topics[k].title]; })),
       select('type', 'Все типы', Object.keys(EG.ui.TYPES).map(function (k) { return [k, EG.ui.TYPES[k]]; })),
+      select('forms', 'Все формы', [['slang', 'есть сленговая пара'], ['text', 'есть форма для чата']]),
       select('status', 'Любой статус', [['none', 'не изучалось'], ['new', 'новое'], ['learning', 'изучается'], ['review', 'повторение'], ['mastered', 'выучено']]));
 
     function draw() {
@@ -71,7 +73,9 @@
         if (filters.topic && v.topic !== filters.topic) return false;
         if (filters.type && v.type !== filters.type) return false;
         if (filters.status && statusOf(v.id) !== filters.status) return false;
-        if (q && (v.en + ' ' + v.ru + ' ' + (v.example || '')).toLowerCase().indexOf(q) < 0) return false;
+        if (filters.forms === 'slang' && !(v.forms && (v.forms.slang || v.forms.neutral))) return false;
+        if (filters.forms === 'text' && !(v.forms && v.forms.text) && v.topic !== 'texting') return false;
+        if (q && (v.en + ' ' + v.ru + ' ' + (v.example || '') + ' ' + (v.forms ? [v.forms.slang, v.forms.neutral, v.forms.text].join(' ') : '')).toLowerCase().indexOf(q) < 0) return false;
         return true;
       });
       countEl.textContent = 'Найдено: ' + items.length;
@@ -81,7 +85,7 @@
         frag.appendChild(h('button', { class: 'word', type: 'button', onclick: function () { openItem(v, draw); } },
           h('span', { class: 'word-main' },
             h('strong', { lang: 'en' }, v.en),
-            h('span', { class: 'muted' }, v.ru)),
+            h('span', { class: 'muted' }, v.ru + (v.forms && (v.forms.slang || v.forms.neutral) ? '  ·  ' + (v.forms.slang ? 'сленг: ' + v.forms.slang : 'обычно: ' + v.forms.neutral) : ''))),
           h('span', { class: 'word-meta' },
             st !== 'none' ? h('span', { class: 'dot st-' + st, title: EG.ui.STATE_RU[st] }) : null,
             EG.ui.levelBadge(v.level))));

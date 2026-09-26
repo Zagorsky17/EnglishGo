@@ -6,17 +6,22 @@
   var ROUTES = [
     { path: 'home',      title: 'Главная',        icon: 'home',      nav: 'main' },
     { path: 'today',     title: 'Учить сегодня',  short: 'Сегодня', icon: 'today', nav: 'main' },
-    { path: 'words',     title: 'Слова',          icon: 'words',     nav: 'side' },
+    { path: 'chats',     title: 'Чаты',           icon: 'chat',      nav: 'main' },
+    { path: 'games',     title: 'Игры',           icon: 'game',      nav: 'main' },
+    { path: 'review',    title: 'Повторение',     icon: 'review',    nav: 'side' },
+    { path: 'talk',      title: 'Разговор',       icon: 'talk',      nav: 'side' },
     { path: 'dialogues', title: 'Диалоги',        icon: 'dialogues', nav: 'side' },
-    { path: 'talk',      title: 'Разговор',       icon: 'talk',      nav: 'main' },
-    { path: 'review',    title: 'Повторение',     icon: 'review',    nav: 'main' },
+    { path: 'words',     title: 'Слова',          icon: 'words',     nav: 'side' },
     { path: 'mistakes',  title: 'Ошибки',         icon: 'mistakes',  nav: 'side' },
     { path: 'progress',  title: 'Прогресс',       icon: 'progress',  nav: 'side' },
     { path: 'settings',  title: 'Настройки',      icon: 'settings',  nav: 'side' },
     // вложенные экраны (без пункта меню)
     { path: 'lesson',    parent: 'today' },
     { path: 'dialogue',  parent: 'dialogues' },
-    { path: 'session',   parent: 'today' }
+    { path: 'story',     parent: 'dialogues' },
+    { path: 'session',   parent: 'today' },
+    { path: 'chat',      parent: 'chats' },
+    { path: 'game',      parent: 'games' }
   ];
 
   var cleanup = null;

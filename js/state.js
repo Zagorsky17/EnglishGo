@@ -56,17 +56,21 @@
     lessons: new Map(),
     dialogues: new Map(),
     stats: new Map(),
+    games: new Map(),
+    chats: new Map(),
     meta: Object.assign({}, META_DEFAULTS),
     recent: [], // последние ответы {correct, ts}
 
     load: function () {
-      var names = ['cards', 'mistakes', 'lessons', 'dialogues', 'stats', 'meta', 'answers'];
+      var names = ['cards', 'mistakes', 'lessons', 'dialogues', 'stats', 'meta', 'answers', 'games', 'chats'];
       return Promise.all(names.map(EG.db.getAll)).then(function (r) {
         S.cards = new Map(r[0].map(function (c) { return [c.id, c]; }));
         S.mistakes = new Map(r[1].map(function (m) { return [m.itemId, m]; }));
         S.lessons = new Map(r[2].map(function (l) { return [l.id, l]; }));
         S.dialogues = new Map(r[3].map(function (d) { return [d.id, d]; }));
         S.stats = new Map(r[4].map(function (s) { return [s.date, s]; }));
+        S.games = new Map(r[7].map(function (g) { return [g.id, g]; }));
+        S.chats = new Map(r[8].map(function (c) { return [c.id, c]; }));
         S.meta = Object.assign({}, META_DEFAULTS);
         r[5].forEach(function (m) { S.meta[m.key] = m.value; });
         if (!S.meta.createdAt) { S.meta.createdAt = Date.now(); EG.db.put('meta', { key: 'createdAt', value: S.meta.createdAt }); }
@@ -90,6 +94,8 @@
     deleteMistake: function (id) { S.mistakes.delete(id); return EG.db.del('mistakes', id); },
     saveLesson: function (l) { S.lessons.set(l.id, l); return EG.db.put('lessons', l); },
     saveDialogue: function (d) { S.dialogues.set(d.id, d); return EG.db.put('dialogues', d); },
+    saveGame: function (g) { S.games.set(g.id, g); return EG.db.put('games', g); },
+    saveChat: function (c) { S.chats.set(c.id, c); return EG.db.put('chats', c); },
 
     today: function () {
       var key = EG.util.dateKey();

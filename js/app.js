@@ -14,7 +14,8 @@
   function navLink(r, cls) {
     return h('a', { href: '#/' + r.path, class: cls, 'data-nav': r.path }, icon(r.icon), h('span', null, cls === 'bn-item' ? (r.short || r.title) : r.title),
       r.path === 'review' ? h('span', { class: 'nav-count', 'data-count': 'review' }) : null,
-      r.path === 'mistakes' ? h('span', { class: 'nav-count', 'data-count': 'mistakes' }) : null);
+      r.path === 'mistakes' ? h('span', { class: 'nav-count', 'data-count': 'mistakes' }) : null,
+      r.path === 'chats' ? h('span', { class: 'nav-count green', 'data-count': 'chats' }) : null);
   }
 
   function buildNav() {
@@ -41,8 +42,10 @@
   function updateBadges() {
     var review = EG.srs.getDue().filter(function (c) { return c.state !== 'new'; }).length;
     var mistakes = EG.progress.unresolvedMistakes().length;
+    var chats = EG.chat.unreadTotal();
     document.querySelectorAll('[data-count]').forEach(function (el) {
-      var n = el.getAttribute('data-count') === 'review' ? review : mistakes;
+      var k = el.getAttribute('data-count');
+      var n = k === 'review' ? review : k === 'chats' ? chats : mistakes;
       el.textContent = n > 99 ? '99+' : n ? String(n) : '';
     });
     var xpEl = document.getElementById('hud-xp'), stEl = document.getElementById('hud-streak');
@@ -103,6 +106,7 @@
       });
 
     ['cards', 'answer', 'xp', 'loaded', 'settings', 'streak'].forEach(function (e) { EG.bus.on(e, updateBadges); });
+    window.addEventListener('hashchange', function () { setTimeout(updateBadges, 50); });
     EG.bus.on('goal', function () { EG.ui.toast('Дневная цель выполнена! 🎉', 'good'); });
     EG.bus.on('streak', function (n) { if (n > 1) EG.ui.toast('Серия: ' + n + ' ' + EG.util.plural(n, 'день', 'дня', 'дней') + ' подряд 🔥', 'good'); });
     EG.bus.on('voices', function () { if (/^#\/settings/.test(location.hash)) EG.router.refresh(); });

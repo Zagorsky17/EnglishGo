@@ -5,7 +5,7 @@
   var h = EG.ui.h, icon = EG.ui.icon;
   EG.views = EG.views || {};
 
-  var EXPECTED_MS = { context: 8000, meaning: 7000, listen: 9000, register: 7000, recall: 14000, dictation: 15000, build: 16000, turn: 20000, dlgnode: 9000 };
+  var EXPECTED_MS = { context: 8000, meaning: 7000, listen: 9000, register: 7000, recall: 14000, dictation: 15000, build: 16000, turn: 20000, dlgnode: 9000, slangify: 7000, formalize: 7000, decode: 8000, texting: 14000 };
 
   /** Разбор ответа в режиме «Разговор» (используется и в talk.js). */
   function turnFeedback(turn, ev, opts) {
@@ -58,8 +58,21 @@
       h('div', { class: 'item-line' }, h('strong', { class: 'en' }, item.en), EG.ui.speakBtn(item.en, true), h('span', { class: 'ru' }, '— ' + item.ru)),
       item.example ? h('p', { class: 'example' }, EG.ui.highlight(item), ' ', EG.ui.speakBtn(item.example, true)) : null,
       item.exampleRu && !compact ? h('p', { class: 'muted' }, item.exampleRu) : null,
-      item.usage ? h('p', { class: 'usage' }, icon('bulb'), item.usage) : null
+      item.usage ? h('p', { class: 'usage' }, icon('bulb'), item.usage) : null,
+      formsBlock(item)
     );
+  }
+
+  /** Блок «Обычно / Сленг / В переписке» для выражения. */
+  function formsBlock(item) {
+    var f = item && item.forms;
+    if (!f) return null;
+    var rows = [];
+    if (f.neutral) rows.push(h('div', { class: 'form-row' }, h('span', { class: 'form-tag neutral' }, 'Обычно'), h('span', { lang: 'en' }, f.neutral), EG.ui.speakBtn(f.neutral, true)));
+    if (f.slang) rows.push(h('div', { class: 'form-row' }, h('span', { class: 'form-tag slang' }, 'Сленг'), h('span', { lang: 'en' }, f.slang), EG.ui.speakBtn(f.slang, true)));
+    if (f.text) rows.push(h('div', { class: 'form-row' }, h('span', { class: 'form-tag text' }, 'В чате'), h('span', { class: 'msg-mini', lang: 'en' }, f.text)));
+    if (!rows.length) return null;
+    return h('div', { class: 'forms-box' }, rows, f.note ? h('p', { class: 'muted small' }, f.note) : null);
   }
 
   function run(root, list, opts) {
@@ -305,6 +318,7 @@
             h('p', { class: 'example', lang: 'en' }, EG.ui.highlight(it), ' ', EG.ui.speakBtn(it.example, true)),
             h('p', { class: 'muted' }, it.exampleRu)) : null,
           it.usage ? h('p', { class: 'usage' }, icon('bulb'), it.usage) : null,
+          formsBlock(it),
           btn);
       },
 
@@ -471,6 +485,51 @@
           back, showBtn);
       },
 
+      slangify: function (ex) {
+        var it = ex.item;
+        return h('div', null,
+          h('div', { class: 'ex-label' }, icon('chat'), 'Обычно → сленг'),
+          h('p', { class: 'prompt' }, ex.prompt),
+          h('div', { class: 'big-phrase' }, h('span', { lang: 'en' }, it.en), EG.ui.speakBtn(it.en)),
+          h('p', { class: 'muted' }, it.ru),
+          choiceList(ex, { en: true, extra: function () { return { note: ex.note }; } }));
+      },
+
+      formalize: function (ex) {
+        var it = ex.item;
+        var shown = it.register === 'casual' ? it.en : (it.forms.slang || it.en);
+        return h('div', null,
+          h('div', { class: 'ex-label' }, icon('chat'), 'Сленг → обычная речь'),
+          h('p', { class: 'prompt' }, ex.prompt),
+          h('div', { class: 'big-phrase' }, h('span', { lang: 'en' }, shown), EG.ui.speakBtn(shown)),
+          h('p', { class: 'muted' }, it.ru),
+          choiceList(ex, { en: true, extra: function () { return { note: ex.note }; } }));
+      },
+
+      decode: function (ex) {
+        return h('div', null,
+          h('div', { class: 'ex-label' }, icon('chat'), 'Расшифруй сообщение'),
+          h('p', { class: 'prompt' }, ex.prompt),
+          h('div', { class: 'phone-msg' }, h('span', { class: 'msg in', lang: 'en' }, ex.message)),
+          choiceList(ex));
+      },
+
+      texting: function (ex) {
+        var it = ex.item;
+        return h('div', null,
+          h('div', { class: 'ex-label' }, icon('chat'), 'Напиши как в чате'),
+          h('p', { class: 'prompt' }, ex.prompt),
+          h('p', { class: 'big-ru' }, ex.hintRu || it.ru),
+          typedInput(ex, function (v) {
+            var m = EG.text.matchAny(v, ex.answers, 0.8);
+            var ok = m.ok || m.partial;
+            var note = '';
+            if (ok && !EG.text.slangMarkers(v).length) note = 'Верно! Но в чате обычно пишут короче: «' + ex.answer + '».';
+            else if (ok) note = 'Так и пишут в мессенджерах 👍';
+            answered(ex, { correct: ok, partial: !m.ok && m.partial, userAnswer: v, expected: ex.answer, note: note, showAnswer: true });
+          }, 'Напишите как в чате…'));
+      },
+
       // повтор реплики из режима «Разговор» (ошибки)
       turn: function (ex) {
         var t = ex.turn;
@@ -552,5 +611,5 @@
     };
   }
 
-  EG.player = { run: run, turnFeedback: turnFeedback, itemInfo: itemInfo };
+  EG.player = { run: run, turnFeedback: turnFeedback, itemInfo: itemInfo, formsBlock: formsBlock };
 })(window.EG = window.EG || {});

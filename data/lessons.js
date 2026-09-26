@@ -148,6 +148,16 @@
         all: 'Разговорные формы уместны с друзьями, но не в резюме, письме начальнику или на собеседовании.'
       }
     },
+    texting: {
+      title: 'Язык переписки', emoji: '📱', subtitle: 'u, idk, lmk, omw — как пишут в мессенджерах',
+      intro: 'В чатах носители почти никогда не пишут полными фразами: you превращается в u, are — в r, «не знаю» — в idk. Понимать это нужно обязательно, а использовать — с умом: с друзьями да, с начальником или в официальном письме — нет.',
+      tips: {
+        A1: 'Главное: u = you, ur = your / you\'re, r = are. «r u ok?» = «Are you OK?»',
+        A2: 'Цифры читаются как слова: 2 = to/too, 4 = for, 8 = «eight» → l8r (later), gr8 (great), 2nite (tonight).',
+        B1: 'Одиночное «k» может звучать холодно, как будто вы обиделись. Дружелюбнее: ok!, kk, sure 🙂',
+        all: 'Правило регистра: чем выше статус собеседника и формальнее ситуация, тем меньше сокращений. Коллеге — полные слова, другу — как угодно.'
+      }
+    },
     idioms: {
       title: 'Идиомы и фразовые глаголы', emoji: '🧩', subtitle: 'То, что не переводится дословно',
       intro: 'Фразовые глаголы и идиомы — основа живой речи. Учите их целиком, в контексте, как готовые блоки.',
@@ -159,7 +169,7 @@
     }
   };
 
-  var TOPIC_ORDER = ['greetings', 'cafe', 'shop', 'city', 'travel', 'hotel', 'smalltalk', 'reactions', 'plans', 'phone', 'health', 'casual', 'opinions', 'problems', 'work', 'idioms'];
+  var TOPIC_ORDER = ['greetings', 'cafe', 'shop', 'city', 'travel', 'hotel', 'smalltalk', 'reactions', 'plans', 'phone', 'health', 'casual', 'texting', 'opinions', 'problems', 'work', 'idioms'];
   var MAX_PER_LESSON = 7;
 
   /* ---------- сборка уроков ---------- */

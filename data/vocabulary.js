@@ -701,6 +701,81 @@
   V('B2', 'p', 'n', 'Keep me posted.', 'Держи меня в курсе.', "Keep me posted. I want to know how it goes.", 'Держи меня в курсе. Хочу знать, как пройдёт.',
     'Просим сообщать новости. Также: Keep me updated.', { alt: ['Keep me updated', 'Keep me in the loop'] });
 
+  /* ===================== Язык переписки (мессенджеры) ===================== */
+  T('texting');
+  V('A1', 'c', 'c', 'u', 'you (ты, вы)', 'Are u coming tonight?', 'Ты придёшь сегодня вечером?',
+    'Самое частое сокращение в чатах. С друзьями — нормально, в письме коллеге или начальнику — нет.', { alt: ['you'] });
+  V('A1', 'c', 'c', 'ur', 'your / you\'re (твой / ты)', 'ur the best, thanks!', 'Ты лучший, спасибо!',
+    'Заменяет и your, и you\'re — смысл понятен из контекста. Только неформально.', { alt: ['your', "you're"] });
+  V('A1', 'c', 'c', 'r', 'are', 'r u ok?', 'Ты в порядке?',
+    'Часто в связке r u (are you). Только с друзьями.', { alt: ['are'] });
+  V('A1', 'c', 'c', 'thx', 'спасибо', 'thx for the pics!', 'Спасибо за фотки!',
+    'Короткое «спасибо» в чате. Также: thanks, ty.', { alt: ['thanks', 'ty'] });
+  V('A1', 'c', 'c', 'ty', 'thank you — спасибо', 'ty so much, u saved me', 'Огромное спасибо, ты меня спас',
+    'thank you. Усиленно: tysm (thank you so much).', { alt: ['thank you', 'thx'], cue: 'I sent u the file', cueRu: 'Я отправил тебе файл' });
+  V('A1', 'c', 'c', 'np', 'no problem — без проблем', 'np, happy to help', 'Без проблем, рад помочь',
+    'Ответ на спасибо в чате.', { alt: ['no problem', 'no worries'], cue: 'thx for the ride!', cueRu: 'Спасибо, что подвёз!' });
+  V('A1', 'c', 'c', 'pls', 'please — пожалуйста', 'can u call me back pls?', 'Перезвони мне, пожалуйста?',
+    'Также plz. В рабочей переписке пишите please полностью.', { alt: ['please', 'plz'] });
+  V('A1', 'c', 'c', 'k', 'ok', 'k see u at 7', 'Ок, увидимся в 7',
+    'Внимание: одиночное «k» может звучать холодно или раздражённо. Дружелюбнее — ok!, kk или okie 🙂', { alt: ['ok', 'kk', 'okay'] });
+  V('A1', 'c', 'c', 'lol', 'laughing out loud — ха-ха', 'lol that video is so funny', 'Ха-ха, это видео такое смешное',
+    'Показывает, что смешно, или смягчает фразу. Уже почти не значит «громко смеюсь» — скорее «хех».');
+  V('A2', 'c', 'c', 'idk', 'I don\'t know — не знаю', "idk what time it starts", 'Не знаю, во сколько начало',
+    'Очень частое сокращение. Только в неформальной переписке.', { alt: ["I don't know"] });
+  V('A2', 'c', 'c', 'btw', 'by the way — кстати', 'btw i saw ur sister yesterday', 'Кстати, я вчера видел твою сестру',
+    'Вводит новую тему или добавляет деталь. Иногда допустимо и в рабочих чатах.', { alt: ['by the way'] });
+  V('A2', 'c', 'c', 'brb', 'be right back — сейчас вернусь', 'brb, someone is at the door', 'Сейчас вернусь, кто-то в дверь звонит',
+    'Когда ненадолго отходите от переписки или игры.', { alt: ['be right back'] });
+  V('A2', 'c', 'c', 'omw', 'on my way — уже еду/иду', 'omw! 10 min', 'Уже еду! 10 минут',
+    'Классика перед встречей. Обычно с временем прибытия.', { alt: ['on my way'], cue: 'where r u??', cueRu: 'Ты где??' });
+  V('A2', 'c', 'c', 'lmk', 'let me know — дай знать', 'lmk if u want to come', 'Дай знать, если захочешь прийти',
+    'Очень частое завершение сообщения.', { alt: ['let me know'] });
+  V('A2', 'c', 'c', 'hbu', 'how about you? — а ты?', "i'm good hbu?", 'У меня всё хорошо, а у тебя?',
+    'Встречный вопрос в чате. Также wbu (what about you).', { alt: ['how about you', 'wbu', 'what about you'], cue: 'hey how r u?', cueRu: 'Привет, как ты?' });
+  V('A2', 'c', 'c', 'wyd', 'what are you doing? — что делаешь?', 'hey wyd?', 'Привет, что делаешь?',
+    'Сленговое начало переписки, часто = «ты свободен?». Отвечают: nm (nothing much), u?', { alt: ['what are you doing', 'what r u doing'] });
+  V('A2', 'c', 'c', 'rn', 'right now — прямо сейчас', "can't talk rn, i'm at work", 'Не могу говорить сейчас, я на работе',
+    'Очень частое сокращение у молодёжи.', { alt: ['right now'] });
+  V('A2', 'c', 'c', 'gtg', 'got to go — мне пора', 'gtg, talk later!', 'Мне пора, поговорим позже!',
+    'Быстро заканчиваем переписку. Вариант: g2g.', { alt: ['got to go', 'g2g', 'gotta go'] });
+  V('A2', 'c', 'c', 'cya', 'see you — увидимся', 'ok cya tomorrow!', 'Ок, увидимся завтра!',
+    'Прощание в чате. Также cu, see ya.', { alt: ['see you', 'see ya', 'cu'], cue: 'meet u at the gym tmrw', cueRu: 'Встретимся в зале завтра' });
+  V('A2', 'c', 'c', 'tmrw', 'tomorrow — завтра', 'r we still on for tmrw?', 'Завтра всё в силе?',
+    'Также tmr, 2morrow.', { alt: ['tomorrow', 'tmr'] });
+  V('A2', 'c', 'c', 'l8r', 'later — позже', 'talk l8r!', 'Поговорим позже!',
+    'Цифра 8 читается как «eight» → l-eight-r = later. Похожие: gr8 (great), 2nite (tonight).', { alt: ['later'] });
+  V('A2', 'c', 'c', 'omg', 'oh my god — боже мой', 'omg i passed the exam!!', 'Боже, я сдал экзамен!!',
+    'Эмоциональное восклицание — радость, шок, удивление.');
+  V('B1', 'c', 'c', 'tbh', 'to be honest — честно говоря', "tbh i didn't like the movie", 'Честно говоря, мне не понравился фильм',
+    'Смягчает мнение или признание.', { alt: ['to be honest'] });
+  V('B1', 'c', 'c', 'ngl', 'not gonna lie — не буду врать', 'ngl that was amazing', 'Не буду врать, это было потрясающе',
+    'Подчёркивает искренность, часто перед комплиментом или признанием.', { alt: ['not gonna lie', 'not going to lie'] });
+  V('B1', 'c', 'c', 'imo', 'in my opinion — по-моему', 'imo the first season was better', 'По-моему, первый сезон был лучше',
+    'Мнение в чате или на форуме. Вариант: imho (in my humble opinion).', { alt: ['in my opinion', 'imho'] });
+  V('B1', 'c', 'n', 'fyi', 'for your information — к вашему сведению', 'fyi the meeting moved to 3pm', 'К сведению: встречу перенесли на 15:00',
+    'Одно из немногих сокращений, уместных в рабочих чатах и письмах.', { alt: ['for your information'] });
+  V('B1', 'c', 'n', 'asap', 'as soon as possible — как можно скорее', 'pls send it asap', 'Пожалуйста, пришли как можно скорее',
+    'Уместно и в работе, но звучит настойчиво — используйте с осторожностью.', { alt: ['as soon as possible'] });
+  V('B1', 'c', 'c', 'nvm', 'never mind — неважно, проехали', 'nvm, i found it', 'Неважно, я нашёл',
+    'Отменяем свой вопрос или просьбу.', { alt: ['never mind'] });
+  V('B1', 'c', 'c', 'jk', 'just kidding — шучу', "i'm never talking to u again jk", 'Больше никогда с тобой не заговорю — шучу',
+    'Показывает, что предыдущее — шутка. Важно в письме, где не слышно интонации.', { alt: ['just kidding'] });
+  V('B1', 'c', 'c', 'ikr', 'I know, right? — вот именно!', 'this weather is crazy — ikr', 'Погода сумасшедшая — вот-вот!',
+    'Горячее согласие в чате, как Tell me about it!', { alt: ['i know right', 'tell me about it'], cue: 'this traffic is insane', cueRu: 'Эти пробки — безумие' });
+  V('B1', 'c', 'c', 'ofc', 'of course — конечно', 'ofc i remember!', 'Конечно, я помню!',
+    'Неформальное «конечно».', { alt: ['of course'] });
+  V('B1', 'c', 'c', 'bc', 'because — потому что', "i can't come bc i'm sick", 'Не смогу прийти, потому что заболел',
+    'Также cuz, b/c. Только неформально.', { alt: ['because', 'cuz'] });
+  V('B1', 'c', 'c', 'ttyl', 'talk to you later — поговорим позже', 'ok ttyl!', 'Ок, поговорим позже!',
+    'Прощание в переписке.', { alt: ['talk to you later', 'talk later'] });
+  V('B1', 'c', 'c', 'gr8', 'great — отлично', 'gr8, see u there', 'Отлично, увидимся там',
+    'Цифра 8 = «eight». Сейчас считается немного устаревшим — чаще пишут просто great.', { alt: ['great'] });
+  V('B2', 'c', 'c', 'smh', 'shaking my head — ну и ну (неодобрение)', 'he forgot my birthday again smh', 'Он опять забыл мой день рождения, ну и ну',
+    'Выражает разочарование или неодобрение.');
+  V('B2', 'c', 'c', 'w/', 'with — с', 'going to the beach w/ friends', 'Еду на пляж с друзьями',
+    'w/ = with, w/o = without. Встречается и в заметках, и в рабочих чатах.', { alt: ['with'] });
+
   /* ---------- индексы ---------- */
   D.slug = slug;
   D.vocab = list;

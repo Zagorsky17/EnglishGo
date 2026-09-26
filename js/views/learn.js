@@ -198,6 +198,14 @@
       if (!turn) return null;
       return { type: 'turn', turn: turn, itemId: m.itemId, kind: 'turn', ref: ref, setting: sc.setting, noSrs: true, answer: turn.better || turn.accepted[0].t, mistakePrompt: turn.npc };
     }
+    if (m.kind === 'chat') {
+      var ep = EG.data.episodesById[ref.episodeId];
+      var cn = ep && ep.nodes[ref.nodeId];
+      if (!cn || !cn.reply) return null;
+      var contact = EG.data.contactsById[ep.contactId];
+      return { type: 'turn', turn: cn.reply, itemId: m.itemId, kind: 'chat', ref: ref, setting: '📱 ' + contact.name + ' (' + contact.role + ')', noSrs: true,
+        answer: cn.reply.better || cn.reply.accepted[0].t, mistakePrompt: cn.reply.npc };
+    }
     if (m.kind === 'dlg') {
       var d = EG.data.dialoguesById[ref.dialogueId];
       var node = d && d.nodes[ref.nodeId];
@@ -224,6 +232,11 @@
       var sc = EG.data.scenariosById[ref.scenarioId];
       return { title: sc ? '«' + sc.turns[ref.turnIdx].npc + '»' : m.prompt, where: sc ? 'Разговор · ' + sc.title : 'Разговор' };
     }
+    if (m.kind === 'chat') {
+      var ep = EG.data.episodesById[ref.episodeId];
+      var c = ep && EG.data.contactsById[ep.contactId];
+      return { title: '«' + (m.prompt || '') + '»', where: c ? 'Чат · ' + c.name : 'Чат' };
+    }
     if (m.kind === 'dlg') {
       var d = EG.data.dialoguesById[ref.dialogueId];
       return { title: '«' + (m.prompt || '') + '»', where: d ? 'Диалог · ' + d.title : 'Диалог' };
@@ -232,7 +245,7 @@
     return { title: it ? it.en : m.itemId, where: it ? it.ru : '' };
   }
 
-  var TYPE_RU = { context: 'контекст', meaning: 'понимание', listen: 'аудирование', dictation: 'диктант', reaction: 'реакция', register: 'уместность', recall: 'воспоминание', build: 'сборка фразы', flash: 'карточка', turn: 'разговор', dlgnode: 'диалог' };
+  var TYPE_RU = { context: 'контекст', meaning: 'понимание', listen: 'аудирование', dictation: 'диктант', reaction: 'реакция', register: 'уместность', recall: 'воспоминание', build: 'сборка фразы', flash: 'карточка', turn: 'разговор', dlgnode: 'диалог', slangify: 'сленг', formalize: 'обычная речь', decode: 'расшифровка чата', texting: 'как в чате', chat: 'мессенджер', game: 'игра', story: 'понимание диалога' };
 
   EG.views.mistakes = function (root, params) {
     var open = EG.progress.unresolvedMistakes();

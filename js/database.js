@@ -3,8 +3,8 @@
   'use strict';
 
   var DB_NAME = 'englishgo';
-  var DB_VERSION = 1;
-  var SCHEMA_VERSION = 1; // версия формата backup-файла
+  var DB_VERSION = 2;     // v2: + games, chats
+  var SCHEMA_VERSION = 2; // версия формата backup-файла
   var APP_ID = 'EnglishGo';
 
   var STORES = {
@@ -14,7 +14,9 @@
     lessons:   { keyPath: 'id' },
     dialogues: { keyPath: 'id' },
     stats:     { keyPath: 'date' },
-    meta:      { keyPath: 'key' }
+    meta:      { keyPath: 'key' },
+    games:     { keyPath: 'id' },
+    chats:     { keyPath: 'id' }
   };
   var STORE_NAMES = Object.keys(STORES);
 
@@ -207,11 +209,28 @@
         correct: num(r.correct, 0), wrong: num(r.wrong, 0), minutes: num(r.minutes, 0), dialogues: num(r.dialogues, 0)
       };
     },
-    meta: function (r) { return isStr(r.key) && 'value' in r ? { key: r.key, value: r.value } : null; }
+    meta: function (r) { return isStr(r.key) && 'value' in r ? { key: r.key, value: r.value } : null; },
+    games: function (r) {
+      if (!isStr(r.id)) return null;
+      return { id: r.id, best: num(r.best, 0), plays: num(r.plays, 0), lastScore: num(r.lastScore, 0), lastTs: num(r.lastTs, 0) };
+    },
+    chats: function (r) {
+      if (!isStr(r.id) || !isStr(r.contactId) || !Array.isArray(r.messages)) return null;
+      var msgs = r.messages.filter(function (m) { return m && typeof m === 'object' && typeof m.text === 'string' && (m.from === 'me' || m.from === 'them'); })
+        .map(function (m) { return Object.assign({}, m, { text: m.text.slice(0, 1000) }); });
+      return Object.assign({}, r, { messages: msgs, done: !!r.done, score: num(r.score, 0) });
+    }
   };
 
   // Миграции формата: MIGRATIONS[n] переводит данные версии n в n+1
-  var MIGRATIONS = {};
+  var MIGRATIONS = {
+    // v1 → v2: появились игры и чаты
+    1: function (data) {
+      data.stores.games = data.stores.games || [];
+      data.stores.chats = data.stores.chats || [];
+      return data;
+    }
+  };
 
   function validateBackup(obj) {
     var errors = [], warnings = [];
