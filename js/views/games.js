@@ -140,7 +140,7 @@
 
       var feedback = h('div', { class: 'game-fb' });
       function reveal(ok, extra) {
-        feedback.replaceChildren(h('p', { class: ok ? 'good-text' : 'bad-text' }, ok ? 'Верно!' : (ok === null ? 'Время вышло' : 'Неверно')),
+        EG.ui.fill(feedback, h('p', { class: ok ? 'good-text' : 'bad-text' }, ok ? 'Верно!' : (ok === null ? 'Время вышло' : 'Неверно')),
           extra ? h('p', { class: 'small' }, extra) : null,
           q.explain ? h('p', { class: 'muted small' }, q.explain) : null);
       }

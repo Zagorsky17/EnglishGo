@@ -127,7 +127,7 @@
         if (e.target.closest('button')) return;
         if (!extra.childNodes.length) {
           var dec = EG.chat.decodeMessage(m.text);
-          extra.append(
+          EG.ui.fill(extra,
             m.ru ? h('div', { class: 'msg-ru' }, m.ru) : null,
             dec.length ? h('div', { class: 'msg-decode' }, dec.map(function (d) {
               return h('span', null, h('b', null, d.abbr), ' = ' + (d.full || '') + (d.ru ? ' (' + d.ru.split(' — ').pop() + ')' : ''));
