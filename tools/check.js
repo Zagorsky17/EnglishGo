@@ -142,7 +142,7 @@ console.log('  exercise availability:', JSON.stringify(cnt));
   let r = null, t = 0; const boxes = [];
   for (const ok of [true, true, true, true, false, true]) { r = EG.wordTrainer.schedule(r, ok, 6000, t); boxes.push(r.box); t = r.due; }
   if (boxes.join() !== '1,2,3,4,1,2') err('word boxes', boxes.join());
-  if (EG.wordTrainer.schedule(null, true, 2000, 0).box !== 3) err('known word should jump');
+  if (EG.wordTrainer.schedule(null, true, 2000, 0).box !== EG.wordTrainer.KNOWN_BOX) err('known word should jump');
   console.log('words', W.length, JSON.stringify(pos), '| boxes', boxes.join(','));
 }
 

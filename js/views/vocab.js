@@ -215,7 +215,9 @@
       h('div', { class: 'vocab-modes' },
         action('#/vocab/learn/' + level + '/' + n, '📘', st.fresh ? 'Учить новые слова' : 'Закрепить блок',
           st.fresh ? 'Следующие ' + words(Math.min(LEARN_BATCH, st.fresh)) + ': сразу варианты ответа в обе стороны, ошибки повторяются.' : 'Повторим самые слабые слова блока с написанием.', true),
-        action(base + 'mix', '⚡', 'Проверить себя', 'Все слова блока на скорость. Знакомые слова сразу отметятся как известные.'),
+        action(base + 'mix', '⚡', 'Проверить себя', 'Все слова блока вперемешку в обе стороны. Знакомые слова сразу отметятся как известные.'),
+        action(base + 'en-ru', '🇬🇧 → 🇷🇺', 'English → русский', 'Карточка: английское слово, варианты ответа на русском.'),
+        action(base + 'ru-en', '🇷🇺 → 🇬🇧', 'Русский → English', 'Карточка: русское слово, варианты ответа на английском.'),
         action(base + 'type', '⌨️', 'Написание', 'Перевод → напишите слово по-английски.'),
         EG.ui.canSpeak() ? action(base + 'listen', '🎧', 'На слух', 'Слушайте слово и выбирайте перевод.') : null),
       h('section', { class: 'card' },
@@ -373,6 +375,7 @@
         if (locked) return;
         locked = true;
         var ok = i >= 0 && q.options[i] === q.answer;
+        item.unknown = i < 0;
         btns.forEach(function (b, j) {
           b.disabled = true;
           if (q.options[j] === q.answer) b.classList.add('correct');
@@ -393,7 +396,8 @@
         promptEl,
         h('p', { class: 'muted small center' }, EG.data.wordPos[w.pos] + (st === 'learned' ? ' · вы уже знаете это слово — проверим' : '')),
         opts,
-        h('div', { class: 'center' }, h('button', { class: 'link-btn dont-know', type: 'button', onclick: function () { pick(-1); } }, 'Не знаю'))));
+        h('div', { class: 'center' }, h('button', { class: 'link-btn dont-know', type: 'button', onclick: function () { pick(-1); } },
+          en ? 'Не знаю' : "I don't know"))));
       shownAt = Date.now();
       if (listen) setTimeout(function () { if (alive) EG.ui.speak(w.en); }, 250);
       else if (en) EG.ui.autoSpeak(w.en);
@@ -426,6 +430,7 @@
         locked = true;
         input.disabled = true; hintBtn.disabled = true; submitBtn.disabled = true; giveUp.disabled = true;
         var verdict = gaveUp === true ? 'wrong' : WT().checkSpelling(w, typed);
+        item.unknown = gaveUp === true;
         // больше половины букв подсказано — слово не вспомнили сами
         var helped = hints > 1 && hints * 2 > letters;
         var ok = verdict !== 'wrong' && !helped;
@@ -519,11 +524,16 @@
         return;
       }
       var b = h('button', { class: 'btn primary block', type: 'button', onclick: advance }, 'Далее', icon('arrow'));
+      var tail = item.requeued ? (item.first ? 'Запомните перевод — слово сейчас появится ещё раз.' : 'Слово вернётся ещё раз в этой сессии.')
+        : 'Слово скоро появится в повторении.';
+      if (item.unknown && wasNew[w.id]) tail = 'Слово добавлено в изучение. ' + tail;
       foot.replaceChildren(h('div', { class: 'feedback bad' },
-        h('div', { class: 'fb-head' }, h('span', { class: 'fb-verdict bad' }, icon('x'), item.helped ? 'С подсказкой' : 'Неверно')),
+        h('div', { class: 'fb-head' }, h('span', { class: 'fb-verdict bad' },
+          icon(item.unknown ? 'plus' : 'x'),
+          item.helped ? 'С подсказкой' : item.unknown ? 'Учим это слово' : 'Неверно')),
         h('p', { class: 'muted small' }, 'Правильно:'), line,
         exampleBlock(w),
-        h('p', { class: 'muted small' }, item.requeued ? (item.first ? 'Запомните перевод — слово сейчас появится ещё раз.' : 'Слово вернётся ещё раз в этой сессии.') : 'Слово скоро появится в повторении.')), b);
+        h('p', { class: 'muted small' }, tail)), b);
       keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); advance(); } };
       setTimeout(function () { b.focus(); }, 30);
     }
