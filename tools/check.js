@@ -16,7 +16,7 @@ const ctx = {
 };
 ctx.window = ctx;
 vm.createContext(ctx);
-const files = ['data/vocabulary.js', 'data/registers.js', 'data/dialogues.js', 'data/dialogues-more.js', 'data/stories.js', 'data/chats.js', 'data/chats-more.js', 'data/lessons.js', 'data/words/a1.js', 'data/words/a2.js', 'data/words/b1.js', 'data/words/b2.js', 'data/words/c1.js', 'data/wordbank.js', 'data/texts.js', 'js/storage.js', 'js/database.js', 'js/state.js', 'js/srs.js', 'js/progress.js', 'js/exercises.js', 'js/dialogues.js', 'js/chat.js', 'js/games.js', 'js/wordtrainer.js', 'js/lexicon.js'];
+const files = ['data/vocabulary.js', 'data/registers.js', 'data/dialogues.js', 'data/dialogues-more.js', 'data/stories.js', 'data/chats.js', 'data/chats-more.js', 'data/chats-extra.js', 'data/lessons.js', 'data/words/a1.js', 'data/words/a2.js', 'data/words/b1.js', 'data/words/b2.js', 'data/words/c1.js', 'data/wordbank.js', 'data/texts.js', 'js/storage.js', 'js/database.js', 'js/state.js', 'js/srs.js', 'js/progress.js', 'js/exercises.js', 'js/dialogues.js', 'js/chat.js', 'js/games.js', 'js/wordtrainer.js', 'js/lexicon.js'];
 const warns=[]; const ow=console.warn; console.warn=(...a)=>{warns.push(a.join(' '));};
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx, { filename: f });
 const EG = ctx.EG;
