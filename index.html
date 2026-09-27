@@ -22,8 +22,14 @@
       </a>
       <nav id="side-nav" class="side-nav" aria-label="Разделы"></nav>
       <div class="hud">
-        <span title="Серия дней"><span class="hud-ic">🔥</span><b id="hud-streak">0</b></span>
-        <span title="XP сегодня / цель"><span class="hud-ic">⚡</span><b id="hud-xp">0</b></span>
+        <button class="hud-chip" type="button" id="hud-streak-btn" title="Серия дней — нажмите, чтобы узнать подробнее" aria-label="Серия дней — что это значит">
+          <span class="hud-top"><span class="hud-ic">🔥</span><b id="hud-streak">0</b></span>
+          <span class="hud-label" id="hud-streak-label">дней подряд</span>
+        </button>
+        <button class="hud-chip" type="button" id="hud-xp-btn" title="XP за сегодня — нажмите, чтобы узнать подробнее" aria-label="XP за сегодня — что это значит">
+          <span class="hud-top"><span class="hud-ic">⚡</span><b id="hud-xp">0</b></span>
+          <span class="hud-label" id="hud-xp-label">XP сегодня</span>
+        </button>
       </div>
     </aside>
 
