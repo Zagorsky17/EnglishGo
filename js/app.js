@@ -39,6 +39,30 @@
     window.addEventListener('hashchange', function () { sheet.hidden = true; });
   }
 
+  /** Что означают 🔥 и ⚡ в сайдбаре — цифры без подписи никому ни о чём не говорят. */
+  function hudHelp() {
+    var goal = EG.storage.get('dailyGoal');
+    var xp = EG.state.today().xp;
+    var streak = EG.progress.currentStreak();
+    EG.ui.modal({
+      title: 'Что означают эти цифры',
+      body: [
+        h('p', null, h('strong', null, '🔥 Серия — ' + streak + ' ' + EG.util.plural(streak, 'день', 'дня', 'дней')),
+          '. Сколько дней подряд вы занимались. День засчитывается за любой верный или неверный ответ; пропустили день — серия обнуляется.'),
+        h('p', null, h('strong', null, '⚡ XP за сегодня — ' + xp + ' из ' + goal),
+          '. Очки за ответы: примерно 10 XP за верный ответ, в играх — с множителем за серию без ошибок. ' +
+          goal + ' XP — ваша дневная цель, её можно изменить в «Настройках».'),
+        xp >= goal
+          ? h('p', { class: 'muted small' }, 'Цель на сегодня выполнена. Всё, что сверх неё, идёт в общий счёт и в статистику — счётчик не останавливается.')
+          : h('p', { class: 'muted small' }, 'Осталось ' + (goal - xp) + ' XP до дневной цели.')
+      ],
+      actions: [
+        { label: 'Открыть «Прогресс»', value: 'progress', primary: true },
+        { label: 'Закрыть', value: null }
+      ]
+    }).then(function (v) { if (v === 'progress') location.hash = '#/progress'; });
+  }
+
   var badgesQueued = false;
   function scheduleBadges() {
     if (badgesQueued) return;
@@ -56,8 +80,20 @@
       el.textContent = n > 99 ? '99+' : n ? String(n) : '';
     });
     var xpEl = document.getElementById('hud-xp'), stEl = document.getElementById('hud-streak');
-    if (xpEl) xpEl.textContent = EG.state.today().xp + '/' + EG.storage.get('dailyGoal');
-    if (stEl) stEl.textContent = EG.progress.currentStreak();
+    if (xpEl) {
+      var goal = EG.storage.get('dailyGoal'), xp = EG.state.today().xp, done = xp >= goal;
+      xpEl.textContent = xp;
+      var xpLab = document.getElementById('hud-xp-label');
+      if (xpLab) xpLab.textContent = done ? 'цель ' + goal + ' ✓' : 'XP · цель ' + goal;
+      var xpChip = document.getElementById('hud-xp-btn');
+      if (xpChip) xpChip.classList.toggle('done', done);
+    }
+    if (stEl) {
+      var streak = EG.progress.currentStreak();
+      stEl.textContent = streak;
+      var stLab = document.getElementById('hud-streak-label');
+      if (stLab) stLab.textContent = EG.util.plural(streak, 'день', 'дня', 'дней') + ' подряд';
+    }
   }
 
   function onboarding() {
@@ -208,6 +244,10 @@
       if (mq.addEventListener) mq.addEventListener('change', f); else if (mq.addListener) mq.addListener(f);
     }
     buildNav();
+    ['hud-streak-btn', 'hud-xp-btn'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('click', hudHelp);
+    });
     installGuards();
     voicesSeen = EG.ui.voices().length > 0;
     EG.instance.start().then(function (active) { if (active) boot(); else showAlreadyOpen(); });

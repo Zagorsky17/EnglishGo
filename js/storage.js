@@ -38,7 +38,8 @@
     if (out.wordLevel && EG.LEVELS.indexOf(out.wordLevel) === -1) delete out.wordLevel;
     if (out.wordMode && ['ru-en', 'en-ru', 'mix', 'type', 'listen'].indexOf(out.wordMode) === -1) delete out.wordMode;
     if (out.theme && ['auto', 'light', 'dark'].indexOf(out.theme) === -1) delete out.theme;
-    if ('dailyGoal' in out) out.dailyGoal = Math.min(500, Math.max(10, Math.round(out.dailyGoal) || DEFAULTS.dailyGoal));
+    // верхнего предела у цели нет — ограничиваем только снизу, чтобы не делить на ноль в кольцах прогресса
+    if ('dailyGoal' in out) out.dailyGoal = isFinite(out.dailyGoal) ? Math.max(10, Math.round(out.dailyGoal) || DEFAULTS.dailyGoal) : DEFAULTS.dailyGoal;
     if ('newPerDay' in out) out.newPerDay = Math.min(40, Math.max(0, Math.round(out.newPerDay) || 0));
     if ('rate' in out) out.rate = Math.min(1.5, Math.max(0.5, out.rate || 1));
     if ('name' in out) out.name = out.name.slice(0, 30);
