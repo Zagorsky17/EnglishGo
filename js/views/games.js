@@ -123,16 +123,40 @@
       return true;
     }
 
+    /** Пауза после истечения времени: ученик сам решает, когда перейти к следующему заданию. */
+    function waitNext(feedback) {
+      qTimer = null; qDeadline = 0;
+      if (!deadline) { timeText.textContent = ''; timerFill.style.transform = 'scaleX(0)'; }
+      var done = false;
+      function go() {
+        if (done || st.over) return;
+        done = true; keyHandler = null;
+        nextQuestion();
+      }
+      keyHandler = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } };
+      var btn = h('button', { class: 'btn primary', type: 'button', onclick: go }, 'Дальше');
+      feedback.appendChild(h('div', { class: 'row gap wrap center' }, btn));
+      btn.focus();
+    }
+
     /* ---------- вопросы (все игры, кроме «пар») ---------- */
     function nextQuestion() {
       if (st.over) return;
       var q = EG.games.GEN[g.id]();
       var shownAt = Date.now();
       var locked = false;
+      var onTimeout = null; // показать правильный ответ, когда время вышло (задаётся ниже по типу задания)
       keyHandler = null;
       if (g.perQ) {
         qDeadline = Date.now() + g.perQ * 1000;
-        qTimer = function () { if (!locked) { locked = true; reveal(null); if (score(false, q.itemId, { user: '(время вышло)' })) later(nextQuestion, 1300); } };
+        qTimer = function () {
+          if (locked) return;
+          locked = true;
+          var right = onTimeout ? onTimeout() : null;
+          reveal(null, right);
+          // время вышло — ждём, пока ученик прочитает правильный ответ и нажмёт «Дальше»
+          if (score(false, q.itemId, { user: '(время вышло)', expected: right || '' })) waitNext(feedback);
+        };
       }
 
       var head = [];
@@ -162,6 +186,11 @@
           if (cont) later(nextQuestion, o.correct ? 700 : 1600);
         };
         keyHandler = function (e) { var n = parseInt(e.key, 10); if (n >= 1 && n <= btns.length) { e.preventDefault(); pick(n - 1); } };
+        onTimeout = function () {
+          var right = null;
+          btns.forEach(function (b, j) { b.disabled = true; if (q.options[j].correct) { b.classList.add('correct'); right = q.options[j].label; } });
+          return right ? 'Правильный ответ: ' + right : null;
+        };
         body = h('div', { class: 'options' + (q.en ? ' en' : '') }, btns);
       } else if (q.kind === 'tf') {
         var tfb = [true, false].map(function (v) {
@@ -177,6 +206,10 @@
         keyHandler = function (e) {
           if (e.key === 'ArrowLeft' || e.key === '1') { e.preventDefault(); answer(true); }
           if (e.key === 'ArrowRight' || e.key === '2') { e.preventDefault(); answer(false); }
+        };
+        onTimeout = function () {
+          tfb.forEach(function (b, j) { b.disabled = true; if ((j === 0) === q.truth) b.classList.add('correct'); });
+          return 'Правильный ответ: ' + (q.truth ? 'Правда' : 'Неправда');
         };
         body = h('div', { class: 'tf-row' }, tfb);
       } else {
@@ -205,6 +238,7 @@
           if (score(ok, q.itemId, { ms: Date.now() - shownAt, user: v, points: 15 })) later(nextQuestion, ok ? 900 : 1800);
         };
         redraw();
+        onTimeout = function () { redraw(); line.classList.add('bad'); return 'Правильно: ' + q.answer; };
         keyHandler = function (e) { if (e.key === 'Backspace' && chosen.length && !locked) { e.preventDefault(); chosen.pop().used = false; redraw(); } };
         body = h('div', null, h('p', { class: 'prompt' }, q.hint), line, bank);
       }

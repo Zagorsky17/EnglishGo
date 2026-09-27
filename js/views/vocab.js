@@ -214,7 +214,7 @@
       EG.ui.pageHead('Блок ' + n + ' из ' + total, st.total + ' слов · выучено ' + st.learned + ' · изучается ' + st.learning + (st.fresh ? ' · новых ' + st.fresh : '')),
       h('div', { class: 'vocab-modes' },
         action('#/vocab/learn/' + level + '/' + n, '📘', st.fresh ? 'Учить новые слова' : 'Закрепить блок',
-          st.fresh ? 'Следующие ' + words(Math.min(LEARN_BATCH, st.fresh)) + ': карточка → перевод в обе стороны → написание.' : 'Повторим самые слабые слова блока с написанием.', true),
+          st.fresh ? 'Следующие ' + words(Math.min(LEARN_BATCH, st.fresh)) + ': сразу варианты ответа в обе стороны, ошибки повторяются.' : 'Повторим самые слабые слова блока с написанием.', true),
         action(base + 'mix', '⚡', 'Проверить себя', 'Все слова блока на скорость. Знакомые слова сразу отметятся как известные.'),
         action(base + 'type', '⌨️', 'Написание', 'Перевод → напишите слово по-английски.'),
         EG.ui.canSpeak() ? action(base + 'listen', '🎧', 'На слух', 'Слушайте слово и выбирайте перевод.') : null),
@@ -243,18 +243,16 @@
     });
   }
 
-  /** Занятие блока: новые слова порциями по 5 — карточки, выбор в обе стороны; в конце написание. */
+  /** Занятие блока: новые слова порциями по 5 — сразу варианты ответа в обе стороны, ошибки возвращаются. */
   function learnSteps(u) {
     var fresh = u.words.filter(function (w) { return !WT().rec(w.id); }).slice(0, LEARN_BATCH);
     var steps = [];
     if (fresh.length) {
       for (var i = 0; i < fresh.length; i += 5) {
         var chunk = fresh.slice(i, i + 5);
-        chunk.forEach(function (w) { steps.push({ kind: 'intro', w: w }); });
-        EG.util.shuffle(chunk).forEach(function (w) { steps.push({ kind: 'choice', w: w, dir: 'en-ru' }); });
-        EG.util.shuffle(chunk).forEach(function (w) { steps.push({ kind: 'choice', w: w, dir: 'ru-en' }); });
+        chunk.forEach(function (w) { steps.push({ kind: 'choice', w: w, dir: 'en-ru', first: true }); });
+        EG.util.shuffle(chunk.slice()).forEach(function (w) { steps.push({ kind: 'choice', w: w, dir: 'ru-en' }); });
       }
-      EG.util.shuffle(fresh).forEach(function (w) { steps.push({ kind: 'type', w: w }); });
       return { words: fresh, steps: steps, fresh: true };
     }
     // все слова уже встречались — закрепляем самые слабые
@@ -286,7 +284,7 @@
   function runSession(root, cfg) {
     var queue = cfg.steps.slice();
     var words = cfg.words;
-    var wasNew = {}, lastGrade = {}, retries = {}, reinforced = {}, learnedNow = {}, introduced = {}, errored = {}, typedBonus = {}, knownNow = {};
+    var wasNew = {}, lastGrade = {}, retries = {}, reinforced = {}, learnedNow = {}, errored = {}, typedBonus = {}, knownNow = {};
     words.forEach(function (w) { wasNew[w.id] = !WT().rec(w.id); });
     var idx = 0, keyHandler = null, timers = [], alive = true;
     var res = { right: 0, wrong: 0, xp: 0 };
@@ -341,50 +339,8 @@
       progressEl.firstChild.style.width = (idx / queue.length * 100) + '%';
       counter.textContent = (idx + 1) + ' / ' + queue.length;
       var item = queue[idx];
-      if (item.kind === 'intro') return showIntro(item);
       if (item.kind === 'type') return showType(item);
       return showChoice(item);
-    }
-
-    /* ---------- карточка нового слова: «знаю» → проверка, «не знаю» → перевод ---------- */
-    function showIntro(item) {
-      var w = item.w;
-      var body = h('div', { class: 'intro-body' });
-      var card = h('div', { class: 'card ex-card word-q intro-card enter' },
-        h('div', { class: 'row between' }, h('p', { class: 'prompt' }, 'Новое слово'), badges(w)),
-        h('div', { class: 'word-prompt' }, h('span', { lang: 'en' }, w.en), EG.ui.speakBtn(w.en)),
-        h('p', { class: 'muted small center' }, EG.data.wordPos[w.pos]),
-        body);
-      stage.replaceChildren(card);
-      EG.ui.autoSpeak(w.en);
-
-      function ask() {
-        var know = h('button', { class: 'btn ghost', type: 'button', onclick: claim }, h('span', { class: 'opt-key' }, '1'), 'Знаю это слово');
-        var dont = h('button', { class: 'btn primary', type: 'button', onclick: reveal }, h('span', { class: 'opt-key' }, '2'), 'Не знаю — показать');
-        EG.ui.fill(body, h('p', { class: 'center muted' }, 'Знаете, как это переводится?'), h('div', { class: 'row gap wrap center' }, know, dont));
-        keyHandler = function (e) {
-          if (e.key === '1') { e.preventDefault(); claim(); } else if (e.key === '2' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); }
-        };
-        setTimeout(function () { dont.focus(); }, 30);
-      }
-      function reveal() {
-        introduced[w.id] = true;
-        var ok = h('button', { class: 'btn primary', type: 'button', onclick: function () { keyHandler = null; idx++; show(); } }, 'Запомнил', icon('arrow'));
-        EG.ui.fill(body,
-          h('div', { class: 'intro-ru' }, w.ru),
-          exampleBlock(w),
-          h('p', { class: 'muted small center' }, 'Произнесите слово вслух и представьте ситуацию, где оно нужно.'),
-          h('div', { class: 'center' }, ok));
-        keyHandler = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ok.click(); } };
-        setTimeout(function () { ok.focus(); }, 30);
-      }
-      // «знаю»: сразу проверяем выбором перевода (перевод ещё не показан)
-      function claim() {
-        keyHandler = null;
-        queue[idx] = { kind: 'choice', w: w, dir: 'en-ru', check: true };
-        show();
-      }
-      ask();
     }
 
     /* ---------- выбор из 4 вариантов (и режим «на слух») ---------- */
@@ -432,7 +388,7 @@
 
       stage.replaceChildren(h('div', { class: 'card ex-card word-q enter' },
         h('div', { class: 'row between' },
-          h('p', { class: 'prompt' }, item.check ? 'Проверим: как переводится?' : listen ? 'Прослушайте и выберите перевод' : en ? 'Как переводится?' : 'Как сказать по-английски?'),
+          h('p', { class: 'prompt' }, listen ? 'Прослушайте и выберите перевод' : item.first ? 'Новое слово: как переводится?' : en ? 'Как переводится?' : 'Как сказать по-английски?'),
           badges(w)),
         promptEl,
         h('p', { class: 'muted small center' }, EG.data.wordPos[w.pos] + (st === 'learned' ? ' · вы уже знаете это слово — проверим' : '')),
@@ -512,15 +468,16 @@
         if (bonus) typedBonus[w.id] = true;
         lastGrade[w.id] = ok;
         // только что показанное слово не считается «угаданным сразу»; «знаю» с верным ответом — считается
-        var gms = item.check ? (ok ? 1 : 0) : (had || introduced[w.id] ? 0 : ms);
+        var gms = had ? 0 : ms;
         tasks.push(WT().grade(w.id, ok, gms));
       }
-      if (item.check && ok) { knownNow[w.id] = true; dropRest(w); }
       // ошибка — слово вернётся через несколько вопросов
       if (!ok && (retries[w.id] || 0) < 2) {
         retries[w.id] = (retries[w.id] || 0) + 1;
-        var again = item.kind === 'type' ? { kind: 'type', w: w } : { kind: 'choice', w: w, dir: item.dir === 'en-ru' || item.kind === 'listen' ? 'ru-en' : 'en-ru' };
-        insertLater(again, 3);
+        var again = item.kind === 'type' ? { kind: 'type', w: w }
+          : item.first ? { kind: 'choice', w: w, dir: 'en-ru', first: true } // новое слово покажем ещё раз так же
+            : { kind: 'choice', w: w, dir: item.dir === 'en-ru' || item.kind === 'listen' ? 'ru-en' : 'en-ru' };
+        insertLater(again, cfg.learn ? 1 : 3);
         item.requeued = true;
       } else if (!cfg.learn && ok && wasNew[w.id] && !reinforced[w.id] && ms >= 4000 && item.kind !== 'type') {
         reinforced[w.id] = true;
@@ -529,6 +486,11 @@
       Promise.all(tasks).then(function (r) {
         res.xp += r[0] || 0;
         var g = r[1];
+        // новое слово узнали сразу и быстро — оно уже знакомо, остальные его шаги убираем
+        if (item.first && ok && !errored[w.id] && g && !g.before && g.after.box >= WT().KNOWN_BOX) {
+          knownNow[w.id] = true;
+          dropRest(w);
+        }
         var justLearned = g && g.after.box >= WT().LEARNED_BOX && !(g.before && g.before.box >= WT().LEARNED_BOX);
         if (justLearned) learnedNow[w.id] = true;
         if (!ok) delete learnedNow[w.id];
@@ -543,16 +505,16 @@
       if (!alive) return;
       var w = item.w;
       var line = h('div', { class: 'item-line' }, h('strong', { class: 'en', lang: 'en' }, w.en), EG.ui.speakBtn(w.en, true), h('span', { class: 'ru' }, '— ' + w.ru));
-      var note = item.check && ok ? h('p', { class: 'fb-note' }, icon('check'), 'Вы знаете это слово — пропускаем его. Повтор ' + (g ? EG.ui.relDue(g.after.due) : 'позже') + '.')
+      var note = knownNow[w.id] && ok ? h('p', { class: 'fb-note' }, icon('check'), 'Вы знаете это слово — пропускаем его. Повтор ' + (g ? EG.ui.relDue(g.after.due) : 'позже') + '.')
         : justLearned ? h('p', { class: 'fb-note' }, icon('check'), 'Слово выучено! Следующий повтор ' + EG.ui.relDue(g.after.due) + '.')
           : item.synonym && ok ? h('p', { class: 'muted small' }, '«' + item.synonym + '» — тоже верно, это синоним. Здесь загадано слово ниже.')
             : item.typo && ok ? h('p', { class: 'muted small' }, 'Засчитано, но с опечаткой — сравните написание.')
-            : ok && g && !g.before && g.after.box >= 3 ? h('p', { class: 'muted small' }, 'Вы знали это слово — покажем его снова только ' + EG.ui.relDue(g.after.due) + '.')
+            : ok && g && !g.before && g.after.box >= WT().KNOWN_BOX ? h('p', { class: 'muted small' }, 'Вы знали это слово — покажем его снова только ' + EG.ui.relDue(g.after.due) + '.')
               : null;
       if (ok) {
         foot.replaceChildren(h('div', { class: 'feedback good' },
           h('div', { class: 'fb-head' }, h('span', { class: 'fb-verdict good' }, icon('check'), item.typo ? 'Почти верно' : item.synonym ? 'Верно (синоним)' : 'Верно!')), line, note));
-        later(advance, justLearned || item.check || item.typo || item.synonym ? 1700 : item.kind === 'type' ? 1100 : 900);
+        later(advance, justLearned || knownNow[w.id] || item.typo || item.synonym ? 1700 : item.kind === 'type' ? 1100 : 900);
         keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); advance(); } };
         return;
       }
@@ -561,7 +523,7 @@
         h('div', { class: 'fb-head' }, h('span', { class: 'fb-verdict bad' }, icon('x'), item.helped ? 'С подсказкой' : 'Неверно')),
         h('p', { class: 'muted small' }, 'Правильно:'), line,
         exampleBlock(w),
-        h('p', { class: 'muted small' }, item.check ? 'Ничего страшного — выучим его сейчас.' : item.requeued ? 'Слово вернётся ещё раз в этой сессии.' : 'Слово скоро появится в повторении.')), b);
+        h('p', { class: 'muted small' }, item.requeued ? (item.first ? 'Запомните перевод — слово сейчас появится ещё раз.' : 'Слово вернётся ещё раз в этой сессии.') : 'Слово скоро появится в повторении.')), b);
       keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); advance(); } };
       setTimeout(function () { b.focus(); }, 30);
     }

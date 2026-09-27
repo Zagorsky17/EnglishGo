@@ -713,6 +713,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .btn.tf { min-height: 64px; font-size: 1.1rem; }
 .btn.tf.yes:hover { background: var(--good-soft); border-color: var(--good); }
 .btn.tf.no:hover { background: var(--bad-soft); border-color: var(--bad); }
+.btn.tf.correct { border-color: var(--good); background: var(--good-soft); }
 .game-fb { min-height: 24px; margin-top: 12px; }
 .game-fb p { margin: 2px 0; }
 .good-text { color: var(--good); font-weight: 700; }
@@ -797,8 +798,6 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .unit-ok { color: var(--good); }
 .unit-action.primary { border-color: var(--accent); background: var(--accent-soft); }
 .unit-nav { margin-bottom: var(--gap); }
-.intro-body { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
-.intro-ru { text-align: center; font-size: 1.35rem; font-weight: 600; color: var(--accent); }
 .word-example { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 10px 12px; border-radius: var(--radius-sm);
   background: var(--surface-2); font-size: .95rem; margin-top: 8px; }
 .word-example > .muted { width: 100%; }
