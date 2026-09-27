@@ -88,16 +88,22 @@
       EG.data.episodes.forEach(function (e) {
         if (U.levelIndex(e.level) > max) return;
         var c = EG.data.contactsById[e.contactId];
-        Object.keys(e.nodes).forEach(function (k) { var n = e.nodes[k]; if (n.reply && (n.reply.distractors || []).length) replies.push({ reply: n.reply, who: c.name + ' · ' + c.role }); });
+        Object.keys(e.nodes).forEach(function (k) {
+          var n = e.nodes[k];
+          if (!n.reply || !(n.reply.distractors || []).length) return;
+          // в эпизоде реплика собеседника лежит в узле (them / ru), а не в самом ходе
+          replies.push({ reply: n.reply, who: c.name + ' · ' + c.role, npc: (n.them || []).slice(-1)[0], npcRu: (n.ru || []).slice(-1)[0] });
+        });
       });
       EG.data.scenarios.forEach(function (s) {
         if (U.levelIndex(s.level) > max) return;
-        s.turns.forEach(function (t) { if ((t.distractors || []).length) replies.push({ reply: t, who: s.partner }); });
+        s.turns.forEach(function (t) { if ((t.distractors || []).length) replies.push({ reply: t, who: s.partner, npc: t.npc, npcRu: t.npcRu }); });
       });
       var r = replies[Math.floor(Math.random() * replies.length)];
       var o = EG.dialogue.hintOptions(r.reply).map(function (x) { return { label: x.t, correct: x.good, n: x.n, note: x.note }; });
-      return { kind: 'choice', chat: r.reply.npc, who: r.who, prompt: r.reply.intent || 'Выберите лучший ответ', options: o, en: true,
-        explain: 'Лучше всего: ' + (r.reply.better || r.reply.accepted[0].t), turn: r.reply };
+      var best = r.reply.better || r.reply.accepted[0].t;
+      return { kind: 'choice', chat: r.npc, chatRu: r.npcRu, who: r.who, prompt: r.reply.intent || 'Выберите лучший ответ', options: o, en: true,
+        explain: 'Лучше всего: ' + best + (r.reply.betterRu ? ' — ' + r.reply.betterRu : ''), turn: r.reply };
     },
 
     build: function () {
@@ -106,7 +112,7 @@
       var words = it.example.split(/\s+/);
       var sh = U.shuffle(words);
       if (sh.join(' ') === words.join(' ')) sh = words.slice().reverse();
-      return { kind: 'build', words: sh, answer: it.example, hint: it.exampleRu, itemId: it.id, explain: it.example };
+      return { kind: 'build', words: sh, order: words, answer: it.example, hint: it.exampleRu, itemId: it.id, explain: it.example };
     }
   };
 

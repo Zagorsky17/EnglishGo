@@ -160,7 +160,14 @@
       }
 
       var head = [];
-      if (q.chat) head.push(h('div', { class: 'phone-msg' }, q.who ? h('span', { class: 'muted tiny' }, q.who) : null, h('span', { class: 'msg in', lang: 'en' }, q.chat)));
+      if (q.chat) {
+        var chatRu = q.chatRu ? h('span', { class: 'msg-ru muted small', hidden: true }, q.chatRu) : null;
+        head.push(h('div', { class: 'phone-msg' },
+          q.who ? h('span', { class: 'muted tiny' }, q.who) : null,
+          h('span', { class: 'msg in', lang: 'en' }, q.chat),
+          chatRu,
+          chatRu ? h('button', { class: 'link-btn', type: 'button', onclick: function () { chatRu.hidden = !chatRu.hidden; } }, icon('bulb'), 'Перевод') : null));
+      }
       if (q.bubble) head.push(h('div', { class: 'bubble npc' }, h('span', { lang: 'en' }, q.bubble)));
       if (q.big) head.push(h('div', { class: 'big-phrase' }, h('span', { lang: 'en' }, q.big)));
       if (q.statement) head.push(h('p', { class: 'statement' }, q.statement));
@@ -229,18 +236,46 @@
             } }, p.w);
           }));
         };
+        var order = q.order || q.answer.split(/\s+/);
+        var hints = 0;
+        var hintBtn = h('button', { class: 'btn ghost sm', type: 'button', onclick: function () { giveHint(); } }, icon('bulb'), 'Подсказка');
+        var hintNote = h('span', { class: 'muted small' });
+        /** Открыть следующее слово: оставляем верное начало фразы, неверный «хвост» убираем. */
+        function giveHint() {
+          if (locked) return;
+          var k = 0;
+          while (k < chosen.length && chosen[k].w === order[k]) k++;
+          while (chosen.length > k) chosen.pop().used = false;
+          if (chosen.length >= order.length) return;
+          var want = order[chosen.length];
+          var p = pool.filter(function (x) { return !x.used && x.w === want; })[0];
+          if (!p) return;
+          hints++;
+          p.used = true;
+          chosen.push(p);
+          hintNote.textContent = 'Открыто слов: ' + hints + ' из ' + order.length;
+          redraw();
+          if (chosen.length === pool.length) check();
+        }
         var check = function () {
           if (locked) return; locked = true; qTimer = null;
           var v = chosen.map(function (p) { return p.w; }).join(' ');
           var ok = EG.text.normalize(v) === EG.text.normalize(q.answer);
           line.classList.add(ok ? 'ok' : 'bad');
-          reveal(ok);
-          if (score(ok, q.itemId, { ms: Date.now() - shownAt, user: v, points: 15 })) later(nextQuestion, ok ? 900 : 1800);
+          hintBtn.disabled = true;
+          // подсказки не лишают правильного ответа, но снижают награду
+          var points = Math.max(3, 15 - hints * 4);
+          reveal(ok, ok && hints ? 'С подсказками (' + hints + ') — очки уменьшены.' : null);
+          if (score(ok, q.itemId, { ms: Date.now() - shownAt, user: v, points: points })) later(nextQuestion, ok ? 900 : 1800);
         };
         redraw();
-        onTimeout = function () { redraw(); line.classList.add('bad'); return 'Правильно: ' + q.answer; };
-        keyHandler = function (e) { if (e.key === 'Backspace' && chosen.length && !locked) { e.preventDefault(); chosen.pop().used = false; redraw(); } };
-        body = h('div', null, h('p', { class: 'prompt' }, q.hint), line, bank);
+        onTimeout = function () { redraw(); line.classList.add('bad'); hintBtn.disabled = true; return 'Правильно: ' + q.answer; };
+        keyHandler = function (e) {
+          if (e.key === 'Backspace' && chosen.length && !locked) { e.preventDefault(); chosen.pop().used = false; redraw(); }
+          if (e.key === '?' && !locked) { e.preventDefault(); giveHint(); }
+        };
+        body = h('div', null, h('p', { class: 'prompt' }, q.hint), line, bank,
+          h('div', { class: 'row gap wrap build-actions' }, hintBtn, hintNote));
       }
 
       stage.replaceChildren(h('div', { class: 'card game-card-q enter' },

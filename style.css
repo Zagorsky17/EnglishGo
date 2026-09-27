@@ -775,6 +775,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .word-prompt { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; text-align: center; font-size: 1.9rem; font-weight: 700; line-height: 1.25; margin: 18px 0 4px; }
 .word-q .badges { margin-bottom: 0; }
 .dont-know { margin: 12px 0 0; }
+.msg-ru { display: block; margin-top: 6px; }
+.build-actions { margin-top: 12px; align-items: center; }
 .vocab-plan { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .vocab-plan-text { flex: 1; min-width: 240px; }
 .vocab-plan-text p { margin: 4px 0; }
