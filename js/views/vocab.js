@@ -519,6 +519,7 @@
       if (ok) {
         foot.replaceChildren(h('div', { class: 'feedback good' },
           h('div', { class: 'fb-head' }, h('span', { class: 'fb-verdict good' }, icon('check'), item.typo ? 'Почти верно' : item.synonym ? 'Верно (синоним)' : 'Верно!')), line, note));
+        EG.ui.scrollToEnd(foot);
         later(advance, justLearned || knownNow[w.id] || item.typo || item.synonym ? 1700 : item.kind === 'type' ? 1100 : 900);
         keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); advance(); } };
         return;
@@ -535,7 +536,8 @@
         exampleBlock(w),
         h('p', { class: 'muted small' }, tail)), b);
       keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); advance(); } };
-      setTimeout(function () { b.focus(); }, 30);
+      setTimeout(function () { b.focus({ preventScroll: true }); }, 30);
+      EG.ui.scrollToEnd(foot);
     }
 
     function finish() {
