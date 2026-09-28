@@ -71,6 +71,8 @@
       h('button', { class: 'composer-btn', type: 'button', title: 'Варианты ответа', 'aria-label': 'Варианты ответа', onclick: toggleQuick }, icon('bulb')),
       sendBtn);
 
+    var composerWrap = h('div', { class: 'composer-wrap' }, intentEl, quick, emojiPanel, composer);
+
     root.append(h('div', { class: 'messenger' },
       h('div', { class: 'chat-head' },
         h('a', { class: 'icon-btn', href: '#/chats', 'aria-label': 'Назад' }, icon('back')),
@@ -78,7 +80,7 @@
         h('div', { class: 'chat-head-main' }, h('strong', null, contact.name), statusEl),
         h('button', { class: 'icon-btn', title: 'О собеседнике', 'aria-label': 'О собеседнике', onclick: aboutContact }, icon('help'))),
       msgs,
-      h('div', { class: 'composer-wrap' }, intentEl, quick, emojiPanel, composer)));
+      composerWrap));
 
     input.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
@@ -95,7 +97,14 @@
     }
 
     function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
-    function scroll() { msgs.scrollTop = msgs.scrollHeight; }
+
+    var pinned = true;
+    msgs.addEventListener('scroll', function () { pinned = msgs.scrollHeight - msgs.clientHeight - msgs.scrollTop < 48; });
+    function scroll() { pinned = true; msgs.scrollTop = msgs.scrollHeight; }
+    // Композер меняет высоту (подсказка «Что ответить?», эмодзи, растущее поле) уже после
+    // scroll() и «съедает» низ ленты — возвращаем её вниз, если человек и так читал последние сообщения.
+    var sizeWatch = window.ResizeObserver ? new ResizeObserver(function () { if (pinned) msgs.scrollTop = msgs.scrollHeight; }) : null;
+    if (sizeWatch) sizeWatch.observe(composerWrap);
 
     function aboutContact() {
       var s = EG.chat.status(contact);
@@ -349,6 +358,6 @@
     }
     scroll();
 
-    return function () { alive = false; timers.forEach(clearTimeout); };
+    return function () { alive = false; timers.forEach(clearTimeout); if (sizeWatch) sizeWatch.disconnect(); };
   };
 })(window.EG = window.EG || {});

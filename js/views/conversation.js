@@ -85,7 +85,7 @@
         h('p', { class: 'muted' }, dlg.settingRu)),
       log, controls);
 
-    function scroll() { controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    function scroll() { EG.ui.scrollToEnd(controls); }
 
     function showNode() {
       var node = EG.dialogue.currentNode(run);
@@ -131,7 +131,7 @@
       }
       keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } };
       controls.replaceChildren(btn);
-      setTimeout(function () { btn.focus(); }, 30);
+      setTimeout(function () { btn.focus({ preventScroll: true }); }, 30);
       scroll();
     }
 
@@ -191,7 +191,7 @@
       log, controls);
     var progressFill = root.querySelector('.talk-progress span');
 
-    function scroll() { controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    function scroll() { EG.ui.scrollToEnd(controls); }
 
     function showTurn(isRetry) {
       var turn = sc.turns[idx];
@@ -257,7 +257,7 @@
             !ev.correct || ev.naturalness < 75 ? h('button', { class: 'btn ghost', onclick: function () { keyHandler = null; showTurn(true); } }, 'Сказать ещё раз') : null,
             nextBtn));
           keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); next(); } };
-          setTimeout(function () { nextBtn.focus(); }, 30);
+          setTimeout(function () { nextBtn.focus({ preventScroll: true }); }, 30);
           scroll();
         });
       }
@@ -282,7 +282,7 @@
           h('button', { class: 'btn ghost', onclick: giveUp }, 'Не знаю')),
         h('p', { class: 'muted small' }, 'Enter — отправить, Shift+Enter — новая строка.'),
         hintsBox);
-      setTimeout(function () { input.focus(); }, 60);
+      setTimeout(function () { input.focus({ preventScroll: true }); }, 60);
       scroll();
     }
 

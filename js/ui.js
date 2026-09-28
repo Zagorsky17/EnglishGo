@@ -305,6 +305,33 @@
     return 'через ' + EG.srs.describeInterval(diff);
   }
 
+  var SCROLL_PAD = 20;
+
+  /**
+   * Показать свежий блок внизу страницы: после ответа его нижний край должен быть
+   * виден с запасом, а не остаться под сгибом. Блок выше окна — показываем его начало.
+   * Запуск в rAF: к этому моменту только что вставленные узлы уже разложены.
+   * Фокус на кнопках/поле ставится с preventScroll, иначе он обрывает эту прокрутку.
+   */
+  function scrollToEnd(el) {
+    if (!el) return;
+    requestAnimationFrame(function () {
+      if (!el.isConnected) return;
+      var r = el.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var dy;
+      if (r.height + SCROLL_PAD > vh) dy = r.top - SCROLL_PAD;
+      else if (r.bottom + SCROLL_PAD > vh) dy = r.bottom + SCROLL_PAD - vh;
+      else if (r.top < SCROLL_PAD) dy = r.top - SCROLL_PAD;
+      else return;
+      if (Math.abs(dy) < 2) return;
+      if ('scrollBehavior' in document.documentElement.style) {
+        var mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+        window.scrollBy({ top: dy, behavior: mq && mq.matches ? 'auto' : 'smooth' });
+      } else window.scrollBy(0, dy);
+    });
+  }
+
   EG.ui = {
     h: h, fill: fill, icon: icon, toast: toast, modal: modal, confirm: confirmDialog,
     speak: speak, autoSpeak: autoSpeak, stopSpeech: stopSpeech, canSpeak: canSpeak, speakBtn: speakBtn,
@@ -312,6 +339,6 @@
     usableVoices: usableVoices,
     ring: ring, bar: bar, barChart: barChart, levelBadge: levelBadge, registerBadge: registerBadge,
     REGISTER: REGISTER, TYPES: TYPES, empty: empty, pageHead: pageHead, highlight: highlight,
-    formatDate: formatDate, relDue: relDue
+    formatDate: formatDate, relDue: relDue, scrollToEnd: scrollToEnd
   };
 })(window.EG = window.EG || {});
