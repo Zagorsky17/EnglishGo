@@ -270,7 +270,8 @@
             !ok ? h('p', null, 'Правильный ответ: ', h('strong', null, q.options[q.answer])) : null,
             q.explain ? h('p', { class: 'fb-note' }, icon('bulb'), q.explain) : null), next);
           keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); advance(); } };
-          setTimeout(function () { next.focus(); }, 30);
+          setTimeout(function () { next.focus({ preventScroll: true }); }, 30);
+          EG.ui.scrollToEnd(foot);
         }
         function advance() { keyHandler = null; idx++; if (idx < t.questions.length) renderQ(); else finish(right); }
         keyHandler = function (e) { var n = parseInt(e.key, 10); if (n >= 1 && n <= btns.length) { e.preventDefault(); pick(n - 1); } };

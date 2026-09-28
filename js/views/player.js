@@ -186,7 +186,7 @@
     function nextButton(label) {
       var b = h('button', { class: 'btn primary block', onclick: advance }, label || 'Далее', icon('arrow'));
       keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); advance(); } };
-      setTimeout(function () { b.focus(); }, 30);
+      setTimeout(function () { b.focus({ preventScroll: true }); }, 30);
       return b;
     }
 
@@ -208,7 +208,7 @@
         );
       }
       foot.replaceChildren(body, nextButton());
-      foot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      EG.ui.scrollToEnd(foot);
     }
 
     /* ---------- общие части ---------- */

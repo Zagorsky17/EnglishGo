@@ -136,7 +136,8 @@
       keyHandler = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } };
       var btn = h('button', { class: 'btn primary', type: 'button', onclick: go }, 'Дальше');
       feedback.appendChild(h('div', { class: 'row gap wrap center' }, btn));
-      btn.focus();
+      btn.focus({ preventScroll: true });
+      EG.ui.scrollToEnd(feedback);
     }
 
     /* ---------- вопросы (все игры, кроме «пар») ---------- */
@@ -177,6 +178,7 @@
         EG.ui.fill(feedback, h('p', { class: ok ? 'good-text' : 'bad-text' }, ok ? 'Верно!' : (ok === null ? 'Время вышло' : 'Неверно')),
           extra ? h('p', { class: 'small' }, extra) : null,
           q.explain ? h('p', { class: 'muted small' }, q.explain) : null);
+        EG.ui.scrollToEnd(feedback);
       }
 
       var body;
