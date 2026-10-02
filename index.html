@@ -11,6 +11,7 @@
   <title>EnglishGo</title>
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="grammar/grammar.css">
   <script src="js/theme-boot.js"></script>
 </head>
 <body class="loading">
@@ -99,6 +100,11 @@
   <script src="js/views/reading.js"></script>
   <script src="js/views/chats.js"></script>
   <script src="js/views/games.js"></script>
+
+  <!-- Раздел «Грамматика» — изолированный модуль (EG.grammar, своё хранилище IndexedDB) -->
+  <script src="grammar/grammar-data.js"></script>
+  <script src="grammar/grammar-ui.js"></script>
+  <script src="grammar/grammar.js"></script>
 
   <script src="js/app.js"></script>
 </body>
