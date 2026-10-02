@@ -332,7 +332,26 @@
     });
   }
 
+  /**
+   * Единый блок разбора ответа: «Вопрос / Правильно / Ваш ответ», у каждой строки — перевод.
+   * o = { ask, askRu, right, rightRu, rightLabel, user, userRu, item }; перевод правильного ответа
+   * и ответа ученика, если не задан, ищется в словаре (EG.exercises.ruOf).
+   */
+  function answerLines(o) {
+    function ruOf(text, ru, item) {
+      if (ru == null && EG.exercises) ru = EG.exercises.ruOf(text, item);
+      return ru && ru !== text ? h('span', { class: 'fb-ru' }, ' — ' + ru) : null;
+    }
+    var rows = [];
+    if (o.ask) rows.push(h('p', { class: 'fb-line' }, h('span', { class: 'muted' }, 'Вопрос: '), h('span', { lang: 'en' }, o.ask), ruOf(o.ask, o.askRu || '')));
+    if (o.right) rows.push(h('p', { class: 'fb-answer' }, h('span', { class: 'muted' }, (o.rightLabel || 'Правильно') + ': '),
+      h('strong', { lang: 'en' }, o.right), ruOf(o.right, o.rightRu, o.item)));
+    if (o.user) rows.push(h('p', { class: 'fb-line muted small' }, 'Ваш ответ: ', h('span', { lang: 'en' }, o.user), ruOf(o.user, o.userRu)));
+    return rows.length ? h('div', { class: 'fb-lines' }, rows) : null;
+  }
+
   EG.ui = {
+    answerLines: answerLines,
     h: h, fill: fill, icon: icon, toast: toast, modal: modal, confirm: confirmDialog,
     speak: speak, autoSpeak: autoSpeak, stopSpeech: stopSpeech, canSpeak: canSpeak, speakBtn: speakBtn,
     voices: function () { return allVoices; },

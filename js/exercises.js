@@ -162,6 +162,24 @@
 
   function stripEnd(s) { return String(s).replace(/[.?!,…]+$/g, '').trim(); }
 
+  // Перевод английской фразы из вариантов ответа: ищем по en, сленговой и обычной форме, alt
+  var ruIndex = null;
+  function phraseKey(s) { return stripEnd(s).toLowerCase(); }
+  function ruOf(text, item) {
+    if (!text) return '';
+    var k = phraseKey(text);
+    if (item && [item.en].concat(item.alt || [], item.forms ? [item.forms.slang, item.forms.neutral] : []).some(function (s) { return s && phraseKey(s) === k; })) return item.ru;
+    if (!ruIndex) {
+      ruIndex = Object.create(null);
+      EG.data.vocab.forEach(function (v) {
+        [v.en].concat(v.forms ? [v.forms.slang, v.forms.neutral] : [], v.alt || []).forEach(function (s) {
+          if (s && !ruIndex[phraseKey(s)]) ruIndex[phraseKey(s)] = v.ru;
+        });
+      });
+    }
+    return ruIndex[k] || '';
+  }
+
   function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
   /** Найти фразу в примере (без учёта регистра) → {before, match, after} */
@@ -269,7 +287,7 @@
       var pool = EG.data.vocab.filter(function (v) { return v.cue && v.id !== item.id && v.cue !== item.cue; });
       var wrong = distractors(item, 3, 'en', pool.length >= 3 ? pool : null);
       return {
-        type: 'reaction', item: item, cue: item.cue, cueRu: item.cueRu,
+        type: 'reaction', item: item, cue: item.cue, cueRu: item.cueRu, ask: item.cue, askRu: item.cueRu,
         prompt: 'Быстро ответьте собеседнику',
         options: options(item.en, wrong), answer: item.en,
         timeMs: EG.progress.reactionMs()
@@ -299,7 +317,7 @@
       var pool = EG.data.vocab.filter(function (v) { return v.forms && v.forms.slang && v.id !== item.id; })
         .map(function (v) { return { en: v.forms.slang, id: v.id, topic: v.topic, level: v.level, type: v.type }; });
       return {
-        type: 'slangify', item: item, prompt: 'Как сказать это неформально — другу?',
+        type: 'slangify', item: item, prompt: 'Как сказать это неформально — другу?', ask: item.en, askRu: item.ru,
         options: options(f.slang, distractors({ id: item.id, en: f.slang, topic: item.topic, level: item.level, type: item.type }, 3, 'en', pool)),
         answer: f.slang, note: f.note
       };
@@ -313,6 +331,7 @@
         .map(function (v) { return { en: v.forms.neutral, id: v.id, topic: v.topic, level: v.level, type: v.type }; });
       return {
         type: 'formalize', item: item, prompt: 'Как сказать это нейтрально — коллеге или незнакомому человеку?',
+        ask: item.register === 'casual' ? item.en : (f.slang || item.en), askRu: item.ru,
         options: options(f.neutral, distractors({ id: item.id, en: f.neutral, topic: item.topic, level: item.level, type: item.type }, 3, 'en', pool)),
         answer: f.neutral, note: f.note
       };
@@ -448,6 +467,7 @@
     forReview: forReview,
     findInExample: findInExample,
     textForms: textForms,
-    stripEnd: stripEnd
+    stripEnd: stripEnd,
+    ruOf: ruOf
   };
 })(window.EG = window.EG || {});

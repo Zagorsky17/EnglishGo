@@ -36,7 +36,7 @@
         h('div', { class: 'better-line' }, h('strong', null, better), EG.ui.speakBtn(better, true)),
         turn.betterRu ? h('p', { class: 'muted' }, turn.betterRu) : null
       ) : null,
-      turn.npcRu ? h('p', { class: 'muted small' }, 'Собеседник сказал: ', h('em', null, turn.npcRu)) : null,
+      turn.npc ? EG.ui.answerLines({ ask: turn.npc, askRu: turn.npcRu, user: opts.user, userRu: '' }) : null,
       turn.explain ? h('div', { class: 'explain' }, h('span', { class: 'metric-label' }, 'Почему так'), h('p', null, turn.explain)) : null,
       turn.accepted.length > 1 ? h('details', { class: 'alts' }, h('summary', null, 'Другие естественные варианты'),
         h('ul', null, turn.accepted.slice(0, 5).map(function (a) { return h('li', null, a.t, h('span', { class: 'muted small' }, ' · ' + a.n + '%')); }))) : null,
@@ -193,7 +193,7 @@
     function showFeedback(ex, res, xp, ms) {
       var body;
       if (ex.type === 'turn') {
-        body = turnFeedback(ex.turn, res.ev, { xp: xp, ms: ms });
+        body = turnFeedback(ex.turn, res.ev, { xp: xp, ms: ms, user: res.userAnswer });
       } else {
         var tone = res.correct ? (res.partial ? 'ok' : 'good') : 'bad';
         var label = res.correct ? (res.partial ? 'Почти верно' : ['Верно!', 'Отлично!', 'Так держать!'][Math.floor(Math.random() * 3)]) : (res.timeout ? 'Время вышло' : 'Неверно');
@@ -201,8 +201,11 @@
           h('div', { class: 'fb-head' },
             h('span', { class: 'fb-verdict ' + tone }, icon(res.correct ? 'check' : 'x'), label),
             xp ? h('span', { class: 'xp-pill' }, '+' + xp + ' XP') : null),
-          (!res.correct || res.partial || res.showAnswer) && ex.answer ? h('p', { class: 'fb-answer' }, h('span', { class: 'muted' }, 'Правильно: '), h('strong', null, res.expected || ex.answer)) : null,
-          res.userAnswer && (!res.correct || res.partial) && !res.timeout ? h('p', { class: 'muted small' }, 'Ваш ответ: ' + res.userAnswer) : null,
+          (!res.correct || res.partial || res.showAnswer) && ex.answer ? EG.ui.answerLines({
+            ask: ex.ask, askRu: ex.askRu,
+            right: res.expected || ex.answer, rightRu: res.expected && res.expected !== ex.answer ? undefined : ex.answerRu, item: ex.item,
+            user: res.userAnswer && (!res.correct || res.partial) && !res.timeout ? res.userAnswer : '', userRu: res.userRu
+          }) : null,
           res.note ? h('p', { class: 'fb-note' }, icon('bulb'), res.note) : null,
           ex.type === 'dlgnode' ? null : itemInfo(ex.item, true)
         );
@@ -558,7 +561,7 @@
           choiceList(ex, {
             en: true,
             isCorrect: function (i) { return node.options[i].q === 'best'; },
-            extra: function (i) { var o = node.options[i]; return { note: o.fb, partial: o.q === 'ok' }; }
+            extra: function (i) { var o = node.options[i]; return { note: o.fb, partial: o.q === 'ok', userRu: o.ru || '' }; }
           }));
       }
     };

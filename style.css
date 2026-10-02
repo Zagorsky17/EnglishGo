@@ -431,6 +431,9 @@ button.chip:hover:not(:disabled) { border-color: var(--accent); }
 .xp-pill { font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--accent); color: #fff; }
 :root[data-theme="dark"] .xp-pill { color: #0f1117; }
 .fb-answer { font-size: 1.05rem; }
+.fb-lines { display: flex; flex-direction: column; gap: 4px; }
+.fb-lines p { margin: 0; }
+.fb-ru { color: var(--muted); font-weight: 400; }
 .fb-note { display: flex; gap: 8px; align-items: flex-start; font-size: .92rem; }
 .fb-note .ic { width: 18px; height: 18px; color: var(--warn); margin-top: 1px; }
 .item-info { border-top: 1px solid color-mix(in srgb, var(--text) 12%, transparent); padding-top: 10px; margin-top: 8px; }

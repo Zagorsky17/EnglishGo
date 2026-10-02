@@ -154,7 +154,7 @@
           if (locked) return;
           locked = true;
           var right = onTimeout ? onTimeout() : null;
-          reveal(null, right);
+          reveal(null, q.kind === 'tf' && right ? 'Правильный ответ: ' + right : null);
           // время вышло — ждём, пока ученик прочитает правильный ответ и нажмёт «Дальше»
           if (score(false, q.itemId, { user: '(время вышло)', expected: right || '' })) waitNext(feedback);
         };
@@ -174,10 +174,19 @@
       if (q.statement) head.push(h('p', { class: 'statement' }, q.statement));
 
       var feedback = h('div', { class: 'game-fb' });
-      function reveal(ok, extra) {
+      /** Правильный ответ задания (для разбора и истории). */
+      function rightText() {
+        if (q.right) return q.right;
+        if (q.kind === 'choice') { var c = q.options.filter(function (o) { return o.correct; })[0]; return c ? c.label : ''; }
+        return q.kind === 'build' ? q.answer : '';
+      }
+      // ошибка/время вышло — тот же блок «Вопрос / Правильно / Ваш ответ» с переводом, что и в уроках
+      function reveal(ok, extra, user) {
+        var lines = !ok && q.kind !== 'tf' ? EG.ui.answerLines({ ask: q.ask, askRu: q.askRu, right: rightText(), rightRu: q.rightRu, user: user }) : null;
         EG.ui.fill(feedback, h('p', { class: ok ? 'good-text' : 'bad-text' }, ok ? 'Верно!' : (ok === null ? 'Время вышло' : 'Неверно')),
+          lines,
           extra ? h('p', { class: 'small' }, extra) : null,
-          q.explain ? h('p', { class: 'muted small' }, q.explain) : null);
+          q.explain && (!lines || q.explainAlways) ? h('p', { class: 'muted small' }, q.explain) : null);
         EG.ui.scrollToEnd(feedback);
       }
 
@@ -190,15 +199,15 @@
           if (locked) return; locked = true; qTimer = null;
           var o = q.options[i];
           btns.forEach(function (b, j) { b.disabled = true; if (q.options[j].correct) b.classList.add('correct'); if (j === i && !o.correct) b.classList.add('wrong'); });
-          reveal(o.correct, o.note);
-          var cont = score(o.correct, q.itemId, { ms: Date.now() - shownAt, user: o.label, points: o.n ? Math.round(o.n / 10) : 10 });
-          if (cont) later(nextQuestion, o.correct ? 700 : 1600);
+          reveal(o.correct, o.note, o.label);
+          var cont = score(o.correct, q.itemId, { ms: Date.now() - shownAt, user: o.label, expected: rightText(), points: o.n ? Math.round(o.n / 10) : 10 });
+          if (cont) later(nextQuestion, o.correct ? 700 : 2600);
         };
         keyHandler = function (e) { var n = parseInt(e.key, 10); if (n >= 1 && n <= btns.length) { e.preventDefault(); pick(n - 1); } };
         onTimeout = function () {
           var right = null;
           btns.forEach(function (b, j) { b.disabled = true; if (q.options[j].correct) { b.classList.add('correct'); right = q.options[j].label; } });
-          return right ? 'Правильный ответ: ' + right : null;
+          return right;
         };
         body = h('div', { class: 'options' + (q.en ? ' en' : '') }, btns);
       } else if (q.kind === 'tf') {
@@ -218,7 +227,7 @@
         };
         onTimeout = function () {
           tfb.forEach(function (b, j) { b.disabled = true; if ((j === 0) === q.truth) b.classList.add('correct'); });
-          return 'Правильный ответ: ' + (q.truth ? 'Правда' : 'Неправда');
+          return q.truth ? 'Правда' : 'Неправда';
         };
         body = h('div', { class: 'tf-row' }, tfb);
       } else {
@@ -267,11 +276,11 @@
           hintBtn.disabled = true;
           // подсказки не лишают правильного ответа, но снижают награду
           var points = Math.max(3, 15 - hints * 4);
-          reveal(ok, ok && hints ? 'С подсказками (' + hints + ') — очки уменьшены.' : null);
-          if (score(ok, q.itemId, { ms: Date.now() - shownAt, user: v, points: points })) later(nextQuestion, ok ? 900 : 1800);
+          reveal(ok, ok && hints ? 'С подсказками (' + hints + ') — очки уменьшены.' : null, v);
+          if (score(ok, q.itemId, { ms: Date.now() - shownAt, user: v, expected: q.answer, points: points })) later(nextQuestion, ok ? 900 : 2800);
         };
         redraw();
-        onTimeout = function () { redraw(); line.classList.add('bad'); hintBtn.disabled = true; return 'Правильно: ' + q.answer; };
+        onTimeout = function () { redraw(); line.classList.add('bad'); hintBtn.disabled = true; return q.answer; };
         keyHandler = function (e) {
           if (e.key === 'Backspace' && chosen.length && !locked) { e.preventDefault(); chosen.pop().used = false; redraw(); }
           if (e.key === '?' && !locked) { e.preventDefault(); giveHint(); }

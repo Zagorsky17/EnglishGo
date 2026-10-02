@@ -53,18 +53,20 @@
       var all = chatLines();
       var l = all[Math.floor(Math.random() * all.length)];
       return { kind: 'choice', chat: l.en, prompt: 'Что значит это сообщение?', options: opts(l.ru, pickOther(all, l.ru, 'ru', 3)), itemId: l.itemId,
-        explain: EG.chat.decodeMessage(l.en).map(function (d) { return d.abbr + ' = ' + d.full; }).join(', ') };
+        ask: l.en, askRu: '', explainAlways: true, explain: EG.chat.decodeMessage(l.en).map(function (d) { return d.abbr + ' = ' + d.full; }).join(', ') };
     },
 
     blitz: function () {
       if (Math.random() < 0.55) {
         var withCue = pool(function (v) { return !!v.cue; });
         var it = withCue[Math.floor(Math.random() * Math.min(withCue.length, 40))];
-        return { kind: 'choice', bubble: it.cue, prompt: 'Быстро ответьте', options: opts(it.en, pickOther(withCue, it.en, 'en', 3)), itemId: it.id, explain: it.en + ' — ' + it.ru, en: true };
+        return { kind: 'choice', bubble: it.cue, prompt: 'Быстро ответьте', options: opts(it.en, pickOther(withCue, it.en, 'en', 3)), itemId: it.id, explain: it.en + ' — ' + it.ru, en: true,
+          ask: it.cue, askRu: it.cueRu || '', rightRu: it.ru };
       }
       var p = pool(function () { return true; });
       var x = p[Math.floor(Math.random() * Math.min(p.length, 60))];
-      return { kind: 'choice', big: x.en, prompt: 'Что это значит?', options: opts(x.ru, pickOther(p, x.ru, 'ru', 3)), itemId: x.id, explain: x.en + ' — ' + x.ru };
+      return { kind: 'choice', big: x.en, prompt: 'Что это значит?', options: opts(x.ru, pickOther(p, x.ru, 'ru', 3)), itemId: x.id, explain: x.en + ' — ' + x.ru,
+        ask: x.en, askRu: '' };
     },
 
     truefalse: function () {
@@ -103,7 +105,8 @@
       var o = EG.dialogue.hintOptions(r.reply).map(function (x) { return { label: x.t, correct: x.good, n: x.n, note: x.note }; });
       var best = r.reply.better || r.reply.accepted[0].t;
       return { kind: 'choice', chat: r.npc, chatRu: r.npcRu, who: r.who, prompt: r.reply.intent || 'Выберите лучший ответ', options: o, en: true,
-        explain: 'Лучше всего: ' + best + (r.reply.betterRu ? ' — ' + r.reply.betterRu : ''), turn: r.reply };
+        explain: 'Лучше всего: ' + best + (r.reply.betterRu ? ' — ' + r.reply.betterRu : ''), turn: r.reply,
+        ask: r.npc, askRu: r.npcRu || '', right: best, rightRu: r.reply.betterRu || '' };
     },
 
     build: function () {
@@ -112,7 +115,7 @@
       var words = it.example.split(/\s+/);
       var sh = U.shuffle(words);
       if (sh.join(' ') === words.join(' ')) sh = words.slice().reverse();
-      return { kind: 'build', words: sh, order: words, answer: it.example, hint: it.exampleRu, itemId: it.id, explain: it.example };
+      return { kind: 'build', words: sh, order: words, answer: it.example, hint: it.exampleRu, itemId: it.id, explain: it.example, rightRu: it.exampleRu };
     }
   };
 
