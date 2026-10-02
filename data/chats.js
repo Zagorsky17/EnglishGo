@@ -508,7 +508,7 @@
     Object.keys(e.nodes).forEach(function (nid) {
       var n = e.nodes[nid];
       // реплика собеседника, на которую отвечаем (для упражнений в «Ошибках»)
-      if (n.reply) n.reply.npc = n.them[n.them.length - 1];
+      if (n.reply) { n.reply.npc = n.them[n.them.length - 1]; n.reply.npcRu = (n.ru || [])[n.them.length - 1] || ''; }
     });
   });
 })(window.EG = window.EG || {});

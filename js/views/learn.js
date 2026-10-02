@@ -223,7 +223,8 @@
       var shuffled = { npc: node.npc, options: EG.util.shuffle(node.options) };
       var best = shuffled.options.filter(function (o) { return o.q === 'best'; })[0];
       return { type: 'dlgnode', node: shuffled, itemId: m.itemId, kind: 'dlg', ref: ref, setting: d.setting, noSrs: true,
-        options: shuffled.options.map(function (o) { return o.en; }), answer: best ? best.en : '', mistakePrompt: node.npc };
+        options: shuffled.options.map(function (o) { return o.en; }), answer: best ? best.en : '', answerRu: best ? best.ru || '' : '',
+        ask: node.npc, askRu: node.ru || '', mistakePrompt: node.npc };
     }
     var item = EG.data.byId[m.itemId];
     if (!item) return null;
@@ -240,19 +241,45 @@
     var ref = m.ref || {};
     if (m.kind === 'turn') {
       var f = findTurn(ref, m.prompt);
-      return { title: f ? '«' + f.turn.npc + '»' : (m.prompt ? '«' + m.prompt + '»' : 'Реплика больше не существует'), where: f ? 'Разговор · ' + f.sc.title : 'Разговор' };
+      return { title: f ? '«' + f.turn.npc + '»' : (m.prompt ? '«' + m.prompt + '»' : 'Реплика больше не существует'), where: f ? 'Разговор · ' + f.sc.title : 'Разговор', ru: f && f.turn.npcRu };
     }
     if (m.kind === 'chat') {
       var ep = EG.data.episodesById[ref.episodeId];
       var c = ep && EG.data.contactsById[ep.contactId];
-      return { title: '«' + (m.prompt || '') + '»', where: c ? 'Чат · ' + c.name : 'Чат' };
+      var cn = ep && ep.nodes[ref.nodeId];
+      return { title: '«' + (m.prompt || '') + '»', where: c ? 'Чат · ' + c.name : 'Чат', ru: cn && cn.reply && cn.reply.npc === m.prompt ? cn.reply.npcRu : '' };
     }
     if (m.kind === 'dlg') {
       var d = EG.data.dialoguesById[ref.dialogueId];
-      return { title: '«' + (m.prompt || '') + '»', where: d ? 'Диалог · ' + d.title : 'Диалог' };
+      var dn = d && d.nodes[ref.nodeId];
+      return { title: '«' + (m.prompt || '') + '»', where: d ? 'Диалог · ' + d.title : 'Диалог', ru: dn && dn.npc === m.prompt ? dn.ru : '' };
     }
     var it = EG.data.byId[m.itemId];
     return { title: it ? it.en : m.itemId, where: it ? it.ru : '' };
+  }
+
+  /** Строки «Вопрос / Правильно / Ваш ответ» с переводом — тот же стандарт, что и в разборе ответа. */
+  function mistakeLines(m) {
+    var ref = m.ref || {};
+    var o = { right: m.expected, user: m.lastUserAnswer };
+    if (m.kind === 'turn') {
+      var f = findTurn(ref, m.prompt);
+      if (f && m.expected === (f.turn.better || '')) o.rightRu = f.turn.betterRu || undefined;
+    } else if (m.kind === 'chat') {
+      var ep = EG.data.episodesById[ref.episodeId];
+      var cn = ep && ep.nodes[ref.nodeId];
+      if (cn && cn.reply && m.expected === cn.reply.better) o.rightRu = cn.reply.betterRu || undefined;
+    } else if (m.kind === 'dlg') {
+      var d = EG.data.dialoguesById[ref.dialogueId];
+      var node = d && d.nodes[ref.nodeId];
+      (node && node.options || []).forEach(function (x) {
+        if (x.en === m.expected) o.rightRu = x.ru;
+        if (x.en === m.lastUserAnswer) o.userRu = x.ru;
+      });
+    } else {
+      o.item = EG.data.byId[m.itemId];
+    }
+    return o;
   }
 
   var TYPE_RU = { context: 'контекст', meaning: 'понимание', listen: 'аудирование', dictation: 'диктант', reaction: 'реакция', register: 'уместность', recall: 'воспоминание', build: 'сборка фразы', flash: 'карточка', turn: 'разговор', dlgnode: 'диалог', slangify: 'сленг', formalize: 'обычная речь', decode: 'расшифровка чата', texting: 'как в чате', chat: 'мессенджер', game: 'игра', story: 'понимание диалога' };
@@ -279,8 +306,8 @@
           h('div', { class: 'row gap wrap' }, h('strong', { lang: 'en' }, t.title), h('span', { class: 'badge' }, TYPE_RU[m.type] || m.type || ''),
             m.resolved ? h('span', { class: 'badge st-mastered' }, 'исправлено') : h('span', { class: 'badge bad' }, '×' + m.count)),
           t.where ? h('span', { class: 'muted small' }, t.where) : null,
-          m.expected ? h('p', { class: 'small' }, h('span', { class: 'muted' }, 'Правильно: '), h('span', { lang: 'en' }, m.expected)) : null,
-          m.lastUserAnswer ? h('p', { class: 'small muted' }, 'Ваш ответ: ' + m.lastUserAnswer) : null,
+          t.ru ? h('span', { class: 'muted small' }, t.ru) : null,
+          m.expected || m.lastUserAnswer ? h('div', { class: 'small' }, EG.ui.answerLines(mistakeLines(m))) : null,
           m.note ? h('p', { class: 'small muted' }, m.note) : null),
         h('button', { class: 'icon-btn', title: 'Удалить из списка', 'aria-label': 'Удалить из списка', onclick: function () {
           EG.state.deleteMistake(m.itemId).then(function () { row.remove(); EG.ui.toast('Удалено из списка ошибок'); });

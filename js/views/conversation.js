@@ -116,9 +116,13 @@
       });
       var fb = h('div', { class: 'feedback inline ' + q.tone },
         h('div', { class: 'fb-head' }, h('span', { class: 'fb-verdict ' + q.tone }, icon(good ? 'check' : 'x'), q.label)),
-        h('p', { class: 'muted small' }, opt.ru),
+        EG.ui.answerLines({
+          ask: dlg.nodes[nodeId].npc, askRu: dlg.nodes[nodeId].ru || '',
+          right: opt.q !== 'best' ? res.best.en : '', rightRu: res.best.ru || '', rightLabel: good ? 'Лучше' : 'Правильно',
+          user: opt.en, userRu: opt.ru || ''
+        }),
         opt.fb ? h('p', { class: 'fb-note' }, icon('bulb'), opt.fb) : null,
-        opt.q !== 'best' ? h('p', { class: 'small' }, h('span', { class: 'muted' }, 'Лучше: '), h('strong', { lang: 'en' }, res.best.en), ' ', EG.ui.speakBtn(res.best.en, true)) : null);
+        opt.q !== 'best' ? h('p', { class: 'small' }, EG.ui.speakBtn(res.best.en, true), h('span', { class: 'muted' }, ' послушать лучший вариант')) : null);
       log.appendChild(fb);
       if (res.reply) {
         log.appendChild(npcBubble(res.reply, res.replyRu, dlg.partner));
@@ -249,7 +253,7 @@
           userAnswer: text, expected: turn.better || turn.accepted[0].t, ms: ms, kind: 'turn', prompt: turn.npc,
           ref: { scenarioId: sc.id, turnIdx: idx }, note: ev.note || '', xpFactor: (usedHint ? 0.6 : 1.5) * (isRetry ? 0.5 : 1)
         }).then(function (xp) {
-          var fb = EG.player.turnFeedback(turn, ev, { xp: xp, ms: text === '(не знаю)' ? 0 : ms });
+          var fb = EG.player.turnFeedback(turn, ev, { xp: xp, ms: text === '(не знаю)' ? 0 : ms, user: text === '(не знаю)' ? '' : text });
           log.appendChild(fb);
           var last = idx >= sc.turns.length - 1;
           var nextBtn = h('button', { class: 'btn primary', onclick: next }, last ? 'Завершить' : 'Дальше', icon('arrow'));

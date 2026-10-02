@@ -165,7 +165,7 @@
       var episode = ep || EG.data.episodesById[m.ep];
       var node = episode && episode.nodes[m.node];
       if (!node || !node.reply) return;
-      EG.ui.modal({ title: 'Разбор ответа', wide: true, body: EG.player.turnFeedback(node.reply, m.ev, {}) });
+      EG.ui.modal({ title: 'Разбор ответа', wide: true, body: EG.player.turnFeedback(node.reply, m.ev, { user: m.text }) });
     }
 
     function renderHistory() {
@@ -318,7 +318,7 @@
       usedHint = false;
 
       if (instant || isMiss) {
-        msgs.appendChild(h('div', { class: 'chat-fb' }, EG.player.turnFeedback(node.reply, m.ev, { ms: ms })));
+        msgs.appendChild(h('div', { class: 'chat-fb' }, EG.player.turnFeedback(node.reply, m.ev, { ms: ms, user: text })));
         scroll();
       } else if (ev.verdict !== 'great' && ev.verdict !== 'good' && !EG.storage.get('chatHintShown')) {
         EG.storage.set('chatHintShown', true);
