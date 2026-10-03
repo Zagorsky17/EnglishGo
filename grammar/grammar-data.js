@@ -8,18 +8,20 @@
      C — «Выбери вариант»      (фраза с ___ → варианты)
      B — «Собери предложение»  (готовое предложение режется на слова и перемешивается)
      F — «Исправь ошибку»      (фраза с ошибкой → список принятых исправлений)
-     S — «Ситуация»            (описание ситуации по-русски → подходящая фраза)  */
+     S — «Ситуация»            (описание ситуации по-русски → подходящая фраза)
+   Последний аргумент N / C / F / S — перевод правильной фразы целиком (для C — с заполненным пропуском,
+   для F — исправленной, для S — правильного варианта). В M перевода нет: смысл и есть ответ.  */
 (function (EG) {
   'use strict';
 
   var G = EG.grammar = EG.grammar || {};
 
   function M(text, options, explain) { return { type: 'meaning', text: text, options: options, explain: explain }; }
-  function N(text, options, explain) { return { type: 'tense', text: text, options: options, explain: explain }; }
-  function C(text, options, explain) { return { type: 'choose', text: text, options: options, explain: explain }; }
+  function N(text, options, explain, ru) { return { type: 'tense', text: text, options: options, explain: explain, ru: ru }; }
+  function C(text, options, explain, ru) { return { type: 'choose', text: text, options: options, explain: explain, ru: ru }; }
   function B(answer, ru, explain) { return { type: 'build', answer: answer, ru: ru, explain: explain }; }
-  function F(text, accept, explain) { return { type: 'fix', text: text, accept: accept, explain: explain }; }
-  function S(text, options, explain) { return { type: 'situation', text: text, options: options, explain: explain }; }
+  function F(text, accept, explain, ru) { return { type: 'fix', text: text, accept: accept, explain: explain, ru: ru }; }
+  function S(text, options, explain, ru) { return { type: 'situation', text: text, options: options, explain: explain, ru: ru }; }
 
   var GROUPS = [
     { id: "tenses", title: "Времена", emoji: "⏱", sub: "Что означает каждое время и как его узнать на слух" },
@@ -60,12 +62,12 @@
       ],
       practice: [
         M("I drink coffee every morning.", ["Это моя привычка", "Я пью кофе прямо сейчас", "Я выпил кофе сегодня утром"], "every morning — повторяющееся действие, привычка."),
-        C("She ___ in London.", ["lives", "live", "is live"], "she → окончание -s: lives."),
-        C("___ you like jazz?", ["Do", "Are", "Does"], "Вопрос в Present Simple с you начинается с Do."),
-        N("The train leaves at 6:15.", ["Present Simple", "Present Continuous", "Future Simple"], "Расписание — Present Simple, даже если поезд уходит завтра."),
-        F("He don't work on Fridays.", ["He doesn't work on Fridays.", "He does not work on Fridays."], "he → doesn't."),
+        C("She ___ in London.", ["lives", "live", "is live"], "she → окончание -s: lives.", "Она живёт в Лондоне."),
+        C("___ you like jazz?", ["Do", "Are", "Does"], "Вопрос в Present Simple с you начинается с Do.", "Ты любишь джаз?"),
+        N("The train leaves at 6:15.", ["Present Simple", "Present Continuous", "Future Simple"], "Расписание — Present Simple, даже если поезд уходит завтра.", "Поезд отправляется в 6:15."),
+        F("He don't work on Fridays.", ["He doesn't work on Fridays.", "He does not work on Fridays."], "he → doesn't.", "Он не работает по пятницам."),
         B("Where do you work?", "Где ты работаешь?", "Вопрос: вопросительное слово + do + подлежащее + глагол."),
-        S("Вы рассказываете о своём обычном дне: во сколько встаёте.", ["I get up at seven.", "I'm getting up at seven.", "I got up at seven."], "Привычный распорядок — Present Simple.")
+        S("Вы рассказываете о своём обычном дне: во сколько встаёте.", ["I get up at seven.", "I'm getting up at seven.", "I got up at seven."], "Привычный распорядок — Present Simple.", "Я встаю в семь.")
       ]
     },
 
@@ -98,12 +100,12 @@
       ],
       practice: [
         M("I'm staying at a hotel this week.", ["Временно, только на эту неделю", "Я всегда живу в отелях", "Я уже уехал из отеля"], "this week + -ing — временная ситуация."),
-        C("Be quiet! The baby ___.", ["is sleeping", "sleeps", "slept"], "Прямо сейчас — Present Continuous."),
-        C("I ___ what you mean.", ["know", "'m knowing", "am know"], "know — глагол состояния, он остаётся в Simple."),
-        N("We're having dinner with Anna on Friday.", ["Present Continuous", "Present Simple", "Future Continuous"], "Договорённость на будущее часто выражают Present Continuous."),
-        F("She is work now.", ["She is working now.", "She's working now."], "После is нужен глагол с -ing."),
+        C("Be quiet! The baby ___.", ["is sleeping", "sleeps", "slept"], "Прямо сейчас — Present Continuous.", "Тише! Малыш спит."),
+        C("I ___ what you mean.", ["know", "'m knowing", "am know"], "know — глагол состояния, он остаётся в Simple.", "Я понимаю, что ты имеешь в виду."),
+        N("We're having dinner with Anna on Friday.", ["Present Continuous", "Present Simple", "Future Continuous"], "Договорённость на будущее часто выражают Present Continuous.", "В пятницу мы ужинаем с Анной."),
+        F("She is work now.", ["She is working now.", "She's working now."], "После is нужен глагол с -ing.", "Она сейчас работает."),
         B("What are you doing?", "Что ты делаешь?", "Вопрос: what + are + you + doing."),
-        S("Друг звонит и спрашивает, чем вы заняты в эту минуту. Вы готовите ужин.", ["I'm cooking dinner.", "I cook dinner.", "I cooked dinner."], "Действие в момент речи — Present Continuous.")
+        S("Друг звонит и спрашивает, чем вы заняты в эту минуту. Вы готовите ужин.", ["I'm cooking dinner.", "I cook dinner.", "I cooked dinner."], "Действие в момент речи — Present Continuous.", "Я готовлю ужин.")
       ]
     },
 
@@ -135,12 +137,12 @@
       ],
       practice: [
         M("We met in 2015.", ["Событие закончилось, известно когда", "Мы встречаемся до сих пор", "Мы встретимся в 2015 году"], "Конкретное время в прошлом — законченное событие."),
-        C("I ___ him two days ago.", ["saw", "have seen", "see"], "ago → Past Simple."),
-        C("___ you enjoy the film?", ["Did", "Do", "Have"], "Вопрос о прошлом событии — Did."),
-        N("She called me last night.", ["Past Simple", "Present Perfect", "Past Continuous"], "last night — конкретное время в прошлом."),
-        F("Did you saw my phone?", ["Did you see my phone?"], "После did — see, а не saw."),
+        C("I ___ him two days ago.", ["saw", "have seen", "see"], "ago → Past Simple.", "Я видел его два дня назад."),
+        C("___ you enjoy the film?", ["Did", "Do", "Have"], "Вопрос о прошлом событии — Did.", "Тебе понравился фильм?"),
+        N("She called me last night.", ["Past Simple", "Present Perfect", "Past Continuous"], "last night — конкретное время в прошлом.", "Она звонила мне вчера вечером."),
+        F("Did you saw my phone?", ["Did you see my phone?"], "После did — see, а не saw.", "Ты не видел мой телефон?"),
         B("I went to bed early.", "Я рано лёг спать.", "Подлежащее + went + остальное."),
-        S("Вы рассказываете, что сделали в прошлые выходные: навестили родителей.", ["I visited my parents.", "I've visited my parents.", "I'm visiting my parents."], "Законченное событие в известное время (прошлые выходные) — Past Simple.")
+        S("Вы рассказываете, что сделали в прошлые выходные: навестили родителей.", ["I visited my parents.", "I've visited my parents.", "I'm visiting my parents."], "Законченное событие в известное время (прошлые выходные) — Past Simple.", "Я навестил родителей.")
       ]
     },
 
@@ -171,12 +173,12 @@
       ],
       practice: [
         M("I was having a shower when the phone rang.", ["Я был в душе, и тут зазвонил телефон", "Сначала зазвонил телефон, потом я пошёл в душ", "Я каждый день принимаю душ"], "was having — процесс-фон, rang — событие, которое его прервало."),
-        C("What ___ you doing at nine last night?", ["were", "did", "was"], "С you — were."),
-        C("I ___ TV when the lights went out.", ["was watching", "watched", "am watching"], "Фон, который прервало событие, — Past Continuous."),
-        N("They were playing football at 5 pm.", ["Past Continuous", "Past Simple", "Present Continuous"], "were + -ing и точный момент в прошлом."),
-        F("She were working late yesterday.", ["She was working late yesterday."], "she → was."),
+        C("What ___ you doing at nine last night?", ["were", "did", "was"], "С you — were.", "Что ты делал вчера в девять вечера?"),
+        C("I ___ TV when the lights went out.", ["was watching", "watched", "am watching"], "Фон, который прервало событие, — Past Continuous.", "Я смотрел телевизор, когда погас свет."),
+        N("They were playing football at 5 pm.", ["Past Continuous", "Past Simple", "Present Continuous"], "were + -ing и точный момент в прошлом.", "В 5 вечера они играли в футбол."),
+        F("She were working late yesterday.", ["She was working late yesterday."], "she → was.", "Вчера она допоздна работала."),
         B("It was raining all day.", "Весь день шёл дождь.", "It + was + raining + остальное."),
-        S("Вы объясняете, почему не ответили на звонок: в тот момент вы были за рулём.", ["I was driving.", "I drove.", "I've driven."], "Процесс в момент звонка — Past Continuous.")
+        S("Вы объясняете, почему не ответили на звонок: в тот момент вы были за рулём.", ["I was driving.", "I drove.", "I've driven."], "Процесс в момент звонка — Past Continuous.", "Я был за рулём.")
       ]
     },
 
@@ -213,12 +215,12 @@
       practice: [
         M("I've already eaten.", ["Я сыт — я поел раньше", "Я ем прямо сейчас", "Я поем позже"], "already + Present Perfect: результат сейчас — я не голоден."),
         M("She's lost her phone.", ["Телефона у неё сейчас нет", "Когда-то давно теряла, но нашла", "Она теряет телефон прямо сейчас"], "Present Perfect — результат: телефон потерян и сейчас."),
-        C("I ___ here for three years.", ["have lived", "live", "am living"], "Началось в прошлом и длится до сих пор (for three years) — Present Perfect."),
-        C("Have you ___ been to Spain?", ["ever", "yet", "ago"], "Опыт за всю жизнь — ever."),
-        N("Have you finished your homework?", ["Present Perfect", "Past Simple", "Present Simple"], "have + V3, важен результат: готово ли сейчас."),
-        F("I have seen him yesterday.", ["I saw him yesterday."], "yesterday — точное время в прошлом, поэтому Past Simple."),
+        C("I ___ here for three years.", ["have lived", "live", "am living"], "Началось в прошлом и длится до сих пор (for three years) — Present Perfect.", "Я живу здесь три года."),
+        C("Have you ___ been to Spain?", ["ever", "yet", "ago"], "Опыт за всю жизнь — ever.", "Ты когда-нибудь был в Испании?"),
+        N("Have you finished your homework?", ["Present Perfect", "Past Simple", "Present Simple"], "have + V3, важен результат: готово ли сейчас.", "Ты сделал домашнее задание?"),
+        F("I have seen him yesterday.", ["I saw him yesterday."], "yesterday — точное время в прошлом, поэтому Past Simple.", "Я видел его вчера."),
         B("I have already eaten.", "Я уже поел.", "already ставится между have и третьей формой."),
-        S("Вы работаете в компании с 2020 года и до сих пор. Как сказать?", ["I've worked here since 2020.", "I work here since 2020.", "I worked here since 2020."], "Началось в прошлом и продолжается — Present Perfect + since.")
+        S("Вы работаете в компании с 2020 года и до сих пор. Как сказать?", ["I've worked here since 2020.", "I work here since 2020.", "I worked here since 2020."], "Началось в прошлом и продолжается — Present Perfect + since.", "Я работаю здесь с 2020 года.")
       ]
     },
 
@@ -250,12 +252,12 @@
       ],
       practice: [
         M("You look tired. Have you been working all night?", ["Спрашивают о процессе, следы которого видны", "Спрашивают о планах на ночь", "Спрашивают о работе вообще"], "Perfect Continuous: процесс шёл до сих пор, и видны его следы (усталость)."),
-        C("I ___ for you for twenty minutes!", ["'ve been waiting", "'m waiting", "wait"], "Длится до сих пор + for — Perfect Continuous."),
-        C("How long ___ you been living here?", ["have", "are", "did"], "have + been + -ing."),
-        N("It's been snowing since morning.", ["Present Perfect Continuous", "Present Continuous", "Past Continuous"], "'s been + -ing + since — длится с утра до сих пор."),
-        F("I'm learning English for five years.", ["I've been learning English for five years.", "I have been learning English for five years."], "Длится пять лет и продолжается — have been + -ing."),
+        C("I ___ for you for twenty minutes!", ["'ve been waiting", "'m waiting", "wait"], "Длится до сих пор + for — Perfect Continuous.", "Я жду тебя уже двадцать минут!"),
+        C("How long ___ you been living here?", ["have", "are", "did"], "have + been + -ing.", "Как долго ты здесь живёшь?"),
+        N("It's been snowing since morning.", ["Present Perfect Continuous", "Present Continuous", "Past Continuous"], "'s been + -ing + since — длится с утра до сих пор.", "С утра идёт снег."),
+        F("I'm learning English for five years.", ["I've been learning English for five years.", "I have been learning English for five years."], "Длится пять лет и продолжается — have been + -ing.", "Я учу английский уже пять лет."),
         B("How long have you been waiting?", "Сколько ты уже ждёшь?", "How long + have + you + been + waiting."),
-        S("Друг опоздал, и вы уже полчаса стоите на улице. Вы раздражены.", ["I've been standing here for half an hour!", "I'm standing here for half an hour!", "I stood here for half an hour!"], "Длится до сих пор, важна длительность — Perfect Continuous.")
+        S("Друг опоздал, и вы уже полчаса стоите на улице. Вы раздражены.", ["I've been standing here for half an hour!", "I'm standing here for half an hour!", "I stood here for half an hour!"], "Длится до сих пор, важна длительность — Perfect Continuous.", "Я стою тут уже полчаса!")
       ]
     },
 
@@ -286,12 +288,12 @@
       ],
       practice: [
         M("When we got to the cinema, the film had started.", ["Фильм начался до нашего прихода", "Фильм начался, когда мы вошли", "Фильм начнётся позже"], "had started — раньше нашего прихода."),
-        C("I was hungry because I ___ breakfast.", ["hadn't had", "haven't had", "don't have"], "Причина раньше другого прошлого — Past Perfect."),
-        C("By the time we arrived, they ___ all the pizza.", ["had eaten", "have eaten", "eat"], "By the time + прошлое → had + V3."),
-        N("She had already gone home when I called.", ["Past Perfect", "Present Perfect", "Past Simple"], "had + V3: ушла раньше моего звонка."),
-        F("When I arrived, the party already finished.", ["When I arrived, the party had already finished."], "Вечеринка закончилась раньше моего прихода — had finished."),
+        C("I was hungry because I ___ breakfast.", ["hadn't had", "haven't had", "don't have"], "Причина раньше другого прошлого — Past Perfect.", "Я был голоден, потому что не позавтракал."),
+        C("By the time we arrived, they ___ all the pizza.", ["had eaten", "have eaten", "eat"], "By the time + прошлое → had + V3.", "К тому времени, как мы пришли, они уже съели всю пиццу."),
+        N("She had already gone home when I called.", ["Past Perfect", "Present Perfect", "Past Simple"], "had + V3: ушла раньше моего звонка.", "Когда я позвонил, она уже ушла домой."),
+        F("When I arrived, the party already finished.", ["When I arrived, the party had already finished."], "Вечеринка закончилась раньше моего прихода — had finished.", "Когда я пришёл, вечеринка уже закончилась."),
         B("I had never seen snow before.", "Я никогда раньше не видел снега.", "had + never + seen."),
-        S("Вы рассказываете: пришли на вокзал, а поезда уже не было.", ["The train had left.", "The train left.", "The train has left."], "Поезд ушёл раньше вашего прихода — Past Perfect.")
+        S("Вы рассказываете: пришли на вокзал, а поезда уже не было.", ["The train had left.", "The train left.", "The train has left."], "Поезд ушёл раньше вашего прихода — Past Perfect.", "Поезд уже ушёл.")
       ]
     },
 
@@ -323,12 +325,12 @@
       ],
       practice: [
         M("— The phone's ringing. — I'll get it!", ["Решение принято прямо сейчас", "Это давний план", "Я уже ответил на звонок"], "will — спонтанное решение в момент речи."),
-        C("Don't worry, I ___ anyone.", ["won't tell", "don't tell", "am not telling"], "Обещание — will / won't."),
-        C("If it ___ tomorrow, we'll stay at home.", ["rains", "will rain", "rained"], "После if о будущем — Present Simple."),
-        N("I'll send you the file tonight.", ["Future Simple", "be going to", "Present Simple"], "'ll = will: обещание."),
-        F("I will to help you.", ["I will help you.", "I'll help you."], "После will — без to."),
+        C("Don't worry, I ___ anyone.", ["won't tell", "don't tell", "am not telling"], "Обещание — will / won't.", "Не волнуйся, я никому не скажу."),
+        C("If it ___ tomorrow, we'll stay at home.", ["rains", "will rain", "rained"], "После if о будущем — Present Simple.", "Если завтра будет дождь, мы останемся дома."),
+        N("I'll send you the file tonight.", ["Future Simple", "be going to", "Present Simple"], "'ll = will: обещание.", "Я пришлю тебе файл сегодня вечером."),
+        F("I will to help you.", ["I will help you.", "I'll help you."], "После will — без to.", "Я тебе помогу."),
         B("I think it will rain.", "Думаю, будет дождь.", "I think + it will + rain."),
-        S("Подруге холодно. Вы сразу предлагаете закрыть окно.", ["I'll close the window.", "I close the window tomorrow.", "I closed the window."], "Предложение и решение в момент речи — will.")
+        S("Подруге холодно. Вы сразу предлагаете закрыть окно.", ["I'll close the window.", "I close the window tomorrow.", "I closed the window."], "Предложение и решение в момент речи — will.", "Я закрою окно.")
       ]
     },
 
@@ -359,12 +361,12 @@
       ],
       practice: [
         M("Look at those clouds! It's going to rain.", ["Есть явные признаки: скоро пойдёт дождь", "Дождь идёт прямо сейчас", "Когда-нибудь, возможно, пойдёт дождь"], "going to — прогноз по тому, что видно сейчас."),
-        C("We've decided. We ___ sell the house.", ["'re going to", "will to", "sell"], "Решение принято заранее — going to."),
-        C("What ___ you going to do this weekend?", ["are", "do", "will"], "are + you + going to."),
-        N("I'm going to start a new job next month.", ["be going to", "Present Continuous", "Future Simple"], "am going to + V — заранее принятый план."),
-        F("He going to buy a car.", ["He is going to buy a car.", "He's going to buy a car."], "Нужно is: He is going to…"),
+        C("We've decided. We ___ sell the house.", ["'re going to", "will to", "sell"], "Решение принято заранее — going to.", "Мы решили. Мы продаём дом."),
+        C("What ___ you going to do this weekend?", ["are", "do", "will"], "are + you + going to.", "Что ты собираешься делать на выходных?"),
+        N("I'm going to start a new job next month.", ["be going to", "Present Continuous", "Future Simple"], "am going to + V — заранее принятый план.", "В следующем месяце я выхожу на новую работу."),
+        F("He going to buy a car.", ["He is going to buy a car.", "He's going to buy a car."], "Нужно is: He is going to…", "Он собирается купить машину."),
         B("What are you going to do?", "Что ты собираешься делать?", "What + are + you + going to + do."),
-        S("Вы давно решили провести лето в Испании и рассказываете об этом.", ["I'm going to visit Spain this summer.", "I visit Spain this summer.", "I visited Spain this summer."], "Заранее принятый план — going to.")
+        S("Вы давно решили провести лето в Испании и рассказываете об этом.", ["I'm going to visit Spain this summer.", "I visit Spain this summer.", "I visited Spain this summer."], "Заранее принятый план — going to.", "Этим летом я собираюсь съездить в Испанию.")
       ]
     },
 
@@ -395,12 +397,12 @@
       ],
       practice: [
         M("This time tomorrow I'll be sitting on a plane.", ["Завтра в это время я буду лететь", "Я сажусь в самолёт прямо сейчас", "Я уже прилетел"], "will be + -ing — процесс в момент будущего."),
-        C("Don't call me at ten — I ___.", ["'ll be sleeping", "sleep", "slept"], "В десять будет идти процесс — Future Continuous."),
-        C("___ you be using your laptop tonight?", ["Will", "Are", "Do"], "Вежливый вопрос о планах: Will you be + -ing?"),
-        N("At noon tomorrow we'll be having lunch.", ["Future Continuous", "Future Simple", "Present Continuous"], "'ll be + -ing + момент в будущем."),
-        F("I will be work all day tomorrow.", ["I will be working all day tomorrow.", "I'll be working all day tomorrow."], "После be — -ing."),
+        C("Don't call me at ten — I ___.", ["'ll be sleeping", "sleep", "slept"], "В десять будет идти процесс — Future Continuous.", "Не звони мне в десять — я буду спать."),
+        C("___ you be using your laptop tonight?", ["Will", "Are", "Do"], "Вежливый вопрос о планах: Will you be + -ing?", "Ты будешь пользоваться ноутбуком сегодня вечером?"),
+        N("At noon tomorrow we'll be having lunch.", ["Future Continuous", "Future Simple", "Present Continuous"], "'ll be + -ing + момент в будущем.", "Завтра в полдень мы будем обедать."),
+        F("I will be work all day tomorrow.", ["I will be working all day tomorrow.", "I'll be working all day tomorrow."], "После be — -ing.", "Завтра я буду работать весь день."),
         B("I will be waiting for you.", "Я буду тебя ждать.", "will + be + waiting."),
-        S("Коллега хочет созвониться завтра в три, но в это время у вас встреча с клиентом.", ["I'll be meeting a client at three.", "I met a client at three.", "I meet a client at three every day."], "Процесс в конкретный момент будущего — Future Continuous.")
+        S("Коллега хочет созвониться завтра в три, но в это время у вас встреча с клиентом.", ["I'll be meeting a client at three.", "I met a client at three.", "I meet a client at three every day."], "Процесс в конкретный момент будущего — Future Continuous.", "В три у меня будет встреча с клиентом.")
       ]
     },
 
@@ -430,12 +432,12 @@
       ],
       practice: [
         M("By 10 pm I'll have finished the report.", ["К 22:00 отчёт уже будет готов", "Я начну отчёт в 22:00", "Я закончил отчёт вчера в 22:00"], "will have + V3 — готово к сроку."),
-        C("By the end of the year, I ___ twenty books.", ["will have read", "will read", "have read"], "by the end of the year — срок → Future Perfect."),
-        C("Don't worry, we ___ finished by the time you come back.", ["will have", "have", "had"], "will have + V3: к твоему возвращению уже закончим."),
-        N("By June they'll have built the bridge.", ["Future Perfect", "Future Simple", "Present Perfect"], "'ll have + V3 + by June."),
-        F("By tomorrow I will have write the essay.", ["By tomorrow I will have written the essay.", "By tomorrow I'll have written the essay."], "После have — третья форма: written."),
+        C("By the end of the year, I ___ twenty books.", ["will have read", "will read", "have read"], "by the end of the year — срок → Future Perfect.", "К концу года я прочитаю двадцать книг."),
+        C("Don't worry, we ___ finished by the time you come back.", ["will have", "have", "had"], "will have + V3: к твоему возвращению уже закончим.", "Не волнуйся, к твоему возвращению мы уже закончим."),
+        N("By June they'll have built the bridge.", ["Future Perfect", "Future Simple", "Present Perfect"], "'ll have + V3 + by June.", "К июню они построят мост."),
+        F("By tomorrow I will have write the essay.", ["By tomorrow I will have written the essay.", "By tomorrow I'll have written the essay."], "После have — третья форма: written.", "К завтрашнему дню я напишу эссе."),
         B("I will have finished by Monday.", "К понедельнику я закончу.", "will + have + finished + by…"),
-        S("Вы обещаете начальнику, что отчёт будет готов к пятнице.", ["I'll have finished the report by Friday.", "I've finished the report by Friday.", "I finished the report by Friday."], "Готово к сроку в будущем — Future Perfect.")
+        S("Вы обещаете начальнику, что отчёт будет готов к пятнице.", ["I'll have finished the report by Friday.", "I've finished the report by Friday.", "I finished the report by Friday."], "Готово к сроку в будущем — Future Perfect.", "Я закончу отчёт к пятнице.")
       ]
     },
 
@@ -455,11 +457,11 @@
         ["Look! It rains.", "Look! It's raining.", "Происходит на глазах — Continuous."]
       ],
       practice: [
-        C("Listen! Somebody ___ at the door.", ["is knocking", "knocks", "knock"], "Listen! — прямо сейчас."),
-        C("He ___ to the gym three times a week.", ["goes", "is going", "go"], "three times a week — привычка."),
-        C("I ___ you're right.", ["think", "'m thinking", "thinking"], "think в значении «считаю» — состояние, Simple."),
+        C("Listen! Somebody ___ at the door.", ["is knocking", "knocks", "knock"], "Listen! — прямо сейчас.", "Послушай! Кто-то стучит в дверь."),
+        C("He ___ to the gym three times a week.", ["goes", "is going", "go"], "three times a week — привычка.", "Он ходит в спортзал три раза в неделю."),
+        C("I ___ you're right.", ["think", "'m thinking", "thinking"], "think в значении «считаю» — состояние, Simple.", "Думаю, ты прав."),
         M("She's living with her parents at the moment.", ["Временно живёт у родителей", "Всегда жила и живёт с родителями", "Раньше жила с родителями"], "at the moment + -ing — временно."),
-        S("Вас спрашивают, чем вы зарабатываете на жизнь. Вы учитель английского.", ["I teach English.", "I am teach English.", "I taught English."], "Профессия — постоянное, Present Simple.")
+        S("Вас спрашивают, чем вы зарабатываете на жизнь. Вы учитель английского.", ["I teach English.", "I am teach English.", "I taught English."], "Профессия — постоянное, Present Simple.", "Я преподаю английский.")
       ]
     },
 
@@ -477,11 +479,11 @@
         ["I have finished it two hours ago.", "I finished it two hours ago.", "ago → Past Simple."]
       ],
       practice: [
-        C("I ___ that film. Let's watch something else.", ["'ve seen", "saw", "see"], "Важен результат сейчас: я его уже знаю."),
-        C("We ___ in Paris in 2018.", ["were", "have been", "are"], "in 2018 — точное время, Past Simple."),
-        C("___ you ever eaten sushi?", ["Have", "Did", "Do"], "Опыт за жизнь — Have you ever…?"),
+        C("I ___ that film. Let's watch something else.", ["'ve seen", "saw", "see"], "Важен результат сейчас: я его уже знаю.", "Я уже смотрел этот фильм. Давай посмотрим что-нибудь другое."),
+        C("We ___ in Paris in 2018.", ["were", "have been", "are"], "in 2018 — точное время, Past Simple.", "Мы были в Париже в 2018 году."),
+        C("___ you ever eaten sushi?", ["Have", "Did", "Do"], "Опыт за жизнь — Have you ever…?", "Ты когда-нибудь ел суши?"),
         M("I've lost my wallet.", ["Кошелька нет до сих пор", "Когда-то терял, но нашёл", "Потеряю в будущем"], "Present Perfect — результат сейчас."),
-        F("When have you met her?", ["When did you meet her?"], "When → Past Simple.")
+        F("When have you met her?", ["When did you meet her?"], "When → Past Simple.", "Когда ты с ней познакомился?")
       ]
     },
 
@@ -499,11 +501,11 @@
         ["I've been knowing him since school.", "I've known him since school.", "know — состояние."]
       ],
       practice: [
-        C("She ___ ten kilometres today.", ["has run", "has been running", "runs"], "Есть результат-число — Present Perfect."),
-        C("I'm so tired. I ___ all day.", ["'ve been working", "'m work", "had worked"], "Длительность и следы процесса — Perfect Continuous."),
-        C("I ___ this book three times.", ["have read", "have been reading", "am reading"], "three times — результат, количество."),
+        C("She ___ ten kilometres today.", ["has run", "has been running", "runs"], "Есть результат-число — Present Perfect.", "Сегодня она пробежала десять километров."),
+        C("I'm so tired. I ___ all day.", ["'ve been working", "'m work", "had worked"], "Длительность и следы процесса — Perfect Continuous.", "Я так устал. Я весь день работал."),
+        C("I ___ this book three times.", ["have read", "have been reading", "am reading"], "three times — результат, количество.", "Я прочитал эту книгу три раза."),
         M("Your eyes are red. Have you been crying?", ["Спрашивают о процессе, следы которого видны", "Спрашивают, сколько раз ты плакал", "Спрашивают о будущем"], "Perfect Continuous — видны следы процесса."),
-        C("How long have you ___ for me?", ["been waiting", "wait", "waiting"], "How long — длительность: been + -ing.")
+        C("How long have you ___ for me?", ["been waiting", "wait", "waiting"], "How long — длительность: been + -ing.", "Сколько ты меня уже ждёшь?")
       ]
     },
 
@@ -521,11 +523,11 @@
         ["I'm going to answer! (звонит телефон)", "I'll answer it!", "Решение в момент звонка — will."]
       ],
       practice: [
-        S("Звонят в дверь. Вы решаете открыть.", ["I'll get it!", "I'm going to get it next week!", "I got it!"], "Решение на месте — will."),
-        C("We ___ get married in June. We've booked everything.", ["'re going to", "'ll to", "get"], "Всё забронировано — план, going to."),
+        S("Звонят в дверь. Вы решаете открыть.", ["I'll get it!", "I'm going to get it next week!", "I got it!"], "Решение на месте — will.", "Я открою!"),
+        C("We ___ get married in June. We've booked everything.", ["'re going to", "'ll to", "get"], "Всё забронировано — план, going to.", "Мы женимся в июне. Мы уже всё забронировали."),
         M("I'm going to quit my job.", ["Я уже решил и собираюсь это сделать", "Решил только что, в разговоре", "Я уже уволился"], "going to — заранее принятое решение."),
         M("— I can't open this. — I'll help you.", ["Предложение помощи — решение прямо сейчас", "Давно запланированная помощь", "Помощь в прошлом"], "will — спонтанное предложение помочь."),
-        C("Look out! That glass ___ fall!", ["is going to", "will to", "falls"], "Явный признак: вот-вот упадёт.")
+        C("Look out! That glass ___ fall!", ["is going to", "will to", "falls"], "Явный признак: вот-вот упадёт.", "Осторожно! Стакан сейчас упадёт!")
       ]
     },
 
@@ -544,11 +546,11 @@
         ["Did you used to smoke?", "Did you use to smoke?", "После did — use без d."]
       ],
       practice: [
-        C("I ___ have long hair.", ["used to", "would", "use to"], "have (иметь) — состояние: только used to."),
-        C("When I was a kid, my grandma ___ tell me stories every night.", ["would", "was", "use to"], "Повторяющееся действие в воспоминаниях — would (used to тоже подошло бы)."),
+        C("I ___ have long hair.", ["used to", "would", "use to"], "have (иметь) — состояние: только used to.", "Раньше у меня были длинные волосы."),
+        C("When I was a kid, my grandma ___ tell me stories every night.", ["would", "was", "use to"], "Повторяющееся действие в воспоминаниях — would (used to тоже подошло бы).", "Когда я был маленьким, бабушка каждый вечер рассказывала мне истории."),
         M("I used to smoke.", ["Раньше курил, теперь нет", "Курю и сейчас", "Привык к курению"], "used to — было раньше, сейчас нет."),
-        F("I didn't used to like coffee.", ["I didn't use to like coffee."], "После didn't — use без d."),
-        C("We ___ to be friends.", ["used", "would", "use"], "be — состояние: used to.")
+        F("I didn't used to like coffee.", ["I didn't use to like coffee."], "После didn't — use без d.", "Раньше я не любил кофе."),
+        C("We ___ to be friends.", ["used", "would", "use"], "be — состояние: used to.", "Раньше мы были друзьями.")
       ]
     },
 
@@ -567,11 +569,11 @@
         ["Say me!", "Tell me!", "«Скажи мне» — Tell me."]
       ],
       practice: [
-        C("Can you ___ me the time?", ["tell", "say", "speak"], "tell + me."),
-        C("What did she ___?", ["say", "tell", "talk"], "Без человека — say."),
-        C("Always ___ the truth.", ["tell", "say", "speak"], "Устойчиво: tell the truth."),
-        C("He ___ hello and left.", ["said", "told", "spoke"], "Устойчиво: say hello."),
-        F("She said me about her trip.", ["She told me about her trip."], "Есть человек (me) — told.")
+        C("Can you ___ me the time?", ["tell", "say", "speak"], "tell + me.", "Не подскажете, который час?"),
+        C("What did she ___?", ["say", "tell", "talk"], "Без человека — say.", "Что она сказала?"),
+        C("Always ___ the truth.", ["tell", "say", "speak"], "Устойчиво: tell the truth.", "Всегда говори правду."),
+        C("He ___ hello and left.", ["said", "told", "spoke"], "Устойчиво: say hello.", "Он поздоровался и ушёл."),
+        F("She said me about her trip.", ["She told me about her trip."], "Есть человек (me) — told.", "Она рассказала мне о своей поездке.")
       ]
     },
 
@@ -590,11 +592,11 @@
         ["I need to make my homework.", "I need to do my homework.", "Устойчиво: do homework."]
       ],
       practice: [
-        C("I've ___ a decision.", ["made", "done", "did"], "make a decision."),
-        C("Could you ___ me a favour?", ["do", "make", "give"], "do a favour."),
-        C("Let's ___ some coffee.", ["make", "do", "create"], "make coffee — приготовить."),
-        C("It doesn't ___ sense.", ["make", "do", "have"], "make sense — иметь смысл."),
-        F("She does a lot of money.", ["She makes a lot of money."], "make money — зарабатывать.")
+        C("I've ___ a decision.", ["made", "done", "did"], "make a decision.", "Я принял решение."),
+        C("Could you ___ me a favour?", ["do", "make", "give"], "do a favour.", "Можешь сделать мне одолжение?"),
+        C("Let's ___ some coffee.", ["make", "do", "create"], "make coffee — приготовить.", "Давай сварим кофе."),
+        C("It doesn't ___ sense.", ["make", "do", "have"], "make sense — иметь смысл.", "Это не имеет смысла."),
+        F("She does a lot of money.", ["She makes a lot of money."], "make money — зарабатывать.", "Она много зарабатывает.")
       ]
     },
 
@@ -612,11 +614,11 @@
         ["I live here since 2019.", "I've lived here since 2019.", "Длится до сих пор — Present Perfect."]
       ],
       practice: [
-        C("I've been waiting ___ twenty minutes.", ["for", "since", "from"], "Период → for."),
-        C("We've been friends ___ school.", ["since", "for", "from"], "Точка начала → since."),
-        C("She's worked here ___ March.", ["since", "for", "during"], "С марта → since."),
-        C("I haven't seen him ___ ages.", ["for", "since", "ago"], "for ages — целую вечность."),
-        S("Вы говорите, что знаете друга со школы.", ["I've known him since school.", "I know him since school.", "I've known him for school."], "Длится до сих пор + точка начала: have known + since.")
+        C("I've been waiting ___ twenty minutes.", ["for", "since", "from"], "Период → for.", "Я жду уже двадцать минут."),
+        C("We've been friends ___ school.", ["since", "for", "from"], "Точка начала → since.", "Мы дружим со школы."),
+        C("She's worked here ___ March.", ["since", "for", "during"], "С марта → since.", "Она работает здесь с марта."),
+        C("I haven't seen him ___ ages.", ["for", "since", "ago"], "for ages — целую вечность.", "Я сто лет его не видел."),
+        S("Вы говорите, что знаете друга со школы.", ["I've known him since school.", "I know him since school.", "I've known him for school."], "Длится до сих пор + точка начала: have known + since.", "Я знаю его со школы.")
       ]
     },
 
@@ -635,11 +637,11 @@
         ["many informations", "a lot of information", "information не имеет множественного числа."]
       ],
       practice: [
-        C("How ___ does it cost?", ["much", "many", "lot"], "О цене — How much."),
-        C("How ___ times have you been there?", ["many", "much", "lot"], "times можно посчитать."),
-        C("I don't have ___ friends here.", ["many", "much", "a lot"], "friends — исчисляемые."),
-        C("There isn't ___ milk left.", ["much", "many", "few"], "milk — неисчисляемое."),
-        F("He gave me many advices.", ["He gave me a lot of advice.", "He gave me some advice.", "He gave me lots of advice."], "advice не имеет множественного числа.")
+        C("How ___ does it cost?", ["much", "many", "lot"], "О цене — How much.", "Сколько это стоит?"),
+        C("How ___ times have you been there?", ["many", "much", "lot"], "times можно посчитать.", "Сколько раз ты там был?"),
+        C("I don't have ___ friends here.", ["many", "much", "a lot"], "friends — исчисляемые.", "У меня здесь не так много друзей."),
+        C("There isn't ___ milk left.", ["much", "many", "few"], "milk — неисчисляемое.", "Молока осталось немного."),
+        F("He gave me many advices.", ["He gave me a lot of advice.", "He gave me some advice.", "He gave me lots of advice."], "advice не имеет множественного числа.", "Он дал мне много советов.")
       ]
     },
 
@@ -657,11 +659,11 @@
         ["There are little people here.", "There are few people here.", "people считаются → few."]
       ],
       practice: [
-        C("Can I ask you a ___ questions?", ["few", "little", "much"], "questions считаются → a few."),
-        C("I speak a ___ French.", ["little", "few", "many"], "Язык — неисчисляемое → a little."),
+        C("Can I ask you a ___ questions?", ["few", "little", "much"], "questions считаются → a few.", "Можно задать тебе несколько вопросов?"),
+        C("I speak a ___ French.", ["little", "few", "many"], "Язык — неисчисляемое → a little.", "Я немного говорю по-французски."),
         M("He has few friends.", ["Друзей почти нет", "У него есть несколько друзей", "У него много друзей"], "few без a — «почти нет»."),
         M("We have a little time.", ["Немного времени есть — успеем", "Времени совсем нет", "Времени очень много"], "a little — немного, но есть."),
-        C("Add a ___ salt.", ["little", "few", "many"], "salt — неисчисляемое.")
+        C("Add a ___ salt.", ["little", "few", "many"], "salt — неисчисляемое.", "Добавь немного соли.")
       ]
     },
 
@@ -679,11 +681,11 @@
         ["There is any milk in the fridge.", "There is some milk in the fridge.", "Утверждение → some."]
       ],
       practice: [
-        C("I didn't buy ___ bread.", ["any", "some", "no"], "Отрицание → any."),
-        C("Can I have ___ water, please?", ["some", "any", "no"], "Просьба → some."),
-        C("There's ___ cheese in the fridge.", ["some", "any", "many"], "Утверждение → some."),
+        C("I didn't buy ___ bread.", ["any", "some", "no"], "Отрицание → any.", "Я не купил хлеба."),
+        C("Can I have ___ water, please?", ["some", "any", "no"], "Просьба → some.", "Можно мне воды, пожалуйста?"),
+        C("There's ___ cheese in the fridge.", ["some", "any", "many"], "Утверждение → some.", "В холодильнике есть сыр."),
         M("Call me any time.", ["Звони в любое время", "Никогда не звони", "Звони иногда"], "any в утверждении = «любой»."),
-        F("I haven't got some friends here.", ["I haven't got any friends here.", "I don't have any friends here."], "Отрицание → any.")
+        F("I haven't got some friends here.", ["I haven't got any friends here.", "I don't have any friends here."], "Отрицание → any.", "У меня здесь нет друзей.")
       ]
     },
 
@@ -704,9 +706,9 @@
       practice: [
         M("You don't have to pay.", ["Платить не обязательно", "Платить запрещено", "Нужно заплатить"], "don't have to — не обязательно."),
         M("You mustn't park here.", ["Здесь парковаться запрещено", "Здесь можно не парковаться", "Здесь надо парковаться"], "mustn't — запрет."),
-        C("Yesterday I ___ work late.", ["had to", "must", "must to"], "Прошлое — had to."),
-        C("It's Sunday, so I ___ get up early.", ["don't have to", "mustn't", "must"], "Не обязательно, но можно — don't have to."),
-        C("She ___ wear glasses to drive.", ["has to", "have to", "must to"], "she → has to.")
+        C("Yesterday I ___ work late.", ["had to", "must", "must to"], "Прошлое — had to.", "Вчера мне пришлось задержаться на работе."),
+        C("It's Sunday, so I ___ get up early.", ["don't have to", "mustn't", "must"], "Не обязательно, но можно — don't have to.", "Сегодня воскресенье, так что мне не нужно рано вставать."),
+        C("She ___ wear glasses to drive.", ["has to", "have to", "must to"], "she → has to.", "Ей приходится надевать очки за рулём.")
       ]
     },
 
@@ -724,11 +726,11 @@
         ["He shoulds go.", "He should go.", "У should не бывает -s."]
       ],
       practice: [
-        S("Друг жалуется на головную боль. Вы советуете отдохнуть.", ["You should rest.", "You should to rest.", "You shoulds rest."], "Совет — should + глагол без to."),
-        S("Вы объясняете туристу правило музея: сумку нужно сдать в гардероб.", ["You have to leave your bag in the cloakroom.", "You should to leave your bag in the cloakroom.", "You has to leave your bag in the cloakroom."], "Правило без вариантов — have to."),
-        C("You ___ eat so much sugar. It's bad for you.", ["shouldn't", "don't have to", "haven't to"], "Совет «не стоит» — shouldn't."),
+        S("Друг жалуется на головную боль. Вы советуете отдохнуть.", ["You should rest.", "You should to rest.", "You shoulds rest."], "Совет — should + глагол без to.", "Тебе стоит отдохнуть."),
+        S("Вы объясняете туристу правило музея: сумку нужно сдать в гардероб.", ["You have to leave your bag in the cloakroom.", "You should to leave your bag in the cloakroom.", "You has to leave your bag in the cloakroom."], "Правило без вариантов — have to.", "Сумку нужно оставить в гардеробе."),
+        C("You ___ eat so much sugar. It's bad for you.", ["shouldn't", "don't have to", "haven't to"], "Совет «не стоит» — shouldn't.", "Не стоит есть столько сахара. Это вредно."),
         M("You don't have to bring anything.", ["Можно ничего не приносить", "Приносить запрещено", "Обязательно что-нибудь принеси"], "don't have to — не обязательно."),
-        F("You should to call her.", ["You should call her."], "После should — без to.")
+        F("You should to call her.", ["You should call her."], "После should — без to.", "Тебе стоит ей позвонить.")
       ]
     },
 
@@ -747,11 +749,11 @@
         ["He cans drive.", "He can drive.", "У can не бывает -s."]
       ],
       practice: [
-        C("When I was a child, I ___ climb trees.", ["could", "can", "can to"], "Умение в прошлом — could."),
-        C("___ you pass the salt, please?", ["Could", "Should", "Must"], "Вежливая просьба — Could you…?"),
+        C("When I was a child, I ___ climb trees.", ["could", "can", "can to"], "Умение в прошлом — could.", "В детстве я умел лазить по деревьям."),
+        C("___ you pass the salt, please?", ["Could", "Should", "Must"], "Вежливая просьба — Could you…?", "Не могли бы вы передать соль?"),
         M("It could be dangerous.", ["Возможно, это опасно", "Раньше это было опасно, сейчас нет", "Это точно опасно"], "could — осторожное предположение."),
-        C("I ___ hear you. The music is too loud.", ["can't", "couldn't to", "mustn't"], "Не могу сейчас — can't."),
-        F("Last night I can't sleep.", ["Last night I couldn't sleep.", "Last night I could not sleep."], "Прошлое — couldn't.")
+        C("I ___ hear you. The music is too loud.", ["can't", "couldn't to", "mustn't"], "Не могу сейчас — can't.", "Я тебя не слышу. Музыка слишком громкая."),
+        F("Last night I can't sleep.", ["Last night I couldn't sleep.", "Last night I could not sleep."], "Прошлое — couldn't.", "Прошлой ночью я не мог уснуть.")
       ]
     },
 
@@ -769,11 +771,11 @@
         ["It mays rain.", "It may rain.", "У may не бывает -s."]
       ],
       practice: [
-        C("___ I ask you a question?", ["May", "Might", "Must"], "Вежливо просим разрешения — May I…?"),
+        C("___ I ask you a question?", ["May", "Might", "Must"], "Вежливо просим разрешения — May I…?", "Можно задать вам вопрос?"),
         M("I might go to the party.", ["Возможно, пойду — не уверен", "Точно пойду", "Мне разрешили пойти"], "might — неуверенная возможность."),
-        C("Take an umbrella. It ___ rain later.", ["might", "must", "can to"], "Возможность — might."),
-        F("She may to know the answer.", ["She may know the answer."], "После may — без to."),
-        S("Друг зовёт в кино, а вы ещё не решили.", ["I might come.", "I must come.", "I may to come."], "Неуверенно «может, приду» — might.")
+        C("Take an umbrella. It ___ rain later.", ["might", "must", "can to"], "Возможность — might.", "Возьми зонт. Позже может пойти дождь."),
+        F("She may to know the answer.", ["She may know the answer."], "После may — без to.", "Возможно, она знает ответ."),
+        S("Друг зовёт в кино, а вы ещё не решили.", ["I might come.", "I must come.", "I may to come."], "Неуверенно «может, приду» — might.", "Может быть, я приду.")
       ]
     },
 
@@ -802,12 +804,12 @@
         ["Have a bank near here?", "Is there a bank near here?", "Вопрос о наличии — Is there…?"]
       ],
       practice: [
-        C("___ any milk in the fridge?", ["Is there", "Are there", "Has it"], "milk — неисчисляемое: Is there."),
-        C("___ two bedrooms in the flat.", ["There are", "There is", "They are"], "Два — There are."),
-        C("___ a lot of traffic this morning.", ["There was", "There were", "It was"], "traffic — неисчисляемое, прошлое: There was."),
-        F("In our office is a coffee machine.", ["There is a coffee machine in our office.", "There's a coffee machine in our office.", "In our office there is a coffee machine."], "Начинаем с There is."),
+        C("___ any milk in the fridge?", ["Is there", "Are there", "Has it"], "milk — неисчисляемое: Is there.", "В холодильнике есть молоко?"),
+        C("___ two bedrooms in the flat.", ["There are", "There is", "They are"], "Два — There are.", "В квартире две спальни."),
+        C("___ a lot of traffic this morning.", ["There was", "There were", "It was"], "traffic — неисчисляемое, прошлое: There was.", "Сегодня утром было много машин."),
+        F("In our office is a coffee machine.", ["There is a coffee machine in our office.", "There's a coffee machine in our office.", "In our office there is a coffee machine."], "Начинаем с There is.", "У нас в офисе есть кофемашина."),
         B("Is there a pharmacy near here?", "Здесь поблизости есть аптека?", "Is + there + a pharmacy…"),
-        S("Вы спрашиваете прохожего, есть ли рядом банкомат.", ["Is there an ATM near here?", "Have an ATM near here?", "Is it an ATM near here?"], "Вопрос о наличии — Is there…?")
+        S("Вы спрашиваете прохожего, есть ли рядом банкомат.", ["Is there an ATM near here?", "Have an ATM near here?", "Is it an ATM near here?"], "Вопрос о наличии — Is there…?", "Здесь поблизости есть банкомат?")
       ]
     },
 
@@ -835,9 +837,9 @@
       ],
       practice: [
         M("I've got a headache.", ["У меня болит голова", "Вчера у меня болела голова", "Голова уже прошла"], "'ve got = have: есть сейчас."),
-        C("___ you got any brothers?", ["Have", "Do", "Are"], "Вопрос с have got — Have you got…?"),
-        C("He ___ got a car.", ["hasn't", "haven't", "doesn't"], "he → hasn't got."),
-        F("Do you have got a pen?", ["Have you got a pen?", "Do you have a pen?"], "Либо Have you got…, либо Do you have…"),
+        C("___ you got any brothers?", ["Have", "Do", "Are"], "Вопрос с have got — Have you got…?", "У тебя есть братья?"),
+        C("He ___ got a car.", ["hasn't", "haven't", "doesn't"], "he → hasn't got.", "У него нет машины."),
+        F("Do you have got a pen?", ["Have you got a pen?", "Do you have a pen?"], "Либо Have you got…, либо Do you have…", "У тебя есть ручка?"),
         B("I have got to go.", "Мне надо идти.", "have got to = have to.")
       ]
     },
@@ -871,11 +873,11 @@
       ],
       practice: [
         M("I used to live in Spain.", ["Раньше жил в Испании, теперь нет", "Я привык к Испании", "Живу в Испании сейчас"], "used to + V — было раньше."),
-        C("This café ___ be a bookshop.", ["used to", "use to", "was used to"], "Раньше было — used to + V."),
-        C("I didn't ___ like vegetables.", ["use to", "used to", "using to"], "После didn't — use to."),
-        F("She use to work here.", ["She used to work here."], "В утверждении — used to."),
+        C("This café ___ be a bookshop.", ["used to", "use to", "was used to"], "Раньше было — used to + V.", "Раньше в этом кафе был книжный магазин."),
+        C("I didn't ___ like vegetables.", ["use to", "used to", "using to"], "После didn't — use to.", "Раньше я не любил овощи."),
+        F("She use to work here.", ["She used to work here."], "В утверждении — used to.", "Раньше она здесь работала."),
         B("We used to be friends.", "Раньше мы были друзьями.", "We + used to + be + friends."),
-        S("В детстве вы каждое лето ездили к бабушке, а теперь нет. Как сказать?", ["I used to visit my grandma every summer.", "I'm used to visiting my grandma every summer.", "I use to visit my grandma every summer."], "Было раньше, теперь нет — used to + V.")
+        S("В детстве вы каждое лето ездили к бабушке, а теперь нет. Как сказать?", ["I used to visit my grandma every summer.", "I'm used to visiting my grandma every summer.", "I use to visit my grandma every summer."], "Было раньше, теперь нет — used to + V.", "Раньше я каждое лето ездил к бабушке.")
       ]
     },
 
@@ -901,11 +903,11 @@
         ["I used to the noise.", "I'm used to the noise.", "Без am получается «раньше…»."]
       ],
       practice: [
-        C("I'm used to ___ late.", ["working", "work", "worked"], "be used to + -ing."),
+        C("I'm used to ___ late.", ["working", "work", "worked"], "be used to + -ing.", "Я привык работать допоздна."),
         M("I'm used to spicy food.", ["Острая еда для меня привычна", "Раньше ел острое, теперь нет", "Начинаю привыкать к острому"], "be used to — уже привык."),
-        C("She ___ used to the climate yet.", ["isn't", "doesn't", "didn't"], "be used to: отрицание через isn't."),
-        F("He's used to drive on the right.", ["He's used to driving on the right.", "He is used to driving on the right."], "be used to + -ing."),
-        S("Коллега удивлён, что вы встаёте в пять утра. Для вас это нормально.", ["I'm used to it.", "I used to it.", "I use to it."], "Уже привык — be used to.")
+        C("She ___ used to the climate yet.", ["isn't", "doesn't", "didn't"], "be used to: отрицание через isn't.", "Она ещё не привыкла к климату."),
+        F("He's used to drive on the right.", ["He's used to driving on the right.", "He is used to driving on the right."], "be used to + -ing.", "Он привык ездить по правой стороне."),
+        S("Коллега удивлён, что вы встаёте в пять утра. Для вас это нормально.", ["I'm used to it.", "I used to it.", "I use to it."], "Уже привык — be used to.", "Я к этому привык.")
       ]
     },
 
@@ -931,10 +933,10 @@
         ["I'll get use to it.", "I'll get used to it.", "Всегда used."]
       ],
       practice: [
-        C("It's hard to get used to ___ on the left.", ["driving", "drive", "drove"], "get used to + -ing."),
+        C("It's hard to get used to ___ on the left.", ["driving", "drive", "drove"], "get used to + -ing.", "Трудно привыкнуть ездить по левой стороне."),
         M("I'm getting used to the new schedule.", ["Постепенно привыкаю", "Уже давно привык", "Раньше так работал"], "getting used to — процесс."),
-        C("Don't worry, you'll ___ used to it.", ["get", "got", "use"], "will + get used to."),
-        F("I got use to it fast.", ["I got used to it fast."], "get used to — всегда used."),
+        C("Don't worry, you'll ___ used to it.", ["get", "got", "use"], "will + get used to.", "Не волнуйся, ты привыкнешь."),
+        F("I got use to it fast.", ["I got used to it fast."], "get used to — всегда used.", "Я быстро к этому привык."),
         B("You will get used to it.", "Ты привыкнешь.", "will + get used to + it.")
       ]
     },
@@ -962,10 +964,10 @@
         ["Yesterday I have to work.", "Yesterday I had to work.", "Прошлое — had to."]
       ],
       practice: [
-        C("She ___ to wear a uniform.", ["has", "have", "is"], "she → has to."),
-        C("Yesterday we ___ to wait for two hours.", ["had", "have", "must"], "Прошлое — had to."),
+        C("She ___ to wear a uniform.", ["has", "have", "is"], "she → has to.", "Ей приходится носить форму."),
+        C("Yesterday we ___ to wait for two hours.", ["had", "have", "must"], "Прошлое — had to.", "Вчера нам пришлось ждать два часа."),
         M("You don't have to come.", ["Можешь не приходить", "Тебе нельзя приходить", "Ты должен прийти"], "don't have to — не обязательно."),
-        F("I haven't to get up early tomorrow.", ["I don't have to get up early tomorrow."], "Отрицание — don't have to."),
+        F("I haven't to get up early tomorrow.", ["I don't have to get up early tomorrow."], "Отрицание — don't have to.", "Завтра мне не нужно рано вставать."),
         B("Do I have to pay now?", "Мне нужно платить сейчас?", "Do + I + have to + pay…")
       ]
     },
@@ -993,10 +995,10 @@
         ["She is able speak.", "She is able to speak.", "Не забывайте to."]
       ],
       practice: [
-        C("I'm sorry, I won't ___ come tomorrow.", ["be able to", "can", "able"], "После won't — be able to."),
-        C("I haven't ___ to call him yet.", ["been able", "could", "can"], "Perfect — have been able to."),
+        C("I'm sorry, I won't ___ come tomorrow.", ["be able to", "can", "able"], "После won't — be able to.", "Извини, завтра я не смогу прийти."),
+        C("I haven't ___ to call him yet.", ["been able", "could", "can"], "Perfect — have been able to.", "Мне пока не удалось ему дозвониться."),
         M("I was able to finish on time.", ["Мне удалось закончить вовремя", "Я всегда заканчиваю вовремя", "Я смогу закончить позже"], "was able to — удалось в конкретной ситуации."),
-        F("I will can do it tomorrow.", ["I will be able to do it tomorrow.", "I'll be able to do it tomorrow."], "will + be able to."),
+        F("I will can do it tomorrow.", ["I will be able to do it tomorrow.", "I'll be able to do it tomorrow."], "will + be able to.", "Я смогу сделать это завтра."),
         B("Will you be able to come?", "Ты сможешь прийти?", "Will + you + be able to + come.")
       ]
     },
@@ -1026,9 +1028,9 @@
       practice: [
         M("Would you like some tea?", ["Предлагают выпить чаю", "Спрашивают, нравится ли чай вообще", "Просят принести чай"], "Would you like…? — предложение."),
         M("Do you like tea?", ["Спрашивают, нравится ли чай вообще", "Предлагают выпить чаю сейчас", "Просят заварить чай"], "Do you like…? — о вкусах вообще."),
-        C("I'd like ___ a table for two.", ["to book", "book", "booking"], "would like + to + V."),
-        S("Вы в отеле и вежливо просите поменять номер.", ["I'd like to change my room, please.", "I want change my room.", "I like to change my room."], "Вежливая просьба — I'd like to…"),
-        F("I would like order a pizza.", ["I would like to order a pizza.", "I'd like to order a pizza."], "Нужно to.")
+        C("I'd like ___ a table for two.", ["to book", "book", "booking"], "would like + to + V.", "Я бы хотел забронировать столик на двоих."),
+        S("Вы в отеле и вежливо просите поменять номер.", ["I'd like to change my room, please.", "I want change my room.", "I like to change my room."], "Вежливая просьба — I'd like to…", "Я бы хотел поменять номер, пожалуйста."),
+        F("I would like order a pizza.", ["I would like to order a pizza.", "I'd like to order a pizza."], "Нужно to.", "Я бы хотел заказать пиццу.")
       ]
     },
 
@@ -1055,9 +1057,9 @@
         ["She want to stay.", "She wants to stay.", "she → wants."]
       ],
       practice: [
-        C("I want ___ to help me.", ["you", "that you", "you that"], "want + человек + to."),
-        C("She ___ to go out tonight.", ["doesn't want", "don't want", "not want"], "she → doesn't want."),
-        F("I want that you call me.", ["I want you to call me."], "want + you + to."),
+        C("I want ___ to help me.", ["you", "that you", "you that"], "want + человек + to.", "Я хочу, чтобы ты мне помог."),
+        C("She ___ to go out tonight.", ["doesn't want", "don't want", "not want"], "she → doesn't want.", "Она не хочет никуда идти сегодня вечером."),
+        F("I want that you call me.", ["I want you to call me."], "want + you + to.", "Я хочу, чтобы ты мне позвонил."),
         B("Do you want to grab lunch?", "Хочешь пообедать вместе?", "Do + you + want to + grab lunch."),
         M("Wanna grab a coffee?", ["Неформально предлагают выпить кофе", "Строго спрашивают о покупке кофе", "Отказываются от кофе"], "wanna = want to, разговорное предложение.")
       ]
@@ -1086,9 +1088,9 @@
         ["You not need to come.", "You don't need to come.", "Отрицание через don't."]
       ],
       practice: [
-        C("You ___ to worry. Everything's fine.", ["don't need", "needn't to", "not need"], "Не нужно — don't need to."),
-        C("She ___ some help.", ["needs", "need", "needs to"], "need + существительное, she → needs."),
-        F("I need talk to you.", ["I need to talk to you."], "need + to + V."),
+        C("You ___ to worry. Everything's fine.", ["don't need", "needn't to", "not need"], "Не нужно — don't need to.", "Не нужно волноваться. Всё в порядке."),
+        C("She ___ some help.", ["needs", "need", "needs to"], "need + существительное, she → needs.", "Ей нужна помощь."),
+        F("I need talk to you.", ["I need to talk to you."], "need + to + V.", "Мне нужно с тобой поговорить."),
         M("You don't need to pay.", ["Платить не нужно", "Платить запрещено", "Нужно заплатить"], "don't need to — не нужно."),
         B("Do we need to book in advance?", "Нужно бронировать заранее?", "Do + we + need to + book…")
       ]
@@ -1118,10 +1120,10 @@
         ["My dad allowed me go.", "My dad let me go.", "allow требует to (allowed me to go), а let — без to."]
       ],
       practice: [
-        C("The film made me ___.", ["cry", "to cry", "crying"], "make + человек + V без to."),
-        C("___ me know when you arrive.", ["Let", "Make", "Allow"], "Let me know — дай знать."),
+        C("The film made me ___.", ["cry", "to cry", "crying"], "make + человек + V без to.", "От этого фильма я заплакал."),
+        C("___ me know when you arrive.", ["Let", "Make", "Allow"], "Let me know — дай знать.", "Дай знать, когда приедешь."),
         M("My boss made me work on Sunday.", ["Начальник заставил работать в воскресенье", "Начальник разрешил работать в воскресенье", "Я сам решил поработать"], "make — заставить."),
-        F("Let me to explain.", ["Let me explain."], "После let — без to."),
+        F("Let me to explain.", ["Let me explain."], "После let — без to.", "Давай я объясню."),
         B("Let me help you.", "Давай я помогу.", "Let + me + help + you.")
       ]
     },
@@ -1149,9 +1151,9 @@
       ],
       practice: [
         M("I had my car washed.", ["Машину мне помыли", "Я сам помыл машину", "Я хочу помыть машину"], "have + предмет + V3 — сделал кто-то другой."),
-        C("I need to get my laptop ___.", ["repaired", "repair", "repairing"], "get + предмет + V3."),
-        C("She had her passport ___.", ["stolen", "steal", "stole"], "had + passport + stolen — у неё украли."),
-        F("I had cut my hair at the salon.", ["I had my hair cut at the salon."], "have + предмет + V3."),
+        C("I need to get my laptop ___.", ["repaired", "repair", "repairing"], "get + предмет + V3.", "Мне нужно отдать ноутбук в ремонт."),
+        C("She had her passport ___.", ["stolen", "steal", "stole"], "had + passport + stolen — у неё украли.", "У неё украли паспорт."),
+        F("I had cut my hair at the salon.", ["I had my hair cut at the salon."], "have + предмет + V3.", "Я подстригся в салоне."),
         B("We are having our kitchen painted.", "Нам красят кухню.", "are having + our kitchen + painted.")
       ]
     },
@@ -1180,11 +1182,11 @@
       ],
       practice: [
         M("If I had a car, I would drive to work.", ["Машины нет — это мечта", "Машина есть, и я езжу на ней", "У меня была машина в прошлом"], "If + Past, would — нереально сейчас."),
-        C("If you ___ hungry, there's pizza in the fridge.", ["are", "will be", "would be"], "После if — Present."),
-        C("If I ___ you, I'd talk to her.", ["were", "am", "will be"], "Формула совета: If I were you…"),
+        C("If you ___ hungry, there's pizza in the fridge.", ["are", "will be", "would be"], "После if — Present.", "Если ты голоден, в холодильнике есть пицца."),
+        C("If I ___ you, I'd talk to her.", ["were", "am", "will be"], "Формула совета: If I were you…", "На твоём месте я бы с ней поговорил."),
         M("If I had known, I would have come.", ["Не знал — и не пришёл", "Знал и пришёл", "Узнаю — и приду"], "Третий тип: нереальное прошлое."),
-        F("If I will see him, I will tell him.", ["If I see him, I will tell him.", "If I see him, I'll tell him."], "После if — Present Simple."),
-        S("Подруга сомневается, принять ли предложение. Вы советуете: «На твоём месте я бы согласился».", ["If I were you, I'd accept it.", "If I am you, I accept it.", "If I will be you, I will accept it."], "Совет — If I were you, I'd…")
+        F("If I will see him, I will tell him.", ["If I see him, I will tell him.", "If I see him, I'll tell him."], "После if — Present Simple.", "Если я его увижу, я ему скажу."),
+        S("Подруга сомневается, принять ли предложение. Вы советуете: «На твоём месте я бы согласился».", ["If I were you, I'd accept it.", "If I am you, I accept it.", "If I will be you, I will accept it."], "Совет — If I were you, I'd…", "На твоём месте я бы согласился.")
       ]
     },
 
@@ -1212,12 +1214,12 @@
         ["It made in Italy.", "It's made in Italy.", "Нужен is: It is made."]
       ],
       practice: [
-        C("The museum ___ in 1850.", ["was built", "built", "is building"], "Музей построили — пассив: was built."),
-        C("Is service ___ in the price?", ["included", "include", "including"], "be + V3: is included."),
+        C("The museum ___ in 1850.", ["was built", "built", "is building"], "Музей построили — пассив: was built.", "Музей был построен в 1850 году."),
+        C("Is service ___ in the price?", ["included", "include", "including"], "be + V3: is included.", "Обслуживание включено в стоимость?"),
         M("My wallet was stolen.", ["Кто-то украл мой кошелёк", "Я украл кошелёк", "Кошелёк крадут прямо сейчас"], "was stolen — с кошельком что-то сделали."),
-        F("I born in 1995.", ["I was born in 1995."], "was born."),
+        F("I born in 1995.", ["I was born in 1995."], "was born.", "Я родился в 1995 году."),
         B("The meeting has been cancelled.", "Встречу отменили.", "has been + cancelled."),
-        S("Вы сообщаете, что ресторан закрыли на ремонт (кто закрыл — неважно).", ["The restaurant has been closed for repairs.", "The restaurant has closed by repairs.", "The restaurant closing for repairs."], "Важно, что сделали, — пассив: has been closed.")
+        S("Вы сообщаете, что ресторан закрыли на ремонт (кто закрыл — неважно).", ["The restaurant has been closed for repairs.", "The restaurant has closed by repairs.", "The restaurant closing for repairs."], "Важно, что сделали, — пассив: has been closed.", "Ресторан закрыт на ремонт.")
       ]
     },
 
@@ -1244,10 +1246,10 @@
         ["He told me wait.", "He told me to wait.", "told + кого + to + V."]
       ],
       practice: [
-        C("«I can swim.» → He said he ___ swim.", ["could", "can to", "will"], "can → could."),
-        C("She asked me where I ___.", ["lived", "did live", "do live"], "Косвенный вопрос: без do, сдвиг времени."),
-        C("He told me ___ the door.", ["to close", "close", "closing"], "told + кого + to + V."),
-        F("She asked me where do I work.", ["She asked me where I worked.", "She asked me where I work."], "Без do: where I worked."),
+        C("«I can swim.» → He said he ___ swim.", ["could", "can to", "will"], "can → could.", "«Я умею плавать». → Он сказал, что умеет плавать."),
+        C("She asked me where I ___.", ["lived", "did live", "do live"], "Косвенный вопрос: без do, сдвиг времени.", "Она спросила меня, где я живу."),
+        C("He told me ___ the door.", ["to close", "close", "closing"], "told + кого + to + V.", "Он велел мне закрыть дверь."),
+        F("She asked me where do I work.", ["She asked me where I worked.", "She asked me where I work."], "Без do: where I worked.", "Она спросила, где я работаю."),
         M("He said he would call.", ["Он обещал позвонить", "Он уже позвонил", "Он звонит сейчас"], "would — будущее с точки зрения прошлого.")
       ]
     },
@@ -1275,11 +1277,11 @@
         ["The book who I read.", "The book that I read.", "Вещь → that / which."]
       ],
       practice: [
-        C("The woman ___ lives upstairs is very kind.", ["who", "which", "where"], "Человек → who."),
-        C("This is the hotel ___ we stayed.", ["where", "which", "who"], "Место → where."),
-        C("The phone ___ I bought last week doesn't work.", ["that", "who", "where"], "Вещь → that."),
-        C("I know a guy ___ brother is an actor.", ["whose", "who", "which"], "«чей брат» → whose."),
-        F("The girl which helped me was nice.", ["The girl who helped me was nice.", "The girl that helped me was nice."], "Человек → who / that.")
+        C("The woman ___ lives upstairs is very kind.", ["who", "which", "where"], "Человек → who.", "Женщина, которая живёт наверху, очень добрая."),
+        C("This is the hotel ___ we stayed.", ["where", "which", "who"], "Место → where.", "Это отель, в котором мы останавливались."),
+        C("The phone ___ I bought last week doesn't work.", ["that", "who", "where"], "Вещь → that.", "Телефон, который я купил на прошлой неделе, не работает."),
+        C("I know a guy ___ brother is an actor.", ["whose", "who", "which"], "«чей брат» → whose.", "Я знаю парня, чей брат — актёр."),
+        F("The girl which helped me was nice.", ["The girl who helped me was nice.", "The girl that helped me was nice."], "Человек → who / that.", "Девушка, которая мне помогла, была милой.")
       ]
     },
 
@@ -1307,10 +1309,10 @@
         ["You should to rest.", "You should rest.", "После модальных — без to."]
       ],
       practice: [
-        C("I went to the shop ___ some milk.", ["to buy", "for buy", "buying"], "Цель — to + V."),
-        C("We hope ___ you soon.", ["to see", "seeing", "see"], "hope + to."),
-        C("It's easy ___ lost here.", ["to get", "get", "getting"], "Прилагательное + to + V."),
-        F("I came here for study.", ["I came here to study."], "Цель — to + V."),
+        C("I went to the shop ___ some milk.", ["to buy", "for buy", "buying"], "Цель — to + V.", "Я пошёл в магазин, чтобы купить молока."),
+        C("We hope ___ you soon.", ["to see", "seeing", "see"], "hope + to.", "Надеемся скоро вас увидеть."),
+        C("It's easy ___ lost here.", ["to get", "get", "getting"], "Прилагательное + to + V.", "Здесь легко заблудиться."),
+        F("I came here for study.", ["I came here to study."], "Цель — to + V.", "Я приехал сюда учиться."),
         B("I don't know what to say.", "Не знаю, что сказать.", "what + to + say.")
       ]
     },
@@ -1339,11 +1341,11 @@
         ["Thanks for help me.", "Thanks for helping me.", "После предлога — -ing."]
       ],
       practice: [
-        C("Do you mind ___ the window?", ["opening", "to open", "open"], "mind + -ing."),
-        C("I'm good at ___.", ["cooking", "cook", "to cook"], "После предлога at — -ing."),
-        C("I'm looking forward to ___ you.", ["seeing", "see", "saw"], "looking forward to + -ing."),
+        C("Do you mind ___ the window?", ["opening", "to open", "open"], "mind + -ing.", "Не могли бы вы открыть окно?"),
+        C("I'm good at ___.", ["cooking", "cook", "to cook"], "После предлога at — -ing.", "Я хорошо готовлю."),
+        C("I'm looking forward to ___ you.", ["seeing", "see", "saw"], "looking forward to + -ing.", "С нетерпением жду встречи с тобой."),
         M("I stopped smoking.", ["Бросил курить", "Остановился, чтобы покурить", "Курю прямо сейчас"], "stop + -ing — прекратить делать."),
-        F("I enjoy to read before bed.", ["I enjoy reading before bed."], "enjoy + -ing.")
+        F("I enjoy to read before bed.", ["I enjoy reading before bed."], "enjoy + -ing.", "Я люблю почитать перед сном.")
       ]
     },
 
@@ -1371,11 +1373,11 @@
         ["You should to go.", "You should go.", "После модальных — без to."]
       ],
       practice: [
-        C("___ I open the window?", ["Can", "Do", "Am"], "Просим разрешения — Can I…?"),
-        C("He ___ speak three languages.", ["can", "cans", "can to"], "Модальный без -s и без to."),
+        C("___ I open the window?", ["Can", "Do", "Am"], "Просим разрешения — Can I…?", "Можно я открою окно?"),
+        C("He ___ speak three languages.", ["can", "cans", "can to"], "Модальный без -s и без to.", "Он говорит на трёх языках."),
         M("You must be hungry.", ["Ты, наверное, голоден", "Ты обязан быть голодным", "Ты был голоден"], "must — уверенное предположение."),
-        S("Вы советуете другу взять зонт.", ["You should take an umbrella.", "You should to take an umbrella.", "You shoulds take an umbrella."], "Совет — should + V."),
-        F("Do you can help me?", ["Can you help me?", "Could you help me?"], "Вопрос с модальным — без do.")
+        S("Вы советуете другу взять зонт.", ["You should take an umbrella.", "You should to take an umbrella.", "You shoulds take an umbrella."], "Совет — should + V.", "Тебе стоит взять зонт."),
+        F("Do you can help me?", ["Can you help me?", "Could you help me?"], "Вопрос с модальным — без do.", "Можешь мне помочь?")
       ]
     }
   ];

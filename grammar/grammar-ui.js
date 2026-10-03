@@ -163,6 +163,17 @@
       return h('div', { class: 'gr-q' }, mark(ex.text), ex.type === 'choose' ? null : speak(ex.text));
     }
 
+    // «Перевод» под фразой: в «Ситуации» перевод подсказал бы ответ — там он только в разборе
+    function ruToggle(ex) {
+      if (!ex.ru || ex.type === 'situation') return null;
+      var ruLine = h('p', { class: 'gr-ex-ru gr-q-ru', hidden: true }, ex.ru);
+      return h('div', { class: 'gr-ru-wrap' }, ruLine,
+        h('button', { class: 'link-btn', type: 'button', onclick: function (e) {
+          ruLine.hidden = !ruLine.hidden;
+          e.currentTarget.textContent = ruLine.hidden ? 'Перевод' : 'Скрыть перевод';
+        } }, 'Перевод'));
+    }
+
     function choiceView(ex) {
       var opts2 = shuffle(ex.options);
       var right = ex.options[0];
@@ -191,7 +202,7 @@
         var n = parseInt(e.key, 10);
         if (n >= 1 && n <= btns.length) { e.preventDefault(); pick(n - 1); }
       };
-      return [h('p', { class: 'prompt' }, TYPE_PROMPT[ex.type]), q, list];
+      return [h('p', { class: 'prompt' }, TYPE_PROMPT[ex.type]), q, ruToggle(ex), list];
     }
 
     function buildView(ex) {
@@ -247,7 +258,7 @@
       keyHandler = function (e) { if (e.key === 'Enter' && document.activeElement === input) { e.preventDefault(); submit(false); } };
       setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (e) { /* нет фокуса */ } }, 30);
       return [h('p', { class: 'prompt' }, TYPE_PROMPT.fix),
-        h('div', { class: 'gr-q gr-q-wrong', lang: 'en' }, ex.text),
+        h('div', { class: 'gr-q gr-q-wrong', lang: 'en' }, ex.text), ruToggle(ex),
         input, hint,
         h('div', { class: 'row gap wrap gr-actions' },
           h('button', { class: 'btn primary', type: 'button', onclick: function () { submit(false); } }, 'Проверить'),
@@ -265,6 +276,7 @@
       foot.replaceChildren(h('div', { class: 'feedback gr-fb ' + tone },
         h('div', { class: 'fb-head' }, h('span', { class: 'fb-verdict ' + tone }, icon(ok ? 'check' : 'bulb'), ok ? (ex.retry ? 'Теперь верно!' : 'Верно!') : 'Не совсем')),
         !ok ? h('p', { class: 'fb-answer' }, h('span', { class: 'muted' }, 'Правильно: '), h('strong', { lang: /[a-z]/i.test(right) ? 'en' : null }, right)) : null,
+        ex.ru ? h('p', { class: 'gr-ex-ru' }, h('span', { class: 'muted' }, 'Перевод: '), ex.ru) : null,
         ex.explain ? h('p', { class: 'gr-explain' }, ex.explain) : null,
         note ? h('p', { class: 'muted small' }, note) : null,
         !ok && !ex.retry ? h('p', { class: 'muted small' }, 'Ничего страшного — это задание вернётся в конце.') : null

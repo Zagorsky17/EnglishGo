@@ -71,6 +71,8 @@ mark.gr-key { background: var(--mark); color: inherit; padding: 0 1px; border-ra
 .gr-ex + .gr-ex { border-top: 1px dashed var(--border); }
 .gr-ex-en { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; line-height: 1.45; }
 .gr-ex-ru { color: var(--muted); font-size: .92rem; margin-top: 2px; }
+.gr-ru-wrap { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 0 0 8px; }
+.gr-ru-wrap .gr-q-ru { margin: 0; }
 .gr-examples { display: flex; flex-direction: column; }
 
 .gr-formula { display: flex; flex-direction: column; gap: 6px; }

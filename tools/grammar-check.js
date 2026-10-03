@@ -81,6 +81,7 @@ for (const t of G.data.topics) {
     exN++;
     const w = t.id + ' #' + i + ' ' + e.type;
     if (!e.explain) err('no explain', w);
+    if (e.type !== 'meaning' && e.type !== 'build' && (!e.ru || !/[а-яё]/i.test(e.ru) || /[\[\]_]/.test(e.ru))) err('needs Russian translation (ru)', w);
     if (e.key !== t.id + ':' + i || e.topic !== t.id) err('bad key', w);
     if (e.type === 'build') {
       const n = G.ui.words(e.answer).list.length;
