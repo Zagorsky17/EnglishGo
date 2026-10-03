@@ -9,11 +9,18 @@
 
   /* ================= Учить сегодня ================= */
 
+  var SESSION_MAX = 25;   // заданий в сессии «Учить сегодня»
+  var NEW_COST = 3;       // forNew даёт 3 задания на новое выражение
+
   function planToday() {
     var t = EG.state.today();
-    var due = EG.srs.getDue(25);
+    var due = EG.srs.getDue(SESSION_MAX);
     var newLimit = Math.max(0, EG.storage.get('newPerDay') - t.newItems);
     var fresh = EG.srs.getNewCandidates(Math.min(newLimit, 6));
+    // Укладываемся в SESSION_MAX заданий: повторение важнее, но 2 новых выражения оставляем всегда
+    var keepNew = Math.min(fresh.length, 2);
+    due = due.slice(0, Math.max(0, SESSION_MAX - keepNew * NEW_COST));
+    fresh = fresh.slice(0, Math.max(keepNew, Math.floor((SESSION_MAX - due.length) / NEW_COST)));
     return { due: due, fresh: fresh };
   }
 
