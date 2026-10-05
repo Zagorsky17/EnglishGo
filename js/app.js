@@ -18,16 +18,26 @@
       r.path === 'chats' ? h('span', { class: 'nav-count green', 'data-count': 'chats' }) : null);
   }
 
+  /** Пункты меню с разделителем там, где меняется блок (route.group). */
+  function navList(routes, cls) {
+    var out = [];
+    routes.forEach(function (r, i) {
+      if (i && r.group !== routes[i - 1].group) out.push(h('div', { class: 'nav-sep', role: 'separator' }));
+      out.push(navLink(r, cls));
+    });
+    return out;
+  }
+
   function buildNav() {
     var routes = EG.router.ROUTES.filter(function (r) { return r.nav; });
     var side = document.getElementById('side-nav');
-    side.replaceChildren.apply(side, routes.map(function (r) { return navLink(r, 'nav-item'); }));
+    side.replaceChildren.apply(side, navList(routes, 'nav-item'));
 
     var bottom = document.getElementById('bottom-nav');
     var main = routes.filter(function (r) { return r.nav === 'main'; });
     var more = routes.filter(function (r) { return r.nav === 'side'; });
     var sheet = h('div', { class: 'sheet', id: 'more-sheet', hidden: true },
-      h('div', { class: 'sheet-inner' }, more.map(function (r) { return navLink(r, 'sheet-item'); })));
+      h('div', { class: 'sheet-inner' }, navList(more, 'sheet-item')));
     var moreBtn = h('button', { class: 'bn-item', type: 'button', 'data-nav-more': '', 'aria-expanded': 'false', onclick: function () {
       var open = sheet.hidden;
       sheet.hidden = !open;

@@ -3,25 +3,26 @@
   'use strict';
 
   // nav: 'main' — в нижней панели на телефоне, 'side' — только в меню/сайдбаре
+  // group — блок меню: между блоками рисуется разделитель (учёба · грамматика · неправильные глаголы · остальное)
   var ROUTES = [
-    { path: 'home',      title: 'Главная',        icon: 'home',      nav: 'main' },
-    { path: 'today',     title: 'Учить сегодня',  short: 'Сегодня', icon: 'today', nav: 'main' },
-    { path: 'vocab',     title: 'Словарный запас', short: 'Слова',  icon: 'vocab', nav: 'main' },
-    { path: 'chats',     title: 'Чаты',           icon: 'chat',      nav: 'main' },
-    { path: 'games',     title: 'Игры',           icon: 'game',      nav: 'main' },
-    { path: 'review',    title: 'Повторение',     icon: 'review',    nav: 'side' },
-    { path: 'talk',      title: 'Разговор',       icon: 'talk',      nav: 'side' },
-    { path: 'dialogues', title: 'Диалоги',        icon: 'dialogues', nav: 'side' },
-    { path: 'reading',   title: 'Чтение',         icon: 'book',      nav: 'side' },
-    { path: 'grammar',   title: 'Грамматика',     icon: 'grammar',   nav: 'side' }, // изолированный модуль grammar/
-    { path: 'gtoday',    title: 'Грамматика сегодня', short: 'Грамм. сегодня', icon: 'bolt', nav: 'side' }, // изолированный модуль gtoday/
-    { path: 'tenses',    title: 'Таблица времён', icon: 'target',    nav: 'side' }, // изолированный модуль tenses/
-    { path: 'iverbs',    title: 'Неправильные глаголы сегодня', icon: 'flame', nav: 'side' }, // изолированный модуль irregular/
-    { path: 'irregular', title: 'Неправильные глаголы', icon: 'star', nav: 'side' }, // изолированный модуль irregular/
-    { path: 'words',     title: 'Выражения',      icon: 'words',     nav: 'side' },
-    { path: 'mistakes',  title: 'Ошибки',         icon: 'mistakes',  nav: 'side' },
-    { path: 'progress',  title: 'Прогресс',       icon: 'progress',  nav: 'side' },
-    { path: 'settings',  title: 'Настройки',      icon: 'settings',  nav: 'side' },
+    { path: 'home',      title: 'Главная',        icon: 'home',      nav: 'main', group: 'home' },
+    { path: 'today',     title: 'Учить сегодня',  short: 'Сегодня', icon: 'today', nav: 'main', group: 'learn' },
+    { path: 'vocab',     title: 'Словарный запас', short: 'Слова',  icon: 'vocab', nav: 'main', group: 'learn' },
+    { path: 'chats',     title: 'Чаты',           icon: 'chat',      nav: 'main', group: 'learn' },
+    { path: 'games',     title: 'Игры',           icon: 'game',      nav: 'main', group: 'learn' },
+    { path: 'review',    title: 'Повторение',     icon: 'review',    nav: 'side', group: 'learn' },
+    { path: 'talk',      title: 'Разговор',       icon: 'talk',      nav: 'side', group: 'learn' },
+    { path: 'dialogues', title: 'Диалоги',        icon: 'dialogues', nav: 'side', group: 'learn' },
+    { path: 'reading',   title: 'Чтение',         icon: 'book',      nav: 'side', group: 'learn' },
+    { path: 'grammar',   title: 'Грамматика',     icon: 'grammar',   nav: 'side', group: 'grammar' }, // изолированный модуль grammar/
+    { path: 'gtoday',    title: 'Грамматика сегодня', short: 'Грамм. сегодня', icon: 'bolt', nav: 'side', group: 'grammar' }, // изолированный модуль gtoday/
+    { path: 'tenses',    title: 'Таблица времён', icon: 'target',    nav: 'side', group: 'grammar' }, // изолированный модуль tenses/
+    { path: 'iverbs',    title: 'Неправильные глаголы сегодня', icon: 'flame', nav: 'side', group: 'verbs' }, // изолированный модуль irregular/
+    { path: 'irregular', title: 'Неправильные глаголы', icon: 'star', nav: 'side', group: 'verbs' }, // изолированный модуль irregular/
+    { path: 'words',     title: 'Выражения',      icon: 'words',     nav: 'side', group: 'more' },
+    { path: 'mistakes',  title: 'Ошибки',         icon: 'mistakes',  nav: 'side', group: 'more' },
+    { path: 'progress',  title: 'Прогресс',       icon: 'progress',  nav: 'side', group: 'more' },
+    { path: 'settings',  title: 'Настройки',      icon: 'settings',  nav: 'side', group: 'more' },
     // вложенные экраны (без пункта меню)
     { path: 'lesson',    parent: 'today' },
     { path: 'dialogue',  parent: 'dialogues' },

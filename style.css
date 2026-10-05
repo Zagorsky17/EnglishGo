@@ -105,6 +105,7 @@ mark { background: var(--mark); color: inherit; padding: 0 3px; border-radius: 4
 }
 .nav-item:hover { background: var(--surface-2); color: var(--text); }
 .nav-item.active { background: var(--accent-soft); color: var(--accent); }
+.nav-sep { flex-shrink: 0; height: 1px; margin: 6px 12px; background: var(--border); }
 .nav-count { margin-left: auto; font-size: .75rem; font-weight: 600; min-width: 20px; text-align: center; border-radius: 10px; padding: 1px 6px; background: var(--accent); color: #fff; }
 .nav-count:empty { display: none; }
 .hud { display: flex; gap: 8px; padding: 12px 8px 0; border-top: 1px solid var(--border); }
@@ -133,6 +134,7 @@ body.loading .view > :not(.boot) { visibility: hidden; }
   width: 100%; background: var(--surface); border-radius: 20px 20px 0 0; padding: 12px 12px calc(84px + env(safe-area-inset-bottom));
   display: grid; grid-template-columns: 1fr 1fr; gap: 6px; animation: up .2s ease;
 }
+.sheet-inner .nav-sep { grid-column: 1 / -1; margin: 4px 6px; }
 .sheet-item { display: flex; align-items: center; gap: 10px; padding: 14px; border-radius: var(--radius-sm); color: var(--text); background: var(--surface-2); font-weight: 500; }
 .sheet-item.active { color: var(--accent); background: var(--accent-soft); }
 .sheet-item .nav-count { margin-left: auto; }
