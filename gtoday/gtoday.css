@@ -1,0 +1,90 @@
+/* gtoday/gtoday.css — стили раздела «Грамматика сегодня».
+   Все классы с префиксом gt- — существующие стили приложения не переопределяются.
+   Цвета берутся из переменных темы (светлая/тёмная) из style.css. */
+
+.view-gtoday > .page-head, .view-gtoday > .card, .view-gtoday > .gt-how, .view-gtoday > .gt-footer, .view-gtoday > .gt-note { max-width: 860px; margin-left: auto; margin-right: auto; }
+
+.gt-note { display: flex; gap: 8px; align-items: flex-start; padding: 10px 14px; border-radius: var(--radius-sm); background: var(--warn-soft); font-size: .9rem; }
+.gt-note .ic { width: 18px; height: 18px; color: var(--warn); flex-shrink: 0; }
+
+.gt-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
+.gt-actions-center { justify-content: center; }
+.gt-today { margin: 0; }
+
+/* ---------- детектор ---------- */
+.gt-det-steps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gt-det-step { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: var(--radius-sm); background: var(--surface-2); }
+.gt-det-step p { margin: 4px 0 0; }
+.gt-det-n { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .gt-det-n { color: #0f1117; }
+.gt-table-link { display: inline-block; margin: 12px 0 0; font-size: .9rem; text-decoration: none; }
+
+/* ---------- список времён ---------- */
+.gt-tenses { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+.gt-tense { position: relative; display: flex; align-items: center; gap: 10px; padding: 11px 14px 13px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); text-decoration: none; overflow: hidden; transition: border-color .15s; }
+.gt-tense:hover { border-color: var(--accent); }
+.gt-tense-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.gt-tense-side { flex-shrink: 0; }
+.gt-tense-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--surface-2); }
+.gt-tense-bar > span { display: block; height: 100%; background: var(--good); transition: width .3s; }
+.gt-locked { opacity: .55; border-style: dashed; }
+.gt-st { font-size: .72rem; font-weight: 600; padding: 2px 8px; border-radius: 99px; white-space: nowrap; background: var(--surface-2); color: var(--muted); }
+.gt-st.learning { background: var(--warn-soft); color: var(--warn); }
+.gt-st.done { background: var(--good-soft); color: var(--good); }
+
+.gt-how { margin-bottom: var(--gap); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
+.gt-how > summary { cursor: pointer; padding: 12px 14px; font-weight: 600; }
+.gt-how ul { margin: 0; padding: 0 16px 14px 34px; display: flex; flex-direction: column; gap: 6px; line-height: 1.45; }
+.gt-footer { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); }
+.gt-footer p { margin: 0; }
+
+/* ---------- упражнения ---------- */
+.gt-run { max-width: 720px; margin: 0 auto; }
+.gt-run-top { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.gt-run-bar { flex: 1; }
+.gt-run-title { text-align: center; margin-bottom: 10px; }
+.gt-again { margin-left: 6px; padding: 1px 8px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); text-transform: none; letter-spacing: 0; }
+
+mark.gt-key { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: 700; }
+.gt-gap { display: inline-block; min-width: 72px; border-bottom: 2px solid var(--accent); margin: 0 3px; }
+.gt-q { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 1.3rem; font-weight: 600; line-height: 1.4; margin: 6px 0 4px; }
+.gt-q-sm { font-size: 1.1rem; }
+.gt-ru-wrap { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 2px 0 4px; }
+.gt-ru-wrap .gt-ru { margin: 0; }
+.gt-ru { color: var(--muted); font-size: .95rem; margin: 4px 0 0; }
+.gt-meaning { font-size: 1.12rem; line-height: 1.5; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); margin: 8px 0 0; }
+.gt-opt-tense { display: flex; flex-direction: column; gap: 1px; }
+
+.gt-step + .gt-step:not(:empty) { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border); }
+.gt-step .prompt { margin: 10px 0 0; }
+.gt-step .options { margin-top: 10px; }
+.gt-step-note { margin: 10px 0 0; padding: 8px 12px; border-radius: var(--radius-sm); font-size: .92rem; line-height: 1.45; }
+.gt-step-note.good { background: var(--good-soft); }
+.gt-step-note.bad { background: var(--bad-soft); }
+
+.gt-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0; }
+.gt-chip { padding: 3px 10px; border-radius: 99px; background: var(--surface); border: 1px solid var(--border); font-size: .85rem; }
+.gt-arrow { color: var(--muted); }
+.gt-chain strong { color: var(--accent); }
+.gt-why { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin: 6px 0; line-height: 1.45; }
+.gt-why-tag { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); }
+.gt-say { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; font-weight: 500; }
+
+.gt-intro-name { margin: 0; font-size: 1.6rem; }
+.gt-intro-ru { margin: 2px 0 6px; font-size: 1.05rem; }
+.gt-intro-point { margin: 6px 0; line-height: 1.5; }
+.gt-intro-form code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: var(--accent-soft); }
+.gt-intro-ex { margin-top: 12px; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); }
+
+.gt-finish { text-align: center; }
+.gt-finish-score { font-size: 1.2rem; }
+.gt-weak { margin-top: 10px; }
+.gt-weak-list { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.gt-chip-link { color: var(--text); text-decoration: none; }
+.gt-chip-link:hover { border-color: var(--accent); }
+
+@media (max-width: 640px) {
+  .gt-det-steps { grid-template-columns: 1fr; }
+  .gt-q { font-size: 1.15rem; }
+  .gt-actions .btn { flex: 1 1 auto; justify-content: center; }
+}
