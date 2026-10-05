@@ -39,8 +39,8 @@
   /** «Сейчас → Результат → Present Perfect» — как время собирается из двух ответов. */
   function chain(t) {
     return h('div', { class: 'gt-chain' },
-      h('span', { class: 'gt-chip' }, D().times[t.time]), h('span', { class: 'gt-arrow' }, '→'),
-      h('span', { class: 'gt-chip' }, D().aspects[t.aspect]), h('span', { class: 'gt-arrow' }, '→'),
+      h('span', { class: 'gt-chip' }, h('strong', { lang: 'en' }, D().timeNames[t.time]), ' · ' + D().times[t.time].toLowerCase()), h('span', { class: 'gt-arrow' }, '→'),
+      h('span', { class: 'gt-chip' }, h('strong', { lang: 'en' }, D().aspectNames[t.aspect]), ' · ' + D().aspects[t.aspect].toLowerCase()), h('span', { class: 'gt-arrow' }, '→'),
       h('strong', { lang: 'en' }, t.name));
   }
 
@@ -146,14 +146,15 @@
       var okTime = false;
       var step2 = h('div', { class: 'gt-step' });
       var note1 = h('p', { class: 'gt-step-note', hidden: true });
-      var times = TIME_KEYS.map(function (k) { return D().times[k]; });
+      // карточка варианта: оригинальное английское название + короткая подсказка по-русски
+      function card(en, ru) { return h('span', { class: 'opt-text gt-opt-tense' }, h('strong', { lang: 'en' }, en), h('span', { class: 'muted small' }, ru)); }
       var step1 = h('div', { class: 'gt-step' },
-        h('p', { class: 'prompt' }, h('strong', null, 'Шаг 1. '), 'Точка отсчёта: о каком моменте речь?'),
-        optionList(times.map(function (x) { return h('span', { class: 'opt-text' }, x); }), function (i, btns) {
+        h('p', { class: 'prompt' }, h('strong', null, 'Шаг 1. '), 'Группа времени: Past, Present или Future?'),
+        optionList(TIME_KEYS.map(function (k) { return card(D().timeNames[k], D().times[k]); }), function (i, btns) {
           var right = TIME_KEYS.indexOf(t.time);
           okTime = i === right;
           markBtns(btns, right, i);
-          note1.textContent = (okTime ? '' : 'Нет, ' + D().times[t.time].toLowerCase() + '. ') + t.point;
+          note1.textContent = (okTime ? '' : 'Нет, ' + D().timeNames[t.time] + '. ') + t.point;
           note1.hidden = false;
           note1.classList.add(okTime ? 'good' : 'bad');
           showStep2();
@@ -162,8 +163,9 @@
 
       function showStep2() {
         step2.append(
-          h('p', { class: 'prompt' }, h('strong', null, 'Шаг 2. '), 'Что здесь главное?'),
-          optionList(ASPECT_KEYS.map(function (k) { return h('span', { class: 'opt-text' }, D().aspects[k]); }), function (i, btns) {
+          h('p', { class: 'prompt' }, h('strong', null, 'Шаг 2. '), 'Какое именно время? Что здесь главное?'),
+          // варианты — все четыре времени верной группы: Present Simple, Present Continuous…
+          optionList(ASPECT_KEYS.map(function (k) { return card(D().timeNames[t.time] + ' ' + D().aspectNames[k], D().aspects[k]); }), function (i, btns) {
             var right = ASPECT_KEYS.indexOf(t.aspect);
             markBtns(btns, right, i);
             answered(ex, okTime && i === right, t.name);

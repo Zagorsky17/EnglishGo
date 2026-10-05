@@ -402,9 +402,9 @@
       h('p', { class: 'muted small' }, 'Любое из 12 времён определяется двумя вопросами. В заданиях «Детектор» вы проходите их по шагам, пока это не станет автоматическим.'),
       h('div', { class: 'gt-det-steps' },
         h('div', { class: 'gt-det-step' }, h('span', { class: 'gt-det-n' }, '1'),
-          h('div', null, h('strong', null, 'Точка отсчёта'), h('p', { class: 'muted small' }, 'Прошлое · Сейчас · Будущее — строка таблицы. Ищите сигнал: yesterday, now, tomorrow, by Friday.'))),
+          h('div', null, h('strong', null, 'Группа: ', h('span', { lang: 'en' }, 'Past · Present · Future')), h('p', { class: 'muted small' }, 'Прошлое, сейчас или будущее — строка таблицы. Ищите сигнал: yesterday, now, tomorrow, by Friday.'))),
         h('div', { class: 'gt-det-step' }, h('span', { class: 'gt-det-n' }, '2'),
-          h('div', null, h('strong', null, 'Что главное'), h('p', { class: 'muted small' }, 'Факт · Процесс · Результат к моменту · Длительность до момента — столбец таблицы.')))),
+          h('div', null, h('strong', null, 'Вид: ', h('span', { lang: 'en' }, 'Simple · Continuous · Perfect · Perfect Continuous')), h('p', { class: 'muted small' }, 'Факт, процесс, результат к моменту или длительность до момента — столбец таблицы. Группа + вид = время: Present + Perfect = Present Perfect.')))),
       hasTable ? h('a', { class: 'link-btn gt-table-link', href: '#/tenses' }, 'Открыть таблицу времён →') : null);
 
     var tensesCard = h('section', { class: 'card' },
