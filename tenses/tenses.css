@@ -1,0 +1,127 @@
+/* tenses/tenses.css — стили раздела «Таблица времён».
+   Все классы с префиксом tt- — существующие стили приложения не переопределяются.
+   Цвета берутся из переменных темы (светлая/тёмная) из style.css.
+   Каждый «вид» (столбец) закреплён за одним цветом — в таблице, легенде и карточке. */
+
+.tt { max-width: 980px; margin: 0 auto; }
+.tt-detail { max-width: 760px; }
+
+.tt-a-simple { --tt-c: var(--ok); --tt-soft: var(--ok-soft); }
+.tt-a-continuous { --tt-c: var(--warn); --tt-soft: var(--warn-soft); }
+.tt-a-perfect { --tt-c: var(--good); --tt-soft: var(--good-soft); }
+.tt-a-perfcont { --tt-c: var(--accent); --tt-soft: var(--accent-soft); }
+
+mark.tt-key { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: 600; }
+.tt code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .86em; }
+
+.tt-quiz-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.tt-quiz-hint { display: flex; gap: 8px; align-items: flex-start; padding: 10px 14px; margin: 0 0 var(--gap); border-radius: var(--radius-sm); background: var(--accent-soft); font-size: .92rem; }
+.tt-quiz-hint[hidden] { display: none; }
+.tt-quiz-hint .ic { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; }
+
+/* режим самопроверки: скрытый блок размыт, пока его не открыли */
+.tt-quiz .tt-hide:not(.tt-shown) { position: relative; cursor: pointer; border-radius: 8px; }
+.tt-quiz .tt-hide:not(.tt-shown) > * { filter: blur(6px); opacity: .55; user-select: none; pointer-events: none; }
+.tt-quiz .tt-hide:not(.tt-shown)::after { content: "нажмите, чтобы проверить"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 600; color: var(--accent); text-align: center; }
+.tt-quiz .tt-hide:not(.tt-shown):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tt-shown { animation: tt-in .25s ease; }
+@keyframes tt-in { from { opacity: .3; } to { opacity: 1; } }
+
+/* ---------- ключ: 4 вида ---------- */
+.tt-lead { margin: -4px 0 12px; max-width: 720px; }
+.tt-aspects { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.tt-aspect { padding: 12px 14px; border-radius: var(--radius-sm); background: var(--tt-soft); border-top: 3px solid var(--tt-c); }
+.tt-aspect-top { display: flex; flex-direction: column; gap: 2px; }
+.tt-aspect-ru { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--tt-c); }
+.tt-aspect p { margin: 6px 0; font-size: .9rem; line-height: 1.4; }
+.tt-aspect code { color: var(--text); font-weight: 600; }
+
+/* ---------- таблица ---------- */
+.tt-table { display: flex; flex-direction: column; gap: 8px; margin-bottom: var(--gap); }
+.tt-grid-head, .tt-row { display: grid; grid-template-columns: 110px repeat(4, minmax(0, 1fr)); gap: 8px; }
+.tt-col { padding: 4px 10px; border-bottom: 3px solid var(--tt-c); display: flex; flex-direction: column; }
+.tt-col span { font-size: .78rem; color: var(--tt-c); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.tt-row-head { display: flex; flex-direction: column; justify-content: center; padding: 8px 4px; }
+.tt-row-head strong { font-size: 1.02rem; }
+.tt-row-head span { color: var(--muted); font-size: .85rem; }
+
+.tt-cell { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px 12px; border: 1px solid var(--border); border-left: 4px solid var(--tt-c); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); text-decoration: none; transition: border-color .15s, transform .15s, box-shadow .15s; min-width: 0; }
+.tt-cell:hover { border-color: var(--tt-c); transform: translateY(-1px); box-shadow: var(--shadow); }
+.tt-cell-aspect { display: none; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--tt-c); }
+.tt-cell-name { font-size: .98rem; line-height: 1.2; }
+.tt-cell-ru { color: var(--muted); font-size: .82rem; line-height: 1.3; }
+.tt-cell-body { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.tt-cell-f { display: block; padding: 3px 6px; border-radius: 6px; background: var(--tt-soft); color: var(--text); line-height: 1.35; overflow-wrap: break-word; }
+.tt-cell-ex { font-size: .88rem; line-height: 1.35; }
+
+/* ---------- 3 вопроса ---------- */
+.tt-steps ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+.tt-steps li { line-height: 1.45; }
+
+/* ---------- карточка времени ---------- */
+.tt-detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.tt-detail-head h1 { margin: 0; font-size: 1.7rem; }
+.tt-detail-ru { margin: 4px 0 8px; font-size: 1.05rem; }
+.tt-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tt-tag { font-size: .75rem; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: var(--surface-2); color: var(--muted); }
+.tt-tag.tt-a-simple, .tt-tag.tt-a-continuous, .tt-tag.tt-a-perfect, .tt-tag.tt-a-perfcont { background: var(--tt-soft); color: var(--tt-c); }
+
+.tt-card { display: flex; flex-direction: column; gap: 18px; }
+.tt-label { font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.tt-two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+.tt-tl { margin: 0; }
+.tt-tl-svg { display: block; width: 100%; max-width: 480px; height: auto; margin: 0 auto; }
+.tt-tl figcaption { text-align: center; font-size: .85rem; margin-top: 2px; }
+.tt-axis { stroke: var(--muted); stroke-width: 2; }
+.tt-axis-head { fill: var(--muted); }
+.tt-now { stroke: var(--bad); stroke-width: 2; }
+.tt-ref { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.tt-tl-text { fill: var(--muted); font-size: 11px; text-anchor: middle; font-family: var(--font); }
+.tt-tl-now { fill: var(--bad); font-weight: 700; }
+.tt-act { fill: var(--accent); }
+.tt-band { fill: var(--accent); opacity: .55; }
+.tt-arrow { stroke: var(--accent); stroke-width: 3; }
+
+.tt-when { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; line-height: 1.4; }
+.tt-formula { display: flex; flex-direction: column; gap: 6px; }
+.tt-f-row { display: flex; align-items: baseline; gap: 8px; }
+.tt-f-tag { flex-shrink: 0; width: 24px; text-align: center; font-weight: 700; padding: 1px 0; border-radius: 6px; background: var(--accent-soft); color: var(--accent); }
+.tt-f-row code { line-height: 1.4; overflow-wrap: break-word; }
+
+.tt-examples { display: flex; flex-direction: column; }
+.tt-ex { padding: 8px 0; }
+.tt-ex + .tt-ex { border-top: 1px dashed var(--border); }
+.tt-ex-en { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 1.05rem; line-height: 1.45; }
+.tt-ex-ru { color: var(--muted); font-size: .92rem; margin-top: 2px; }
+
+.tt-markers { display: flex; flex-wrap: wrap; gap: 6px; }
+.tt-marker { padding: 4px 10px; border-radius: 99px; border: 1px solid var(--border); background: var(--surface-2); font-size: .88rem; }
+
+.tt-vs-item + .tt-vs-item { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+.tt-vs-link { display: inline-block; font-weight: 600; color: var(--accent); text-decoration: none; margin-bottom: 4px; }
+.tt-vs-link:hover { text-decoration: underline; }
+.tt-vs-item p { margin: 0; line-height: 1.5; }
+
+.tt-pitfall { display: flex; gap: 8px; align-items: flex-start; padding: 12px 14px; margin: 0 0 var(--gap); border-radius: var(--radius-sm); background: var(--warn-soft); line-height: 1.45; }
+.tt-pitfall .ic { width: 18px; height: 18px; color: var(--warn); flex-shrink: 0; margin-top: 2px; }
+
+.tt-nav { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; }
+
+/* ---------- узкие экраны ---------- */
+@media (max-width: 900px) {
+  .tt-aspects { grid-template-columns: 1fr 1fr; }
+  .tt-grid-head { display: none; }
+  .tt-row { grid-template-columns: 1fr 1fr; }
+  .tt-row-head { grid-column: 1 / -1; flex-direction: row; align-items: baseline; gap: 8px; padding: 10px 2px 0; }
+  .tt-cell-aspect { display: block; }
+}
+@media (max-width: 560px) {
+  .tt-two { grid-template-columns: 1fr; }
+  .tt-detail-head { flex-direction: column; }
+  .tt-detail-head h1 { font-size: 1.45rem; }
+  .tt-nav .btn { flex: 1 1 auto; justify-content: center; }
+}
+@media (max-width: 380px) {
+  .tt-row, .tt-aspects { grid-template-columns: 1fr; }
+}

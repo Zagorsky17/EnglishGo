@@ -14,6 +14,7 @@
     { path: 'dialogues', title: 'Диалоги',        icon: 'dialogues', nav: 'side' },
     { path: 'reading',   title: 'Чтение',         icon: 'book',      nav: 'side' },
     { path: 'grammar',   title: 'Грамматика',     icon: 'grammar',   nav: 'side' }, // изолированный модуль grammar/
+    { path: 'tenses',    title: 'Таблица времён', icon: 'target',    nav: 'side' }, // изолированный модуль tenses/
     { path: 'words',     title: 'Выражения',      icon: 'words',     nav: 'side' },
     { path: 'mistakes',  title: 'Ошибки',         icon: 'mistakes',  nav: 'side' },
     { path: 'progress',  title: 'Прогресс',       icon: 'progress',  nav: 'side' },
