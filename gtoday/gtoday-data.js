@@ -13,6 +13,9 @@
   var D = (EG.gtoday = EG.gtoday || {}).data = {};
 
   D.times = { past: 'Прошлое', present: 'Сейчас', future: 'Будущее' };
+  // Оригинальные названия: группа (Past / Present / Future) + вид (Simple / Continuous / Perfect / Perfect Continuous) = время
+  D.timeNames = { past: 'Past', present: 'Present', future: 'Future' };
+  D.aspectNames = { simple: 'Simple', continuous: 'Continuous', perfect: 'Perfect', perfcont: 'Perfect Continuous' };
   D.aspects = {
     simple: 'Просто факт или событие',
     continuous: 'Процесс в этот момент',
