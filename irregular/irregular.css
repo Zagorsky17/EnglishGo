@@ -1,0 +1,112 @@
+/* irregular/irregular.css — стили разделов «Неправильные глаголы» и «Неправильные глаголы сегодня».
+   Все классы с префиксом iv- — существующие стили приложения не переопределяются.
+   Цвета берутся из переменных темы (светлая/тёмная) из style.css. */
+
+.iv { max-width: 900px; margin: 0 auto; }
+.view-iverbs > .page-head, .view-iverbs > .card, .view-iverbs > .iv-footer, .view-iverbs > .iv-note { max-width: 860px; margin-left: auto; margin-right: auto; }
+
+.iv-note { display: flex; gap: 8px; align-items: flex-start; padding: 10px 14px; border-radius: var(--radius-sm); background: var(--warn-soft); font-size: .9rem; }
+.iv-note .ic { width: 18px; height: 18px; color: var(--warn); flex-shrink: 0; }
+.iv-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
+.iv-center { justify-content: center; }
+.iv-pattern { display: inline-block; font-size: .75rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; vertical-align: middle; }
+
+/* ---------- таблица ---------- */
+.iv-tips-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.iv-tips-grid p { margin: 4px 0 0; line-height: 1.45; }
+.iv-tips-grid b { color: var(--text); }
+.iv-cta { margin-top: 14px; }
+
+.iv-quiz-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.iv-quiz-hint { display: flex; gap: 8px; align-items: flex-start; padding: 10px 14px; margin: 0 0 var(--gap); border-radius: var(--radius-sm); background: var(--accent-soft); font-size: .92rem; }
+.iv-quiz-hint[hidden] { display: none; }
+.iv-quiz-hint .ic { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; }
+
+.iv-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: var(--gap); }
+.iv-search { flex: 1 1 240px; min-width: 0; }
+
+.iv-group-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.iv-group-head h2 { margin: 0; font-size: 1.15rem; }
+.iv-rule { margin: 6px 0 12px; color: var(--muted); line-height: 1.45; }
+
+.iv-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 40px; gap: 10px; align-items: center; padding: 8px 4px; border-top: 1px solid var(--border); }
+.iv-head { border-top: 0; padding-top: 0; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.iv-c { min-width: 0; }
+.iv-base { display: flex; flex-direction: column; gap: 1px; }
+.iv-en { font-weight: 700; font-size: 1.02rem; }
+.iv-ru { color: var(--muted); font-size: .82rem; line-height: 1.3; }
+.iv-star { color: var(--warn); margin-left: 4px; font-size: .8rem; }
+.iv-row .iv-hide { font-weight: 600; font-size: 1.02rem; color: var(--accent); }
+.iv-say { display: flex; justify-content: flex-end; }
+
+.iv-quiz .iv-hide:not(.iv-shown) { position: relative; display: inline-block; min-width: 70px; cursor: pointer; border-radius: 6px; }
+.iv-quiz .iv-hide:not(.iv-shown) > * { filter: blur(6px); opacity: .5; user-select: none; pointer-events: none; }
+.iv-quiz .iv-hide:not(.iv-shown)::after { content: "?"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent); }
+.iv-quiz .iv-hide:not(.iv-shown):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- тренировка: обзор ---------- */
+.iv-today { margin: 0; }
+.iv-method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.iv-method-item { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: var(--radius-sm); background: var(--surface-2); }
+.iv-method-item p { margin: 4px 0 0; line-height: 1.4; }
+.iv-method-ic { font-size: 1.3rem; line-height: 1; color: var(--warn); }
+.iv-progress-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.iv-progress-head .link-btn { text-decoration: none; font-size: .9rem; }
+.iv-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; margin-top: 12px; }
+.iv-g { position: relative; display: flex; align-items: center; gap: 10px; padding: 11px 14px 13px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); text-decoration: none; overflow: hidden; transition: border-color .15s; }
+.iv-g:hover { border-color: var(--accent); }
+.iv-g-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.iv-g-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--surface-2); }
+.iv-g-bar > span { display: block; height: 100%; background: var(--good); transition: width .3s; }
+.iv-st { font-size: .72rem; font-weight: 600; padding: 2px 8px; border-radius: 99px; white-space: nowrap; background: var(--surface-2); color: var(--muted); }
+.iv-st.learning { background: var(--warn-soft); color: var(--warn); }
+.iv-st.done { background: var(--good-soft); color: var(--good); }
+.iv-footer { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); }
+.iv-footer p { margin: 0; }
+
+/* ---------- тренировка: задания ---------- */
+.iv-run { max-width: 680px; margin: 0 auto; }
+.iv-run-top { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.iv-run-bar { flex: 1; }
+.iv-run-title { text-align: center; margin-bottom: 10px; }
+.iv-again { margin-left: 6px; padding: 1px 8px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); text-transform: none; letter-spacing: 0; }
+
+.iv-q { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 1.8rem; font-weight: 700; line-height: 1.3; margin: 6px 0 0; }
+.iv-q-sent { font-size: 1.25rem; font-weight: 600; }
+.iv-q-ru { color: var(--muted); margin: 2px 0 6px; font-size: 1rem; }
+mark.iv-key { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: 700; }
+.iv-gap { display: inline-block; min-width: 72px; border-bottom: 2px solid var(--accent); margin: 0 3px; }
+
+.iv-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.input.iv-ok { border-color: var(--good); background: var(--good-soft); }
+.input.iv-bad { border-color: var(--bad); background: var(--bad-soft); }
+.iv-hint { min-height: 1em; margin: 6px 0 0; }
+
+.iv-intro-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0; font-size: 1.35rem; }
+.iv-intro-rule { margin: 8px 0; font-size: 1.05rem; line-height: 1.5; }
+.iv-intro-list { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
+.iv-intro-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 10px; border-radius: 8px; }
+.iv-intro-row.now { background: var(--accent-soft); }
+.iv-intro-row > span:first-child { flex: 1 1 200px; }
+
+.iv-triple { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 1.15rem; font-weight: 700; margin: 6px 0; }
+.iv-fb-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0; font-size: .92rem; }
+.iv-tag { font-size: .72rem; font-weight: 700; padding: 1px 7px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); }
+
+.iv-finish { text-align: center; }
+.iv-finish-score { font-size: 1.2rem; }
+.iv-weak { margin-top: 8px; }
+.iv-weak-row { display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; }
+
+@media (max-width: 760px) {
+  .iv-tips-grid, .iv-method-grid { grid-template-columns: 1fr; }
+  .iv-row { grid-template-columns: 1.3fr 1fr 1fr 32px; gap: 6px; }
+  .iv-head { font-size: .62rem; }
+  .iv-row .iv-hide, .iv-en { font-size: .95rem; }
+  .iv-q { font-size: 1.5rem; }
+  .iv-q-sent { font-size: 1.12rem; }
+  .iv-actions .btn { flex: 1 1 auto; justify-content: center; }
+}
+@media (max-width: 420px) {
+  .iv-inputs { grid-template-columns: 1fr; }
+}

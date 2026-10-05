@@ -16,6 +16,8 @@
     { path: 'grammar',   title: 'Грамматика',     icon: 'grammar',   nav: 'side' }, // изолированный модуль grammar/
     { path: 'gtoday',    title: 'Грамматика сегодня', short: 'Грамм. сегодня', icon: 'bolt', nav: 'side' }, // изолированный модуль gtoday/
     { path: 'tenses',    title: 'Таблица времён', icon: 'target',    nav: 'side' }, // изолированный модуль tenses/
+    { path: 'iverbs',    title: 'Неправильные глаголы сегодня', icon: 'flame', nav: 'side' }, // изолированный модуль irregular/
+    { path: 'irregular', title: 'Неправильные глаголы', icon: 'star', nav: 'side' }, // изолированный модуль irregular/
     { path: 'words',     title: 'Выражения',      icon: 'words',     nav: 'side' },
     { path: 'mistakes',  title: 'Ошибки',         icon: 'mistakes',  nav: 'side' },
     { path: 'progress',  title: 'Прогресс',       icon: 'progress',  nav: 'side' },
