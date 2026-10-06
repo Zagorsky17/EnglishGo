@@ -71,6 +71,7 @@
     vocab: '<rect x="3" y="7" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/><path d="M7 12h6M7 16h4"/>',
     book: '<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/>',
     grammar: '<path d="M4 20l5-14h2l5 14"/><path d="M6.5 14h7"/><path d="M17 9h4M17 13h4M17 17h3"/>',
+    table: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/>',
     globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'
   };
 
@@ -219,6 +220,26 @@
       onclick: function (e) { e.stopPropagation(); speak(text); } }, icon('speaker'));
   }
 
+  /** Звёздочка «В избранное» для выражения из словаря (EG.data.byId). */
+  function favBtn(id, small) {
+    var b = h('button', { class: 'icon-btn fav-btn' + (small ? ' sm' : ''), type: 'button', onclick: function (e) {
+      e.stopPropagation();
+      var on = !EG.state.isFavorite(id);
+      EG.state.setFavorite(id, on).catch(function () { /* ошибка уже показана через db-error */ });
+      sync();
+      toast(on ? 'Добавлено в избранное' : 'Убрано из избранного', on ? 'good' : undefined);
+    } }, icon('star'));
+    function sync() {
+      var on = EG.state.isFavorite(id);
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', String(on));
+      b.title = on ? 'Убрать из избранного' : 'Добавить в избранное';
+      b.setAttribute('aria-label', b.title);
+    }
+    sync();
+    return b;
+  }
+
   /* ---------- визуальные компоненты ---------- */
   /** SVG-элемент без innerHTML: значения попадают только в атрибуты и текстовые узлы. */
   function svg(tag, attrs, children) {
@@ -354,7 +375,7 @@
   EG.ui = {
     answerLines: answerLines,
     h: h, fill: fill, icon: icon, toast: toast, modal: modal, confirm: confirmDialog,
-    speak: speak, autoSpeak: autoSpeak, stopSpeech: stopSpeech, canSpeak: canSpeak, speakBtn: speakBtn,
+    speak: speak, autoSpeak: autoSpeak, stopSpeech: stopSpeech, canSpeak: canSpeak, speakBtn: speakBtn, favBtn: favBtn,
     voices: function () { return allVoices; },
     usableVoices: usableVoices,
     ring: ring, bar: bar, barChart: barChart, levelBadge: levelBadge, registerBadge: registerBadge,

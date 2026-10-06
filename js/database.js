@@ -293,7 +293,8 @@
   // типы служебных значений профиля: строка из backup в числовом поле ломала XP и таймеры
   var META_TYPES = {
     totalXp: 'number', streak: 'number', bestStreak: 'number', skill: 'number', totalAnswers: 'number',
-    totalCorrect: 'number', createdAt: 'number', lastExportTs: 'number', lastActiveDate: 'date', levelHintShown: 'string'
+    totalCorrect: 'number', createdAt: 'number', lastExportTs: 'number', lastActiveDate: 'date', levelHintShown: 'string',
+    favorites: 'ids' // избранные выражения (id из словаря), новые — в начале
   };
   function sanitizeMeta(key, value) {
     var t = META_TYPES[key];
@@ -302,6 +303,10 @@
       if (!isNum(value)) return undefined;
       if (key === 'skill') return Math.min(2, Math.max(-2, value));
       return Math.max(0, value);
+    }
+    if (t === 'ids') {
+      if (!Array.isArray(value)) return undefined;
+      return value.filter(function (id, i) { return isStr(id) && id.length <= 200 && value.indexOf(id) === i; }).slice(0, 2000);
     }
     if (t === 'date') return typeof value === 'string' && (value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value)) ? value : undefined;
     return typeof value === 'string' ? value.slice(0, 40) : undefined;

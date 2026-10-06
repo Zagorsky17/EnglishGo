@@ -63,6 +63,11 @@
       }
       S.cards.delete(oldId);
     });
+    if (S.meta.favorites.some(function (id) { return aliases[id]; })) {
+      var fav = S.meta.favorites.map(function (id) { return aliases[id] || id; })
+        .filter(function (id, i, a) { return a.indexOf(id) === i; });
+      S.setMeta('favorites', fav).catch(noop);
+    }
     // карточки без контента не показываем (в базе оставляем — контент может вернуться)
     S.cards.forEach(function (c, id) { if (!EG.data.byId[id]) S.cards.delete(id); });
     if (EG.data.wordsById) S.words.forEach(function (w, id) { if (!EG.data.wordsById[id]) S.words.delete(id); });
@@ -93,7 +98,7 @@
     games: new Map(),
     chats: new Map(),
     words: new Map(), // прогресс тренажёра «Словарный запас»
-    meta: Object.assign({}, META_DEFAULTS),
+    meta: Object.assign({}, META_DEFAULTS, { favorites: [] }),
     recent: [], // последние ответы {correct, ts}
 
     load: function () {
@@ -107,7 +112,7 @@
         S.games = new Map(r[6].map(function (g) { return [g.id, g]; }));
         S.chats = new Map(r[7].map(function (c) { return [c.id, c]; }));
         S.words = new Map(r[8].map(function (w) { return [w.id, w]; }));
-        S.meta = Object.assign({}, META_DEFAULTS);
+        S.meta = Object.assign({}, META_DEFAULTS, { favorites: [] });
         S.hasUndoImport = false;
         r[5].forEach(function (m) {
           if (m.key === 'preImportBackup') { S.hasUndoImport = true; return; } // большую копию в памяти не держим
@@ -126,6 +131,15 @@
     setMeta: function (key, value) {
       S.meta[key] = value;
       return EG.db.put('meta', { key: key, value: value });
+    },
+
+    /* избранные выражения (звёздочка в карточке) — хранятся в meta.favorites */
+    isFavorite: function (id) { return S.meta.favorites.indexOf(id) >= 0; },
+    setFavorite: function (id, on) {
+      var rest = S.meta.favorites.filter(function (x) { return x !== id; });
+      var p = S.setMeta('favorites', on ? [id].concat(rest) : rest);
+      EG.bus.emit('favorites', { id: id, on: !!on });
+      return p;
     },
 
     saveCard: function (card) { S.cards.set(card.id, card); return EG.db.put('cards', card); },

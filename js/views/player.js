@@ -134,7 +134,8 @@
       stage.replaceChildren();
       if (!r) { idx++; return next(); }
       var node = r(ex);
-      stage.appendChild(h('div', { class: 'card ex-card ex-' + ex.type + ' enter' }, node));
+      var fav = ex.item && EG.data.byId[ex.item.id] ? EG.ui.favBtn(ex.item.id, true) : null;
+      stage.appendChild(h('div', { class: 'card ex-card ex-' + ex.type + (fav ? ' has-fav' : '') + ' enter' }, fav, node));
       shownAt = Date.now();
       var f = stage.querySelector('[data-autofocus]');
       if (f) setTimeout(function () { f.focus(); }, 30);
