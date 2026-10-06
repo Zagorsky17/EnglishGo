@@ -6,6 +6,7 @@
   // group — блок меню: между блоками рисуется разделитель (учёба · грамматика · неправильные глаголы · остальное)
   var ROUTES = [
     { path: 'home',      title: 'Главная',        icon: 'home',      nav: 'main', group: 'home' },
+    { path: 'favorites', title: 'Избранное',      icon: 'star',      nav: 'side', group: 'home' },
     { path: 'today',     title: 'Учить сегодня',  short: 'Сегодня', icon: 'today', nav: 'main', group: 'learn' },
     { path: 'vocab',     title: 'Словарный запас', short: 'Слова',  icon: 'vocab', nav: 'main', group: 'learn' },
     { path: 'chats',     title: 'Чаты',           icon: 'chat',      nav: 'main', group: 'learn' },
@@ -18,7 +19,7 @@
     { path: 'gtoday',    title: 'Грамматика сегодня', short: 'Грамм. сегодня', icon: 'bolt', nav: 'side', group: 'grammar' }, // изолированный модуль gtoday/
     { path: 'tenses',    title: 'Таблица времён', icon: 'target',    nav: 'side', group: 'grammar' }, // изолированный модуль tenses/
     { path: 'iverbs',    title: 'Неправильные глаголы сегодня', icon: 'flame', nav: 'side', group: 'verbs' }, // изолированный модуль irregular/
-    { path: 'irregular', title: 'Неправильные глаголы', icon: 'star', nav: 'side', group: 'verbs' }, // изолированный модуль irregular/
+    { path: 'irregular', title: 'Неправильные глаголы', icon: 'table', nav: 'side', group: 'verbs' }, // изолированный модуль irregular/
     { path: 'words',     title: 'Выражения',      icon: 'words',     nav: 'side', group: 'more' },
     { path: 'mistakes',  title: 'Ошибки',         icon: 'mistakes',  nav: 'side', group: 'more' },
     { path: 'progress',  title: 'Прогресс',       icon: 'progress',  nav: 'side', group: 'more' },

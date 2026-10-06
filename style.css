@@ -348,7 +348,17 @@ a.tile:hover { border-color: var(--accent); }
 .player-top { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
 .player-top .bar { flex: 1; }
 .player-title { text-align: center; margin-bottom: 10px; }
-.ex-card { padding: 24px; }
+.ex-card { padding: 24px; position: relative; }
+.ex-card > .fav-btn { position: absolute; top: 14px; right: 14px; }
+.ex-card.has-fav .ex-label { padding-right: 36px; }
+.fav-btn.on { color: var(--warn); border-color: var(--warn); }
+.fav-btn.on svg { fill: currentColor; }
+.fav-list { display: flex; flex-direction: column; gap: 10px; }
+.fav-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; background: var(--surface-2); }
+.fav-main { flex: 1; min-width: 0; }
+.fav-main .item-line { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; }
+.fav-main .example, .fav-main .usage { margin: 6px 0 0; }
+.fav-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .enter { animation: fadeUp .25s ease; }
 .ex-label { display: flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); margin-bottom: 12px; }
 .ex-label .ic { width: 16px; height: 16px; }
