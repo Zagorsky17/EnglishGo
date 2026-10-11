@@ -240,6 +240,26 @@
     return b;
   }
 
+  /** Звёздочка «В избранные выражения» для произвольной фразы {en, ru, ask, askRu} (ответы в чатах и «Разговоре»). */
+  function phraseFavBtn(phrase, small) {
+    var b = h('button', { class: 'icon-btn fav-btn' + (small ? ' sm' : ''), type: 'button', onclick: function (e) {
+      e.stopPropagation();
+      var on = !EG.state.isFavPhrase(phrase.en);
+      EG.state.setFavPhrase(phrase, on).catch(function () { /* ошибка уже показана через db-error */ });
+      sync();
+      toast(on ? 'Добавлено в избранные выражения' : 'Убрано из избранных выражений', on ? 'good' : undefined);
+    } }, icon('star'));
+    function sync() {
+      var on = EG.state.isFavPhrase(phrase.en);
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', String(on));
+      b.title = on ? 'Убрать из избранных выражений' : 'Добавить в избранные выражения';
+      b.setAttribute('aria-label', b.title + ': «' + phrase.en + '»');
+    }
+    sync();
+    return b;
+  }
+
   /* ---------- визуальные компоненты ---------- */
   /** SVG-элемент без innerHTML: значения попадают только в атрибуты и текстовые узлы. */
   function svg(tag, attrs, children) {
@@ -375,7 +395,7 @@
   EG.ui = {
     answerLines: answerLines,
     h: h, fill: fill, icon: icon, toast: toast, modal: modal, confirm: confirmDialog,
-    speak: speak, autoSpeak: autoSpeak, stopSpeech: stopSpeech, canSpeak: canSpeak, speakBtn: speakBtn, favBtn: favBtn,
+    speak: speak, autoSpeak: autoSpeak, stopSpeech: stopSpeech, canSpeak: canSpeak, speakBtn: speakBtn, favBtn: favBtn, phraseFavBtn: phraseFavBtn,
     voices: function () { return allVoices; },
     usableVoices: usableVoices,
     ring: ring, bar: bar, barChart: barChart, levelBadge: levelBadge, registerBadge: registerBadge,

@@ -83,6 +83,8 @@
     });
   }
 
+  function phraseKey(en) { return String(en || '').trim().toLowerCase().replace(/\s+/g, ' '); }
+
   /* ---------- состояние ---------- */
   var META_DEFAULTS = {
     totalXp: 0, streak: 0, bestStreak: 0, lastActiveDate: '', skill: 0,
@@ -98,7 +100,7 @@
     games: new Map(),
     chats: new Map(),
     words: new Map(), // прогресс тренажёра «Словарный запас»
-    meta: Object.assign({}, META_DEFAULTS, { favorites: [] }),
+    meta: Object.assign({}, META_DEFAULTS, { favorites: [], favPhrases: [] }),
     recent: [], // последние ответы {correct, ts}
 
     load: function () {
@@ -112,7 +114,7 @@
         S.games = new Map(r[6].map(function (g) { return [g.id, g]; }));
         S.chats = new Map(r[7].map(function (c) { return [c.id, c]; }));
         S.words = new Map(r[8].map(function (w) { return [w.id, w]; }));
-        S.meta = Object.assign({}, META_DEFAULTS, { favorites: [] });
+        S.meta = Object.assign({}, META_DEFAULTS, { favorites: [], favPhrases: [] });
         S.hasUndoImport = false;
         r[5].forEach(function (m) {
           if (m.key === 'preImportBackup') { S.hasUndoImport = true; return; } // большую копию в памяти не держим
@@ -139,6 +141,19 @@
       var rest = S.meta.favorites.filter(function (x) { return x !== id; });
       var p = S.setMeta('favorites', on ? [id].concat(rest) : rest);
       EG.bus.emit('favorites', { id: id, on: !!on });
+      return p;
+    },
+    /* избранные ответы из чатов и «Разговора» (не из словаря) — meta.favPhrases, ключ — текст без регистра */
+    isFavPhrase: function (en) {
+      var k = phraseKey(en);
+      return S.meta.favPhrases.some(function (p) { return phraseKey(p.en) === k; });
+    },
+    setFavPhrase: function (phrase, on) {
+      var k = phraseKey(phrase.en);
+      var rest = S.meta.favPhrases.filter(function (p) { return phraseKey(p.en) !== k; });
+      var rec = { en: phrase.en.trim(), ru: phrase.ru || '', ask: phrase.ask || '', askRu: phrase.askRu || '', ts: Date.now() };
+      var p = S.setMeta('favPhrases', on ? [rec].concat(rest) : rest);
+      EG.bus.emit('favorites', { phrase: phrase.en, on: !!on });
       return p;
     },
 
