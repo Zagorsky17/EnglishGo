@@ -294,7 +294,8 @@
   var META_TYPES = {
     totalXp: 'number', streak: 'number', bestStreak: 'number', skill: 'number', totalAnswers: 'number',
     totalCorrect: 'number', createdAt: 'number', lastExportTs: 'number', lastActiveDate: 'date', levelHintShown: 'string',
-    favorites: 'ids' // избранные выражения (id из словаря), новые — в начале
+    favorites: 'ids', // избранные выражения (id из словаря), новые — в начале
+    favPhrases: 'phrases' // избранные ответы из чатов и «Разговора»: [{en, ru, ask, askRu, ts}], новые — в начале
   };
   function sanitizeMeta(key, value) {
     var t = META_TYPES[key];
@@ -307,6 +308,19 @@
     if (t === 'ids') {
       if (!Array.isArray(value)) return undefined;
       return value.filter(function (id, i) { return isStr(id) && id.length <= 200 && value.indexOf(id) === i; }).slice(0, 2000);
+    }
+    if (t === 'phrases') {
+      if (!Array.isArray(value)) return undefined;
+      var seen = Object.create(null);
+      return value.filter(function (p) {
+        if (!p || !isStr(p.en) || p.en.length > 300) return false;
+        var k = p.en.trim().toLowerCase();
+        if (seen[k]) return false;
+        seen[k] = true;
+        return true;
+      }).slice(0, 2000).map(function (p) {
+        return { en: p.en.trim(), ru: str(p.ru, 300), ask: str(p.ask, 300), askRu: str(p.askRu, 300), ts: num(p.ts, 0) };
+      });
     }
     if (t === 'date') return typeof value === 'string' && (value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value)) ? value : undefined;
     return typeof value === 'string' ? value.slice(0, 40) : undefined;

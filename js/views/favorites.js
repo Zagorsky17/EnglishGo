@@ -26,6 +26,8 @@
 
     var listEl = h('div', { class: 'fav-list' });
     var countEl = h('p', { class: 'muted small' });
+    var phraseListEl = h('div', { class: 'fav-list' });
+    var phraseCountEl = h('p', { class: 'muted small' });
     var trainBtn = h('a', { class: 'btn primary', href: '#/favorites/train' }, 'Тренировать', icon('arrow'));
 
     function remove(it) {
@@ -47,6 +49,34 @@
             onclick: function () { remove(it); } }, icon('trash'))));
     }
 
+    function removePhrase(p) {
+      EG.state.setFavPhrase(p, false).catch(function () { /* ошибка уже показана через db-error */ });
+      EG.ui.toast('Убрано из избранных выражений');
+      drawPhrases();
+    }
+
+    function phraseRow(p) {
+      return h('div', { class: 'fav-item' },
+        h('div', { class: 'fav-main' },
+          h('div', { class: 'item-line' }, h('strong', { lang: 'en' }, p.en), EG.ui.speakBtn(p.en, true), p.ru ? h('span', { class: 'muted' }, '— ' + p.ru) : null),
+          p.ask ? h('p', { class: 'muted small' }, 'Ответ на: ', h('span', { lang: 'en' }, p.ask), p.askRu ? ' — ' + p.askRu : '') : null),
+        h('div', { class: 'fav-actions' },
+          h('button', { class: 'icon-btn sm', type: 'button', title: 'Удалить из избранных выражений', 'aria-label': 'Удалить из избранных выражений «' + p.en + '»',
+            onclick: function () { removePhrase(p); } }, icon('trash'))));
+    }
+
+    function drawPhrases() {
+      var list = EG.state.meta.favPhrases;
+      phraseCountEl.textContent = list.length ? list.length + ' ' + EG.util.plural(list.length, 'выражение', 'выражения', 'выражений') : '';
+      if (!list.length) {
+        phraseListEl.replaceChildren(EG.ui.empty('star', 'Здесь пока пусто',
+          'В разборе ответа в «Чатах» или «Разговоре» нажмите звёздочку рядом с естественным вариантом — он появится здесь.',
+          h('a', { class: 'btn', href: '#/chats' }, 'Чаты', icon('arrow'))));
+        return;
+      }
+      phraseListEl.replaceChildren.apply(phraseListEl, list.map(phraseRow));
+    }
+
     function draw() {
       var items = favItems();
       countEl.textContent = items.length ? items.length + ' ' + EG.util.plural(items.length, 'выражение', 'выражения', 'выражений') : '';
@@ -60,9 +90,12 @@
       listEl.replaceChildren.apply(listEl, items.map(row));
     }
     draw();
+    drawPhrases();
 
     root.append(
       EG.ui.pageHead('Избранное', 'Выражения, отмеченные звёздочкой. Можно посмотреть, послушать и потренировать их отдельно.', trainBtn),
-      h('section', { class: 'card' }, countEl, listEl));
+      h('section', { class: 'card' }, h('h2', null, 'Фразы из уроков'), countEl, listEl),
+      h('section', { class: 'card' }, h('h2', null, 'Избранные выражения'),
+        h('p', { class: 'muted small' }, 'Естественные ответы из «Чатов» и «Разговора».'), phraseCountEl, phraseListEl));
   };
 })(window.EG = window.EG || {});

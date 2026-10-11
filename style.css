@@ -458,6 +458,9 @@ button.chip:hover:not(:disabled) { border-color: var(--accent); }
 .metric-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
 .better { background: var(--surface); border-radius: 12px; padding: 10px 12px; margin: 10px 0; }
 .better-line { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; margin-top: 2px; }
+.better-line .fav-btn { margin-left: auto; }
+.alts li { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; margin: 2px 0; }
+.alts li .fav-btn { margin-left: auto; }
 .explain { margin: 10px 0 0; }
 .explain p { margin: 2px 0 0; }
 .alts { margin-top: 10px; font-size: .92rem; }

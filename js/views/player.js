@@ -16,6 +16,7 @@
     var nat = ev.naturalness || 0;
     var better = turn.better || (turn.accepted[0] && turn.accepted[0].t);
     var learn = EG.dialogue.learnIds(turn);
+    function star(en, ru) { return EG.ui.phraseFavBtn({ en: en, ru: ru, ask: turn.npc, askRu: turn.npcRu }, true); }
 
     var box = h('div', { class: 'feedback turn-fb ' + tone },
       h('div', { class: 'fb-head' },
@@ -33,13 +34,15 @@
       ev.note ? h('p', { class: 'fb-note' }, icon('bulb'), ev.note) : null,
       better ? h('div', { class: 'better' },
         h('span', { class: 'metric-label' }, ev.verdict === 'great' ? 'Так говорят носители' : 'Более естественный вариант'),
-        h('div', { class: 'better-line' }, h('strong', null, better), EG.ui.speakBtn(better, true)),
+        h('div', { class: 'better-line' }, h('strong', { lang: 'en' }, better), EG.ui.speakBtn(better, true), star(better, turn.betterRu)),
         turn.betterRu ? h('p', { class: 'muted' }, turn.betterRu) : null
       ) : null,
       turn.npc ? EG.ui.answerLines({ ask: turn.npc, askRu: turn.npcRu, user: opts.user, userRu: '' }) : null,
       turn.explain ? h('div', { class: 'explain' }, h('span', { class: 'metric-label' }, 'Почему так'), h('p', null, turn.explain)) : null,
       turn.accepted.length > 1 ? h('details', { class: 'alts' }, h('summary', null, 'Другие естественные варианты'),
-        h('ul', null, turn.accepted.slice(0, 5).map(function (a) { return h('li', null, a.t, h('span', { class: 'muted small' }, ' · ' + a.n + '%')); }))) : null,
+        h('ul', null, turn.accepted.slice(0, 5).map(function (a) {
+          return h('li', null, h('span', { lang: 'en' }, a.t), h('span', { class: 'muted small' }, ' · ' + a.n + '%'), EG.ui.speakBtn(a.t, true), star(a.t, a.t === better ? turn.betterRu : ''));
+        }))) : null,
       learn.length ? h('div', { class: 'learn-list' },
         h('span', { class: 'metric-label' }, 'Новые выражения'),
         h('div', { class: 'chips' }, learn.map(function (id) {
