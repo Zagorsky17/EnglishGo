@@ -399,7 +399,7 @@
   }
 
   /** Выбрать подходящий тип упражнения по стадии карточки (от узнавания к активному использованию). */
-  function forItem(item, card) {
+  function forItem(item, card, skip) {
     var stage = !card ? 0 : card.state === 'new' ? 0 : card.state === 'learning' ? 1 : card.state === 'review' ? 2 : 3;
     var hard = card && card.difficulty > 0.5;
     var high = U.levelIndex(item.level) >= 2;
@@ -409,7 +409,7 @@
       ['recall', 'reaction', 'build', 'context', high ? 'dictation' : 'listen', 'slangify', 'formalize', 'texting'],
       ['recall', 'reaction', 'recall', high ? 'dictation' : 'build', 'texting', 'slangify']
     ];
-    var pool = pools[hard ? Math.max(0, stage - 1) : stage].slice();
+    var pool = pools[hard ? Math.max(0, stage - 1) : stage].filter(function (t) { return !skip || skip.indexOf(t) < 0; });
     pool = U.shuffle(pool);
     for (var i = 0; i < pool.length; i++) {
       var ex = make(pool[i], item);
@@ -418,8 +418,9 @@
     return make('meaning', item);
   }
 
-  /** Сессия для новых выражений: знакомство + упражнение на узнавание. */
-  function forNew(items) {
+  /** Сессия для новых выражений: знакомство + упражнение на узнавание. skip — типы, которые не использовать. */
+  function forNew(items, skip) {
+    var noBuild = skip && skip.indexOf('build') >= 0;
     var out = [];
     items.forEach(function (item) {
       out.push(make('intro', item));
@@ -429,7 +430,7 @@
     });
     // второй проход — активное воспроизведение
     U.shuffle(items).forEach(function (item) {
-      out.push(make('reaction', item) || make('build', item) || make('recall', item));
+      out.push(make('reaction', item) || (!noBuild && make('build', item)) || make('recall', item));
     });
     return out;
   }
@@ -449,13 +450,13 @@
     return out;
   }
 
-  /** Сессия повторения: смесь карточек и упражнений. */
-  function forReview(cards) {
+  /** Сессия повторения: смесь карточек и упражнений. skip — типы, которые не использовать. */
+  function forReview(cards, skip) {
     return cards.map(function (c) {
       var item = EG.data.byId[c.id];
       if (!item) return null;
       if (c.state === 'new') return make('intro', item);
-      return Math.random() < 0.35 ? { type: 'flash', item: item } : forItem(item, c);
+      return Math.random() < 0.35 ? { type: 'flash', item: item } : forItem(item, c, skip);
     }).filter(Boolean);
   }
 
