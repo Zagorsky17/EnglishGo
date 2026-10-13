@@ -75,7 +75,9 @@
 
   EG.views.session = function (root) {
     var p = planToday();
-    var exercises = EG.exercises.forReview(p.due).concat(EG.exercises.forNew(p.fresh));
+    // «Собери фразу» в ежедневной сессии не используем
+    var skip = ['build'];
+    var exercises = EG.exercises.forReview(p.due, skip).concat(EG.exercises.forNew(p.fresh, skip));
     if (!exercises.length) {
       root.append(EG.ui.empty('check', 'На сегодня всё!', 'Повторений нет, а лимит новых выражений исчерпан. Можно пройти урок или разговор.',
         h('a', { class: 'btn primary', href: '#/talk' }, 'К разговору')));
