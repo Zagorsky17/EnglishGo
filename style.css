@@ -353,6 +353,13 @@ a.tile:hover { border-color: var(--accent); }
 .ex-card.has-fav .ex-label { padding-right: 36px; }
 .fav-btn.on { color: var(--warn); border-color: var(--warn); }
 .fav-btn.on svg { fill: currentColor; }
+.conf-row { margin-top: 16px; display: flex; justify-content: flex-end; }
+.conf-btn { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 4px 0; color: var(--muted); font: inherit; font-size: .88rem; cursor: pointer; }
+.conf-btn:hover:not(:disabled) { color: var(--text); }
+.conf-btn:disabled { cursor: default; opacity: .6; }
+.conf-box { width: 16px; height: 16px; border: 1.5px solid currentColor; border-radius: 4px; flex: none; }
+.conf-btn.on { color: var(--warn); }
+.conf-btn.on .conf-box { background: currentColor; box-shadow: inset 0 0 0 3px var(--surface); }
 .fav-list { display: flex; flex-direction: column; gap: 10px; }
 .fav-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; background: var(--surface-2); }
 .fav-main { flex: 1; min-width: 0; }

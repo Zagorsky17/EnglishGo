@@ -5,6 +5,8 @@
   var h = EG.ui.h, icon = EG.ui.icon;
   EG.views = EG.views || {};
 
+  // Упражнения, где можно отметить «Отвечаю наугад» (без знакомства, самооценки и свободных реплик)
+  var NO_CONF = { intro: 1, flash: 1, turn: 1, dlgnode: 1 };
   var EXPECTED_MS = { context: 8000, meaning: 7000, listen: 9000, register: 7000, recall: 14000, dictation: 15000, build: 16000, turn: 20000, dlgnode: 9000, slangify: 7000, formalize: 7000, decode: 8000, texting: 14000 };
 
   /** Разбор ответа в режиме «Разговор» (используется и в talk.js). */
@@ -82,6 +84,7 @@
     opts = opts || {};
     list = list.filter(Boolean);
     var idx = 0, locked = false, shownAt = 0, keyHandler = null;
+    var confBtn = null, guess = false;   // оценка уверенности для текущего задания
     var timers = [];
     var graded = {};
     var results = { correct: 0, wrong: 0, xp: 0 };
@@ -101,6 +104,8 @@
     root.replaceChildren(wrap);
 
     function onKey(e) {
+      // «0» — переключить «Отвечаю наугад» (кроме ввода текста)
+      if (e.key === '0' && confBtn && !locked && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); toggleGuess(); return; }
       if (keyHandler && !e.defaultPrevented && !e.metaKey && !e.ctrlKey && !e.altKey) keyHandler(e);
     }
     document.addEventListener('keydown', onKey);
@@ -124,11 +129,22 @@
       counter.textContent = Math.min(idx + 1, list.length) + ' / ' + list.length;
     }
 
+    function toggleGuess() {
+      guess = !guess;
+      confBtn.classList.toggle('on', guess);
+      confBtn.setAttribute('aria-pressed', String(guess));
+    }
+
+    /** Оценка уверенности: только для заданий, которые двигают расписание SRS. */
+    function canConf(ex) { return !!(ex.item && !ex.noSrs && !NO_CONF[ex.type]); }
+
     function next() {
       clearTimers();
       EG.ui.stopSpeech();
       locked = false;
       keyHandler = null;
+      guess = false;
+      confBtn = null;
       foot.replaceChildren();
       if (idx >= list.length) return finish();
       updateProgress();
@@ -138,7 +154,12 @@
       if (!r) { idx++; return next(); }
       var node = r(ex);
       var fav = ex.item && EG.data.byId[ex.item.id] ? EG.ui.favBtn(ex.item.id, true) : null;
-      stage.appendChild(h('div', { class: 'card ex-card ex-' + ex.type + (fav ? ' has-fav' : '') + ' enter' }, fav, node));
+      if (canConf(ex)) {
+        confBtn = h('button', { class: 'conf-btn', type: 'button', 'aria-pressed': 'false', title: 'Отметьте до ответа, если не уверены (клавиша 0)', onclick: toggleGuess },
+          h('span', { class: 'conf-box' }), 'Отвечаю наугад');
+      }
+      stage.appendChild(h('div', { class: 'card ex-card ex-' + ex.type + (fav ? ' has-fav' : '') + ' enter' }, fav, node,
+        confBtn ? h('div', { class: 'conf-row' }, confBtn) : null));
       shownAt = Date.now();
       var f = stage.querySelector('[data-autofocus]');
       if (f) setTimeout(function () { f.focus(); }, 30);
@@ -156,6 +177,11 @@
       var item = ex.item;
       var itemId = ex.itemId || (item && item.id);
       var tasks = [];
+      // гиперкоррекция: уверенная ошибка запоминается лучше, если разобрать её сразу
+      var conf = canConf(ex);
+      if (confBtn) confBtn.disabled = true;
+      res.guessed = conf && guess && res.correct && !res.partial;
+      res.confidentErr = conf && !guess && !res.correct && !res.partial && !res.dunno && !res.timeout;
 
       tasks.push(EG.progress.recordAnswer({
         itemId: itemId, type: ex.type, correct: res.correct, partial: res.partial,
@@ -165,6 +191,8 @@
 
       if (item && !ex.noSrs) {
         var q = EG.srs.qualityFromAnswer(res.correct, ms, expected(ex), res.partial);
+        // верно, но наугад — интервал растёт осторожно
+        if (res.guessed) q = Math.min(q, EG.srs.QUALITY.HARD);
         // в одной сессии учитываем первый ответ; последующие — только ошибки
         if (!graded[item.id] || q === 0) {
           graded[item.id] = true;
@@ -177,7 +205,9 @@
       // ошибку повторяем в конце сессии (retrieval practice)
       if (!res.correct && !ex.retry) {
         var again = item && ex.kind !== 'turn' && ex.kind !== 'dlg' ? (EG.exercises.make(ex.type, item) || ex) : ex;
-        list.push(Object.assign({}, again, { retry: true, timeMs: ex.timeMs ? Math.round(ex.timeMs * 1.3) : undefined }));
+        var retry = Object.assign({}, again, { retry: true, timeMs: ex.timeMs ? Math.round(ex.timeMs * 1.3) : undefined });
+        // уверенную ошибку возвращаем через два задания, остальные — в конце сессии
+        if (res.confidentErr) list.splice(Math.min(list.length, idx + 3), 0, retry); else list.push(retry);
       }
 
       return Promise.all(tasks).then(function (r) {
@@ -211,6 +241,8 @@
             user: res.userAnswer && (!res.correct || res.partial) && !res.timeout ? res.userAnswer : '', userRu: res.userRu
           }) : null,
           res.note ? h('p', { class: 'fb-note' }, icon('bulb'), res.note) : null,
+          res.guessed ? h('p', { class: 'fb-note' }, icon('bulb'), 'Ответ наугад — фраза вернётся раньше обычного.') : null,
+          res.confidentErr ? h('p', { class: 'fb-note' }, icon('bulb'), 'Уверенная ошибка — сравните с правильным ответом. Задание вернётся через пару карточек.') : null,
           ex.type === 'dlgnode' ? null : itemInfo(ex.item, true)
         );
       }
@@ -261,7 +293,7 @@
         input.disabled = true;
         check(v);
       }
-      function giveUp() { if (locked) return; input.disabled = true; answered(ex, { correct: false, userAnswer: input.value.trim() || '(не знаю)', showAnswer: true }); }
+      function giveUp() { if (locked) return; input.disabled = true; answered(ex, { correct: false, userAnswer: input.value.trim() || '(не знаю)', showAnswer: true, dunno: true }); }
       function hint() {
         hintLevel++;
         var a = ex.answer;
