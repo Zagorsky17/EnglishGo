@@ -217,6 +217,9 @@
     // слова из текстов раздела «Чтение»
     ['B1', 'n', 'loneliness|одиночество; experiment|эксперимент, опыт; smartphone|смартфон; notification|уведомление; grammar|грамматика; textbook|учебник; repetition|повторение; podcast|подкаст; subtitles|субтитры; traveller|путешественник; producer|производитель; rhythm|ритм; concentration|концентрация, сосредоточенность; caffeine|кофеин; daylight|дневной свет; movement|движение; zone|зона; pavement|тротуар; stream|ручей, поток; follower|подписчик, последователь; psychologist|психолог; logo|логотип; supporter|сторонник, болельщик; rating|рейтинг, оценка; courier|курьер; minimum|минимум; crisis|кризис; popularity|популярность; nation|нация, народ; designer|дизайнер; element|элемент; administrator|администратор; net|сеть (сетка); researcher|исследователь; shopper|покупатель; selection|выбор, подборка; lawn|газон; nest|гнездо; corridor|коридор; meadow|луг; factor|фактор; laziness|лень; friendship|дружба'],
     ['B1', 'v', 'chop|рубить, нарезать; commute|ездить на работу; scroll|прокручивать, листать; tend|иметь тенденцию, быть склонным; vary|различаться, меняться; click|щёлкать, нажимать; define|определять'],
-    ['B1', 'a', 'unfamiliar|незнакомый; fried|жареный; hybrid|гибридный, смешанный; irregular|нерегулярный, неправильный; everyday|повседневный; unsuccessful|неудачный; educated|образованный; psychological|психологический; industrial|промышленный; classic|классический; additional|дополнительный; sleepless|бессонный; occupied|занятый']
+    ['B1', 'a', 'unfamiliar|незнакомый; fried|жареный; hybrid|гибридный, смешанный; irregular|нерегулярный, неправильный; everyday|повседневный; unsuccessful|неудачный; educated|образованный; psychological|психологический; industrial|промышленный; classic|классический; additional|дополнительный; sleepless|бессонный; occupied|занятый'],
+    ['B1', 'n', 'hut|хижина; sample|проба, образец для анализа; lab|лаборатория; drug|препарат, наркотик'],
+    ['B1', 'v', 'leak|протекать, просачиваться'],
+    ['B1', 'a', 'unsure|не уверенный, сомневающийся']
   );
 })(window.EG = window.EG || {});

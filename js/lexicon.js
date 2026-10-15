@@ -25,7 +25,8 @@
       'further,furthest,farther,farthest:far; its:it; me,my,mine:i; him,his:he; her,hers:she; us,our,ours:we; them,their:they; ' +
       "don't:do; doesn't:do; didn't:do; can't:can; isn't:be; aren't:be; wasn't:be; weren't:be; i'm:be; you're:be; " +
       "we're:be; they're:be; it's:be; that's:be; there's:there is; haven't:have; hasn't:have; i've:have; we've:have; " +
-      "hadn't:have; i'd:would; couldn't:could; shouldn't:should; wouldn't:would";
+      "hadn't:have; i'd:would; couldn't:could; shouldn't:should; wouldn't:would; " +
+      "you've,they've,who've:have; you'd,we'd,they'd,he'd,she'd:would; lying:lie; dying:die; tying:tie";
     var out = Object.create(null);
     src.split(';').forEach(function (grp) {
       var p = grp.split(':');
@@ -52,14 +53,15 @@
     was: 'был, была, было (форма be)', were: 'были (форма be)', been: 'был (причастие от be)', 'let\'s': 'давай(те)',
     will: 'будет (вспомогательный глагол будущего времени)', won: 'выиграл (форма win)',
     "won't": 'will not — не будет, не стану (отрицание будущего времени)',
-    bit: 'a bit — немного, чуть-чуть; a bit of — кусочек; также прошедшее время от bite (кусать)'
+    bit: 'a bit — немного, чуть-чуть; a bit of — кусочек; также прошедшее время от bite (кусать)',
+    please: 'пожалуйста', ok: 'хорошо, ладно', oh: 'о!, ой! (междометие)', hey: 'эй!', ha: 'ха! (смех)', dr: 'Dr — доктор (перед фамилией)'
   };
   // устойчивые сочетания, в которых слово теряет словарное значение (of course — не «курс»)
   var IDIOMS = {
     'of course': 'конечно', 'a bit': 'немного, чуть-чуть', 'a lot': 'много, очень', 'at all': 'вообще, совсем',
     'at least': 'по крайней мере', 'after all': 'всё-таки, в конце концов', 'in fact': 'на самом деле',
     'by the way': 'кстати', 'at the moment': 'сейчас, в данный момент', 'as well': 'тоже, также',
-    'so far': 'пока что, до сих пор', 'for good': 'навсегда', 'all the time': 'постоянно, всё время'
+    'so far': 'пока что, до сих пор', 'for good': 'навсегда', 'all the time': 'постоянно, всё время', 'lots of': 'много'
   };
 
   // I'll, we'll, it'll… — сокращённое will, а не существительное will (воля) из словаря
