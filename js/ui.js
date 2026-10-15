@@ -69,6 +69,7 @@
     smile: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><path d="M9 9.5h.01M15 9.5h.01"/>',
     help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4"/><path d="M12 17h.01"/>',
     vocab: '<rect x="3" y="7" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/><path d="M7 12h6M7 16h4"/>',
+    convo: '<path d="M3 5c2.5-.8 5-.8 7.5.6V20c-2.5-1.4-5-1.4-7.5-.6z"/><path d="M13 4h8v7h-4l-3 2.5V11h-1z"/><path d="M13.5 15.5H21M13.5 19H19"/>',
     book: '<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/>',
     grammar: '<path d="M4 20l5-14h2l5 14"/><path d="M6.5 14h7"/><path d="M17 9h4M17 13h4M17 17h3"/>',
     table: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/>',

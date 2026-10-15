@@ -16,7 +16,7 @@ const ctx = {
 };
 ctx.window = ctx;
 vm.createContext(ctx);
-const files = ['data/vocabulary.js', 'data/registers.js', 'data/dialogues.js', 'data/dialogues-more.js', 'data/talks.js', 'data/stories.js', 'data/chats.js', 'data/chats-more.js', 'data/chats-extra.js', 'data/lessons.js', 'data/words/a1.js', 'data/words/a2.js', 'data/words/b1.js', 'data/words/b2.js', 'data/words/c1.js', 'data/wordbank.js', 'data/texts.js', 'js/storage.js', 'js/database.js', 'js/state.js', 'js/srs.js', 'js/progress.js', 'js/exercises.js', 'js/dialogues.js', 'js/chat.js', 'js/games.js', 'js/wordtrainer.js', 'js/lexicon.js'];
+const files = ['data/vocabulary.js', 'data/registers.js', 'data/dialogues.js', 'data/dialogues-more.js', 'data/talks.js', 'data/stories.js', 'data/chats.js', 'data/chats-more.js', 'data/chats-extra.js', 'data/lessons.js', 'data/words/a1.js', 'data/words/a2.js', 'data/words/b1.js', 'data/words/b2.js', 'data/words/c1.js', 'data/wordbank.js', 'data/texts.js', 'data/convos.js', 'js/storage.js', 'js/database.js', 'js/state.js', 'js/srs.js', 'js/progress.js', 'js/exercises.js', 'js/dialogues.js', 'js/chat.js', 'js/games.js', 'js/wordtrainer.js', 'js/lexicon.js'];
 const warns=[]; const ow=console.warn; console.warn=(...a)=>{warns.push(a.join(' '));};
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx, { filename: f });
 const EG = ctx.EG;
@@ -178,6 +178,53 @@ console.log('  exercise availability:', JSON.stringify(cnt));
   const toks = 'I was looking for my keys in front of the house'.split(' ');
   const ph = EG.lexicon.phraseAt(toks, 3).map(w => w.en);
   if (!ph.includes('look for')) err('phraseAt look for', ph.join(','));
+}
+// чтение диалогов: реплики, заметки о временах и глоссарий встречаются в диалоге, вопросы, порядок уровней
+{
+  const ids = new Set(EG.data.texts.map(t => t.id));
+  let prevLevel = 0, tokens = 0, known = 0;
+  const grams = new Set();
+  for (const c of EG.data.convos) {
+    if (ids.has(c.id)) err('convo dup id', c.id); ids.add(c.id);
+    if (!EG.LEVELS.includes(c.level)) err('convo level', c.id);
+    const li = EG.LEVELS.indexOf(c.level);
+    if (li < prevLevel) err('convo order: уровни должны идти по возрастанию', c.id); prevLevel = li;
+    if (!EG.data.textTopics[c.topic]) err('convo topic', c.id, c.topic);
+    if (!c.setting || !c.settingRu || /[а-яё]/i.test(c.setting)) err('convo setting', c.id);
+    if (c.lines.length < 8 || !c.questions.length) err('convo too short', c.id);
+    if (new Set(c.lines.map(l => l.who)).size < 2) err('convo speakers', c.id);
+    c.lines.forEach((l, i) => {
+      if (!l.who || !l.en || !l.ru) err('convo line', c.id, i);
+      if (/[а-яё]/i.test(l.en)) err('convo line not in English', c.id, i);
+      if (!/[а-яё]/i.test(l.ru)) err('convo line translation', c.id, i);
+    });
+    // выражение должно целиком стоять в одной реплике — подсветка в попапе ищет его внутри реплики
+    const lows = c.lines.map(l => l.en.toLowerCase().replace(/’/g, "'"));
+    const inLine = ph => lows.some(x => x.indexOf(ph.toLowerCase()) >= 0);
+    c.glossary.forEach(g => { if (!inLine(g[0])) err('convo glossary not in dialogue', c.id, g[0]); });
+    if (c.notes.length < 3) err('convo notes: нужно хотя бы 3 заметки о временах', c.id);
+    c.notes.forEach(n => {
+      if (!EG.data.convoGrammar[n.gram]) err('convo note grammar', c.id, n.gram);
+      if (!inLine(n.phrase)) err('convo note phrase not in dialogue', c.id, n.phrase);
+      if (!n.note) err('convo note text', c.id, n.phrase);
+      grams.add(n.gram);
+    });
+    if (new Set(c.notes.map(n => n.gram)).size < 2) err('convo: нужно хотя бы 2 разных времени', c.id);
+    c.questions.forEach((q, i) => {
+      if (!(q.answer >= 0 && q.answer < q.options.length)) err('convo answer idx', c.id, i);
+      if (new Set(q.options).size !== q.options.length) err('convo dup options', c.id, i);
+      if (!q.qRu || !q.optionsRu || q.optionsRu.length !== q.options.length) err('convo question translation', c.id, i);
+      if (/[а-яё]/i.test(q.q + q.options.join(''))) err('convo question not in English', c.id, i);
+    });
+    for (const tok of c.lines.map(l => l.en).join(' ').match(/[A-Za-zÀ-ÿ]+(?:[-'’][A-Za-zÀ-ÿ]+)*/g)) {
+      tokens++;
+      if (EG.lexicon.lookup(tok).length) known++;
+    }
+  }
+  const unused = Object.keys(EG.data.convoGrammar).filter(g => !grams.has(g));
+  if (unused.length) err('convo grammar never used', unused.join(','));
+  console.log('convos', EG.data.convos.length, EG.LEVELS.map(l => l + ':' + EG.data.convos.filter(c => c.level === l).length).join(' '),
+    '| словарь покрывает', Math.round(known / tokens * 100) + '% слов диалогов');
 }
 // блоки тренажёра слов
 {

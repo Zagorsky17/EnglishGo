@@ -44,8 +44,8 @@
       return n ? h('span', { class: 'dist-seg st-' + st, style: { flexGrow: n }, title: EG.ui.STATE_RU[st] + ': ' + n }) : null;
     }));
 
-    var dlgDone = 0, talkDone = 0, storyDone = 0, chatDone = 0, textDone = 0;
-    S.dialogues.forEach(function (d) { if (d.kind === 'talk') talkDone++; else if (d.kind === 'story') storyDone++; else if (d.kind === 'chat') chatDone++; else if (d.kind === 'text') textDone++; else dlgDone++; });
+    var dlgDone = 0, talkDone = 0, storyDone = 0, chatDone = 0, textDone = 0, convoDone = 0;
+    S.dialogues.forEach(function (d) { if (d.kind === 'talk') talkDone++; else if (d.kind === 'story') storyDone++; else if (d.kind === 'chat') chatDone++; else if (d.kind === 'text') textDone++; else if (d.kind === 'convo') convoDone++; else dlgDone++; });
     var gamesPlayed = 0, bestScore = 0;
     S.games.forEach(function (g) { gamesPlayed += g.plays || 0; bestScore = Math.max(bestScore, g.best || 0); });
 
@@ -89,6 +89,7 @@
             h('li', null, 'Разговорных сценариев: ', h('strong', null, talkDone + ' / ' + EG.data.scenarios.length)),
             h('li', null, 'Диалогов с вопросами: ', h('strong', null, storyDone + ' / ' + EG.data.stories.length)),
             h('li', null, 'Текстов прочитано: ', h('strong', null, textDone + ' / ' + EG.data.texts.length)),
+            h('li', null, 'Диалогов прочитано: ', h('strong', null, convoDone + ' / ' + EG.data.convos.length)),
             h('li', null, 'Переписок в чатах: ', h('strong', null, chatDone + ' / ' + EG.data.episodes.length)),
             h('li', null, 'Игр сыграно: ', h('strong', null, gamesPlayed), gamesPlayed ? ' · лучший результат ' + bestScore : ''),
             h('li', null, 'Ошибок исправлено: ', h('strong', null, (function () { var n = 0; S.mistakes.forEach(function (x) { if (x.resolved) n++; }); return n; })() + ' / ' + S.mistakes.size))))));
