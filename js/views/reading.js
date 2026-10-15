@@ -216,8 +216,6 @@
 
     /** Диалог: реплики-пузыри, слова кликабельны, перевод реплики — по кнопке «RU». */
     function renderDialogue() {
-      var speakers = [];
-      t.lines.forEach(function (l) { if (speakers.indexOf(l.who) < 0) speakers.push(l.who); });
       var rus = [];
       var all = false;
       var toggleAll = h('button', { class: 'btn ghost sm', type: 'button', onclick: function () {
@@ -225,10 +223,12 @@
         rus.forEach(function (el) { el.hidden = !all; });
         toggleAll.textContent = all ? 'Скрыть перевод' : 'Показать весь перевод';
       } }, 'Показать весь перевод');
+      // сторона меняется при смене говорящего, как в чате: так и третий собеседник получает сдвиг
+      var right = true, prev = null;
       var lines = t.lines.map(function (l) {
+        if (l.who !== prev) { right = !right; prev = l.who; }
         var ru = h('span', { class: 'bubble-ru', lang: 'ru', hidden: true }, l.ru);
         rus.push(ru);
-        var right = speakers.indexOf(l.who) % 2 === 1;
         return h('div', { class: 'bubble npc cv-line' + (right ? ' cv-right' : '') },
           h('span', { class: 'bubble-name' }, l.who),
           renderParagraph(l.en),
