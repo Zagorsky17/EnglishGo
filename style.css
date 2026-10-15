@@ -489,6 +489,22 @@ button.chip:hover:not(:disabled) { border-color: var(--accent); }
 .reading-text { padding: 22px 24px; max-width: 760px; }
 .reading-para + .reading-para { margin-top: 1em; }
 .reading-p { font-size: 1.12rem; line-height: 1.75; margin: 0; }
+.cv-chat { margin-bottom: 8px; }
+.bubble.cv-line.cv-right { align-self: flex-end; background: var(--accent-soft); border-bottom-left-radius: 18px; border-bottom-right-radius: 6px; }
+.cv-line .reading-p { width: 100%; font-size: 1.08rem; line-height: 1.6; }
+.cv-ru-btn { font-size: .8rem; font-weight: 700; padding: 2px 6px; }
+.cv-grams { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.cv-gram { font-size: .72rem; }
+a.cv-gram:hover { border-color: var(--accent); color: var(--accent); }
+.cv-note { align-items: baseline; }
+.cv-note-text { flex-basis: 100%; font-size: .92rem; }
+.cv-num { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .9rem;
+  background: var(--surface-2); color: var(--muted); }
+.text-card.done .cv-num { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); }
+.cv-next { border-color: var(--accent); }
+.cv-next .cv-num { background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .cv-next .cv-num { color: #0f1117; }
+.cv-continue { margin-bottom: 14px; gap: 10px; align-items: center; }
 .w { cursor: pointer; border-radius: 4px; transition: background .12s; }
 .w:hover, .w:focus-visible { background: var(--accent-soft); outline: none; }
 .w.active { background: var(--accent); color: #fff; }

@@ -1,6 +1,7 @@
 /* views/reading.js — «Чтение»: связные тексты A1–C1. Нажатие на слово показывает перевод из словаря
    тренажёра (с приведением к начальной форме: went → go, cities → city), слово можно отправить в тренажёр.
-   После чтения — тест на понимание. */
+   После чтения — тест на понимание. Тот же экран (EG.reading.view) показывает диалоги раздела
+   «Чтение диалогов» (views/convos.js): у них вместо paragraphs — реплики lines и заметки о временах notes. */
 (function (EG) {
   'use strict';
 
@@ -67,15 +68,33 @@
 
   /* ================= текст ================= */
 
+  var TEXT = {
+    kind: 'text', noun: 'текст', list: function () { return EG.data.texts; }, href: '#/text/',
+    back: '#/reading', backLabel: 'Чтение', nextLabel: 'Следующий текст: ', allLabel: 'Все тексты'
+  };
+
   EG.views.text = function (root, params) {
     var t = EG.data.textsById[params[0]];
     if (!t) { root.append(EG.ui.empty('book', 'Текст не найден', null, h('a', { class: 'btn', href: '#/reading' }, 'К списку текстов'))); return; }
+    return readView(root, t, TEXT);
+  };
+
+  /**
+   * Экран чтения с переводом слов и тестом. K — откуда материал: {kind, noun, list(), href, back, backLabel,
+   * nextLabel, allLabel, head(t) — дополнительные блоки шапки}. kind — тип записи в EG.state.dialogues.
+   */
+  function readView(root, t, K) {
     var topic = EG.data.textTopics[t.topic] || { name: t.topic, emoji: '📄' };
     var lvl = EG.util.levelIndex(t.level);
     var started = Date.now(), minutesSaved = false;
     var keyHandler = null;
     var added = {};
     var tokenSpans = [];
+    var isDialogue = !!t.lines;
+    // выражения из глоссария + фразы из заметок о временах (третий элемент — пояснение о грамматике)
+    var gloss = t.glossary.concat((t.notes || []).map(function (n) {
+      return [n.phrase, (EG.data.convoGrammar[n.gram] || n.gram) + ' — ' + n.note, true];
+    }));
 
     function onKey(e) {
       if (e.key === 'Escape' && !pop.hidden) { closePop(); return; }
@@ -126,7 +145,7 @@
       var entries = lookup(token).concat(phraseAt(info.tokens, info.i));
       var seen = [];
       entries = entries.filter(function (w) { if (seen.indexOf(w) >= 0) return false; seen.push(w); return true; });
-      var gl = (info.gloss || []).map(function (gi) { return t.glossary[gi]; });
+      var gl = (info.gloss || []).map(function (gi) { return gloss[gi]; });
       var lemma = entries[0] && entries[0].en.toLowerCase() !== norm(token) && entries[0].en.indexOf(' ') < 0 ? entries[0].en : null;
       EG.ui.fill(pop,
         h('div', { class: 'row between pop-head' },
@@ -134,7 +153,7 @@
             EG.ui.speakBtn(token, true)),
           h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Закрыть', onclick: closePop }, icon('x'))),
         gl.map(function (g) {
-          return h('div', { class: 'pop-gloss' }, h('span', { class: 'badge' }, 'выражение'), h('strong', { lang: 'en' }, g[0]), h('span', null, '— ' + g[1]));
+          return h('div', { class: 'pop-gloss' }, h('span', { class: 'badge' + (g[2] ? ' st-learning' : '') }, g[2] ? 'время' : 'выражение'), h('strong', { lang: 'en' }, g[0]), h('span', null, '— ' + g[1]));
         }),
         EG.lexicon.basic(token) ? h('p', { class: 'pop-basic' }, h('span', { class: 'badge' }, 'служебное слово'), ' ' + EG.lexicon.basic(token)) : null,
         entries.length ? entries.map(entryRow)
@@ -156,7 +175,7 @@
       // выражения из глоссария: отмечаем слова, которые в них входят
       var low = text.toLowerCase().replace(/’/g, "'");
       var glossOf = {};
-      t.glossary.forEach(function (g, gi) {
+      gloss.forEach(function (g, gi) {
         var needle = g[0].toLowerCase();
         var from = 0, pos;
         while ((pos = low.indexOf(needle, from)) >= 0) {
@@ -189,30 +208,64 @@
       return p;
     }
 
+    /** Диалог: реплики-пузыри, слова кликабельны, перевод реплики — по кнопке «RU». */
+    function renderDialogue() {
+      var speakers = [];
+      t.lines.forEach(function (l) { if (speakers.indexOf(l.who) < 0) speakers.push(l.who); });
+      var rus = [];
+      var all = false;
+      var toggleAll = h('button', { class: 'btn ghost sm', type: 'button', onclick: function () {
+        all = !all;
+        rus.forEach(function (el) { el.hidden = !all; });
+        toggleAll.textContent = all ? 'Скрыть перевод' : 'Показать весь перевод';
+      } }, 'Показать весь перевод');
+      var lines = t.lines.map(function (l) {
+        var ru = h('span', { class: 'bubble-ru', lang: 'ru', hidden: true }, l.ru);
+        rus.push(ru);
+        var right = speakers.indexOf(l.who) % 2 === 1;
+        return h('div', { class: 'bubble npc cv-line' + (right ? ' cv-right' : '') },
+          h('span', { class: 'bubble-name' }, l.who),
+          renderParagraph(l.en),
+          h('span', { class: 'bubble-tools' }, EG.ui.speakBtn(l.en, true),
+            h('button', { class: 'link-btn cv-ru-btn', type: 'button', title: 'Перевод реплики', onclick: function () { ru.hidden = !ru.hidden; } }, 'RU')),
+          ru);
+      });
+      return h('div', null, h('div', { class: 'chat cv-chat' }, lines), h('div', { class: 'row gap wrap' }, toggleAll));
+    }
+
     var body = h('div', { class: 'reading-body' });
 
     function showReading() {
       keyHandler = null;
       tokenSpans = [];
-      var article = h('article', { class: 'card reading-text' },
+      var article = isDialogue ? renderDialogue() : h('article', { class: 'card reading-text' },
         t.paragraphs.map(function (para) {
           var p = renderParagraph(para);
           return h('div', { class: 'reading-para' }, p);
         }));
       // озвучка — одной кнопкой над текстом, чтобы в самом тексте не было ничего лишнего
       var listen = EG.ui.canSpeak() ? h('button', { class: 'btn ghost sm', type: 'button', onclick: function () {
-        EG.ui.speak(t.paragraphs.join(' '));
-      } }, icon('speaker'), 'Прослушать текст') : null;
+        EG.ui.speak(isDialogue ? t.lines.map(function (l) { return l.en; }).join(' ') : t.paragraphs.join(' '));
+      } }, icon('speaker'), isDialogue ? 'Прослушать диалог' : 'Прослушать текст') : null;
+      var notes = t.notes && t.notes.length ? h('section', { class: 'card' },
+        h('h3', { class: 'card-title' }, 'Времена в диалоге'),
+        h('div', { class: 'gloss-list' }, t.notes.map(function (n) {
+          return h('div', { class: 'gloss-row cv-note' },
+            h('strong', { lang: 'en' }, n.phrase), EG.ui.speakBtn(n.phrase, true),
+            grammarChip(n.gram),
+            h('span', { class: 'muted cv-note-text' }, n.note));
+        }))) : null;
       var glossary = t.glossary.length ? h('section', { class: 'card' },
-        h('h3', { class: 'card-title' }, 'Полезные выражения из текста'),
+        h('h3', { class: 'card-title' }, 'Полезные выражения из ' + (isDialogue ? 'диалога' : 'текста')),
         h('div', { class: 'gloss-list' }, t.glossary.map(function (g) {
           return h('div', { class: 'gloss-row' }, h('strong', { lang: 'en' }, g[0]), EG.ui.speakBtn(g[0], true), h('span', { class: 'muted' }, g[1]));
         }))) : null;
       body.replaceChildren(
         h('div', { class: 'row between wrap reading-bar' },
-          h('span', { class: 'muted small' }, 'Нажмите на любое слово — появится перевод.'),
+          h('span', { class: 'muted small' }, isDialogue ? 'Нажмите на любое слово — появится перевод. «RU» — перевод всей реплики.' : 'Нажмите на любое слово — появится перевод.'),
           listen),
         article,
+        notes,
         glossary,
         h('div', { class: 'row gap wrap story-actions' },
           h('button', { class: 'btn primary', type: 'button', onclick: startQuiz }, 'Проверить понимание (' + t.questions.length + ' вопросов)', icon('arrow'))));
@@ -263,7 +316,7 @@
             if (order[j] === q.answer) b.classList.add('correct');
             if (j === k && !ok) b.classList.add('wrong');
           });
-          EG.progress.recordAnswer({ itemId: 'text:' + t.id + ':' + idx, type: 'text', correct: ok, userAnswer: q.options[oi], expected: q.options[q.answer], noMistake: true, xpFactor: 0.8 });
+          EG.progress.recordAnswer({ itemId: K.kind + ':' + t.id + ':' + idx, type: K.kind, correct: ok, userAnswer: q.options[oi], expected: q.options[q.answer], noMistake: true, xpFactor: 0.8 });
           var next = h('button', { class: 'btn primary block', type: 'button', onclick: advance }, idx + 1 < t.questions.length ? 'Следующий вопрос' : 'Результат', icon('arrow'));
           foot.replaceChildren(h('div', { class: 'feedback ' + (ok ? 'good' : 'bad') },
             h('div', { class: 'fb-head' }, h('span', { class: 'fb-verdict ' + (ok ? 'good' : 'bad') }, icon(ok ? 'check' : 'x'), ok ? 'Верно!' : 'Неверно')),
@@ -278,7 +331,7 @@
         body.replaceChildren(h('div', { class: 'card ex-card enter' },
           h('div', { class: 'row between' }, h('div', { class: 'ex-label' }, icon('book'), 'Вопрос ' + (idx + 1) + ' из ' + t.questions.length),
             h('div', { class: 'row quiz-links' }, ruBtn,
-              h('button', { class: 'link-btn', type: 'button', onclick: function () { keyHandler = null; showReading(); } }, 'Перечитать текст'))),
+              h('button', { class: 'link-btn', type: 'button', onclick: function () { keyHandler = null; showReading(); } }, 'Перечитать ' + K.noun))),
           EG.ui.bar(idx / t.questions.length * 100),
           h('p', { class: 'big-ru', lang: 'en' }, q.q),
           qRu,
@@ -312,8 +365,8 @@
           addAll.textContent = 'Слова добавлены ✓';
         }).catch(function () { addAll.disabled = false; EG.ui.toast('Не удалось сохранить', 'bad'); });
       } }, icon('plus'), 'Добавить все в тренажёр') : null;
-      EG.progress.completeDialogue(t.id, 'text', score).then(function (xp) {
-        var next = EG.data.texts.filter(function (x) { return x.id !== t.id && !statusOf(x) && EG.util.levelIndex(x.level) >= lvl; })
+      EG.progress.completeDialogue(t.id, K.kind, score).then(function (xp) {
+        var next = K.list().filter(function (x) { return x.id !== t.id && !statusOf(x) && EG.util.levelIndex(x.level) >= lvl; })
           .sort(function (a, b) { return EG.util.levelIndex(a.level) - EG.util.levelIndex(b.level) || a.order - b.order; })[0];
         body.replaceChildren(h('div', { class: 'card finish enter' },
           h('h2', null, score === 100 ? 'Всё понято! 🎉' : score >= 70 ? 'Хорошее понимание!' : 'Стоит перечитать'),
@@ -327,16 +380,17 @@
             h('div', { class: 'row gap wrap' }, addAll)) : null,
           h('div', { class: 'row gap wrap center' },
             h('button', { class: 'btn ghost', type: 'button', onclick: showReading }, 'Перечитать'),
-            next ? h('a', { class: 'btn primary', href: '#/text/' + next.id }, 'Следующий текст: ' + next.title) : h('a', { class: 'btn primary', href: '#/reading' }, 'Все тексты'))));
+            next ? h('a', { class: 'btn primary', href: K.href + next.id }, K.nextLabel + next.title) : h('a', { class: 'btn primary', href: K.back }, K.allLabel))));
         window.scrollTo(0, 0);
       }).catch(function (e) { console.error(e); });
     }
 
     root.append(
-      h('a', { class: 'back-link', href: '#/reading' }, icon('back'), 'Чтение'),
+      h('a', { class: 'back-link', href: K.back }, icon('back'), K.backLabel),
       h('div', { class: 'scene-head card' },
         h('div', { class: 'row between' }, h('h1', { lang: 'en' }, t.title), EG.ui.levelBadge(t.level)),
         h('p', { class: 'muted' }, t.titleRu),
+        K.head ? K.head(t) : null,
         h('p', { class: 'muted small' }, topic.emoji + ' ' + topic.name + ' · ' + t.words + ' слов · ~' + minutes(t) + ' мин чтения')),
       body, pop);
     showReading();
@@ -345,6 +399,16 @@
       saveMinutes();
       document.removeEventListener('keydown', onKey);
     };
-  };
+  }
+
+  /** Бейдж времени/конструкции; если для него есть карточка в «Таблице времён» — ссылка на неё. */
+  function grammarChip(id) {
+    var name = EG.data.convoGrammar[id] || id;
+    var card = EG.tenses && EG.tenses.data && EG.tenses.data.byId[id];
+    return card ? h('a', { class: 'badge cv-gram', href: '#/tenses/' + id, title: 'Открыть в «Таблице времён»' }, name)
+      : h('span', { class: 'badge cv-gram' }, name);
+  }
+
+  EG.reading = { view: readView, grammarChip: grammarChip, minutes: minutes };
 
 })(window.EG = window.EG || {});

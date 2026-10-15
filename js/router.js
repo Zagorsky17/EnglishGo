@@ -15,6 +15,7 @@
     { path: 'talk',      title: 'Разговор',       icon: 'talk',      nav: 'side', group: 'learn' },
     { path: 'dialogues', title: 'Диалоги',        icon: 'dialogues', nav: 'side', group: 'learn' },
     { path: 'reading',   title: 'Чтение',         icon: 'book',      nav: 'side', group: 'learn' },
+    { path: 'convos',    title: 'Чтение диалогов', icon: 'convo', nav: 'side', group: 'learn' },
     { path: 'grammar',   title: 'Грамматика',     icon: 'grammar',   nav: 'side', group: 'grammar' }, // изолированный модуль grammar/
     { path: 'gtoday',    title: 'Грамматика сегодня', short: 'Грамм. сегодня', icon: 'bolt', nav: 'side', group: 'grammar' }, // изолированный модуль gtoday/
     { path: 'tenses',    title: 'Таблица времён', icon: 'target',    nav: 'side', group: 'grammar' }, // изолированный модуль tenses/
@@ -29,6 +30,7 @@
     { path: 'dialogue',  parent: 'dialogues' },
     { path: 'story',     parent: 'dialogues' },
     { path: 'text',      parent: 'reading' },
+    { path: 'convo',     parent: 'convos' },
     { path: 'session',   parent: 'today' },
     { path: 'chat',      parent: 'chats' },
     { path: 'game',      parent: 'games' }
