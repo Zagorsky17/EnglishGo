@@ -146,6 +146,9 @@
       var seen = [];
       entries = entries.filter(function (w) { if (seen.indexOf(w) >= 0) return false; seen.push(w); return true; });
       var gl = (info.gloss || []).map(function (gi) { return gloss[gi]; });
+      var idiom = EG.lexicon.idiomAt(info.tokens, info.i);
+      if (idiom && !gl.some(function (g) { return norm(g[0]).indexOf(idiom[0]) >= 0; }) &&
+        !entries.some(function (w) { return norm(w.en) === idiom[0]; })) gl.push(idiom);
       var lemma = entries[0] && entries[0].en.toLowerCase() !== norm(token) && entries[0].en.indexOf(' ') < 0 ? entries[0].en : null;
       EG.ui.fill(pop,
         h('div', { class: 'row between pop-head' },
@@ -189,10 +192,13 @@
           from = pos + needle.length;
         }
       });
+      var prevText = '';
       parts.forEach(function (pt) {
-        if (!pt.word) { p.appendChild(document.createTextNode(pt.s)); return; }
+        if (!pt.word) { p.appendChild(document.createTextNode(pt.s)); prevText = pt.s; return; }
         var span = h('span', { class: 'w', role: 'button', tabindex: '0' }, pt.s);
-        span._info = { tokens: tokens, i: pt.idx, gloss: glossOf[pt.idx] || null };
+        // с заглавной не в начале предложения — скорее всего имя (Frank, Lake District)
+        var initial = pt.idx === 0 || /[.!?:]['"“”‘’)]*\s*['"“”‘’(]*$/.test(prevText);
+        span._info = { tokens: tokens, i: pt.idx, gloss: glossOf[pt.idx] || null, proper: !initial && /^[A-Z]/.test(pt.s) && pt.s !== 'I' };
         span._word = lookup(pt.s)[0] || null;
         tokenSpans.push(span);
         p.appendChild(span);
@@ -342,12 +348,19 @@
       renderQ();
     }
 
-    /** Слова текста уровня текста и выше, которых ещё нет в тренажёре. */
+    /**
+     * Слова текста уровня текста и выше, которых ещё нет в тренажёре. Пропускаем то, где словарное значение
+     * вводит в заблуждение: служебные слова и сокращения (I'll — не «воля»), имена и слова внутри выражений
+     * из глоссария и устойчивых сочетаний (Deal! — «договорились», а не «иметь дело»; of course — не «курс»).
+     */
     function newWords() {
       var out = [], seen = {};
       tokenSpans.forEach(function (s) {
         var w = s._word;
         if (!w || seen[w.id] || EG.wordTrainer.rec(w.id) || EG.util.levelIndex(w.level) < lvl) return;
+        var inGlossary = (s._info.gloss || []).some(function (gi) { return !gloss[gi][2]; });
+        if (inGlossary || s._info.proper || EG.lexicon.basic(s.textContent) || EG.lexicon.basic(w.en)) return;
+        if (EG.lexicon.idiomAt(s._info.tokens, s._info.i)) return;
         seen[w.id] = true;
         out.push(w);
       });

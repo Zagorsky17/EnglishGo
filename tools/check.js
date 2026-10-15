@@ -175,6 +175,14 @@ console.log('  exercise availability:', JSON.stringify(cnt));
     const hit = EG.lexicon.lookup(f).map(w => w.en);
     if (!hit.includes(lemma)) err('lemma', f, '→', hit.join(','));
   }
+  // сокращённое will не должно переводиться как «воля»
+  for (const f of ["I'll", "we'll", "won't", 'Will']) {
+    if (EG.lexicon.lookup(f).some(w => w.en === 'will') && !EG.lexicon.basic(f)) err('will contraction', f);
+    if (!EG.lexicon.basic(f)) err('no basic note', f);
+  }
+  if (EG.lexicon.lookup("I'll").length) err("I'll should not hit the word bank");
+  if (!EG.lexicon.idiomAt(['Oh', 'of', 'course', 'yes'], 2)) err('idiom of course');
+  if (EG.lexicon.idiomAt(['a', 'Spanish', 'course'], 2)) err('idiom false hit');
   const toks = 'I was looking for my keys in front of the house'.split(' ');
   const ph = EG.lexicon.phraseAt(toks, 3).map(w => w.en);
   if (!ph.includes('look for')) err('phraseAt look for', ph.join(','));
