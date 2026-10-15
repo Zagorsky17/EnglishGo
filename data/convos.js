@@ -198,7 +198,7 @@
         N("I've never been so lucky", 'present-perfect', 'Жизненный опыт без указания времени — never.')
       ], [
         ['How can I help you?', 'Чем могу помочь?'], ["I'm sorry to hear that", 'сочувствую, жаль это слышать'], ['What does it look like?', 'Как он выглядит?'],
-        ['Is this it?', 'Это он?'], ['be more careful', 'будьте внимательнее'], ['next time', 'в следующий раз']
+        ['Is this it?', 'Это он?'], ['sign here', 'распишитесь здесь'], ['be more careful', 'будьте внимательнее'], ['next time', 'в следующий раз']
       ], [
         Q('Where was Jack when he last saw his phone?', ['On the platform', 'On a bench in the park', 'On the train', 'At home'], 1, '«I was sitting on a bench in the park opposite the station.»', 'Где был Джек, когда в последний раз видел телефон?', ['На платформе', 'На скамейке в парке', 'В поезде', 'Дома']),
         Q('What was Jack doing in the park?', ['Walking his dog', 'Eating lunch', 'Reading a newspaper and talking to a friend', 'Sleeping'], 2, 'Два действия в Past Continuous.', 'Что Джек делал в парке?', ['Гулял с собакой', 'Обедал', 'Читал газету и болтал с другом', 'Спал']),
@@ -266,7 +266,7 @@
         N("I'll go to the bakery", 'future-simple', 'Решение, которое Том принимает прямо сейчас.'),
         N("I won't answer my phone", 'future-simple', 'won\'t = will not — обещание самой себе.')
       ], [
-        ["Don't ask!", 'лучше не спрашивай!'], ['went wrong', 'пошло не так'], ['go off', 'сработать (о сигнализации, будильнике)'],
+        ["Don't ask!", 'лучше не спрашивай!'], ['went wrong', 'пошло не так'], ['full of smoke', 'полна дыма'], ['smoke alarm', 'пожарная сигнализация'], ['go off', 'сработать (о сигнализации, будильнике)'],
         ['Poor you!', 'бедняжка!'], ['anyway', 'всё равно, в любом случае']
       ], [
         Q('Who was the cake for?', ["Tom's friend", "Mum's birthday", 'The neighbours', 'Anna\'s party'], 1, '«a chocolate cake for Mum\'s birthday».', 'Для кого был торт?', ['Для друга Тома', 'Маме на день рождения', 'Для соседей', 'Для вечеринки Анны']),
@@ -443,7 +443,7 @@
         N('If we both stick to the schedule, things will be much easier', 'conditional', 'First conditional — реальное условие.')
       ], [
         ['Have you got a minute', 'есть минутка?'], ['without asking', 'без спроса'], ["That's fair", 'справедливо'],
-        ['bothered you', 'беспокоило, задевало тебя'], ['cleaning schedule', 'график уборки'], ['stick to', 'придерживаться']
+        ['bothered you', 'беспокоило, задевало тебя'], ['cleaning schedule', 'график уборки'], ['stick to', 'придерживаться'], ['Deal', 'договорились']
       ], [
         Q('What is Jess\'s main complaint?', ['Olly is too noisy', 'Olly eats her food and borrows her things', 'Olly never pays the rent', 'Olly invites too many guests'], 1, 'Еда из холодильника и вещи без спроса.', 'На что в основном жалуется Джесс?', ['Олли шумит', 'Олли ест её еду и берёт её вещи', 'Олли не платит за квартиру', 'Олли зовёт слишком много гостей']),
         Q('What happened to the cheese?', ['It went bad', 'Half of it disappeared', 'Jess ate it', 'Olly threw it away'], 1, '«this morning half of it had disappeared».', 'Что случилось с сыром?', ['Он испортился', 'Половина исчезла', 'Джесс его съела', 'Олли его выбросил']),
@@ -518,7 +518,7 @@
         N("I'll be teaching maths", 'future-continuous', 'Процесс, который будет идти в будущем.')
       ], [
         ['handed in your notice', 'подала заявление об уходе'], ["That's a big step", 'это серьёзный шаг'], ['What made you decide?', 'что тебя подтолкнуло к решению?'],
-        ['I know the feeling', 'мне знакомо это чувство'], ['from scratch', 'с нуля'], ['manage for a while', 'продержаться какое-то время'], ['good with numbers', 'хорошо обращается с цифрами']
+        ['I know the feeling', 'мне знакомо это чувство'], ['from scratch', 'с нуля'], ['manage for a while', 'продержаться какое-то время'], ['secondary school', 'средняя школа'], ['good with numbers', 'хорошо обращается с цифрами']
       ], [
         Q('How long has Nadia worked in banking?', ['Two years', 'Five years', 'Eight years', 'One year'], 2, '«After eight years in banking».', 'Сколько лет Надя проработала в банке?', ['Два года', 'Пять лет', 'Восемь лет', 'Год']),
         Q('Why did Nadia decide to leave?', ['She was fired', 'She had been unhappy for a long time', 'The salary was too low', 'She moved to another city'], 1, '«I\'d been feeling unhappy for a long time.»', 'Почему Надя решила уйти?', ['Её уволили', 'Она давно была несчастна', 'Зарплата была низкой', 'Она переехала']),

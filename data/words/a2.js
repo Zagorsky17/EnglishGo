@@ -21,7 +21,7 @@
       'toy|игрушка; traffic|движение (транспорта), пробки; umbrella|зонт; village|деревня; voice|голос; war|война; wind|ветер; world|мир (планета); ' +
       'accident|авария, несчастный случай; adult|взрослый; age|возраст; aunt|тётя; uncle|дядя; boss|начальник; trousers|брюки; coat|пальто; sweater|свитер; ' +
       'gloves|перчатки; socks|носки; fridge|холодильник; oven|духовка; sofa|диван; mirror|зеркало; wallet|кошелёк'],
-    ['A2', 'n', 'leg|нога; arm|рука (от плеча); back|спина; stomach|живот, желудок; nose|нос; mouth|рот; ear|ухо; neck|шея; finger|палец; knee|колено; shoulder|плечо; ' +
+    ['A2', 'n', 'leg|нога; arm|рука (от плеча); back|спина, обратно; stomach|живот, желудок; nose|нос; mouth|рот; ear|ухо; neck|шея; finger|палец; knee|колено; shoulder|плечо; ' +
       'skin|кожа; blood|кровь; vegetable|овощ; fruit|фрукт; soup|суп; sandwich|бутерброд; menu|меню; waiter|официант; receipt|чек (квитанция); ' +
       'discount|скидка; size|размер; address|адрес; appointment|запись (к врачу), встреча; cousin|двоюродный брат, двоюродная сестра; peace|мир (без войны); ' +
       'team|команда; action|действие; adventure|приключение; alarm|будильник, тревога; album|альбом; army|армия; arrival|прибытие; article|статья; ' +

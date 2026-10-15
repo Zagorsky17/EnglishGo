@@ -23,8 +23,8 @@
       'men:man; women:woman; children:child; feet:foot; teeth:tooth; mice:mouse; people:person; lives:life; wives:wife; ' +
       'knives:knife; leaves:leaf; shelves:shelf; halves:half; thieves:thief; better,best:good; worse,worst:bad; ' +
       'further,furthest,farther,farthest:far; its:it; me,my,mine:i; him,his:he; her,hers:she; us,our,ours:we; them,their:they; ' +
-      "don't:do; doesn't:do; didn't:do; won't:will; can't:can; isn't:be; aren't:be; wasn't:be; weren't:be; i'm:be; you're:be; " +
-      "we're:be; they're:be; it's:be; that's:be; there's:there is; haven't:have; hasn't:have; i've:have; we've:have; i'll:will; " +
+      "don't:do; doesn't:do; didn't:do; can't:can; isn't:be; aren't:be; wasn't:be; weren't:be; i'm:be; you're:be; " +
+      "we're:be; they're:be; it's:be; that's:be; there's:there is; haven't:have; hasn't:have; i've:have; we've:have; " +
       "hadn't:have; i'd:would; couldn't:could; shouldn't:should; wouldn't:would";
     var out = Object.create(null);
     src.split(';').forEach(function (grp) {
@@ -50,8 +50,20 @@
     to: 'к, в (направление); частица перед глаголом: to go — идти', 'do': 'делать; вспомогательный глагол в вопросах и отрицаниях',
     'n\'t': 'не (отрицание)', 'is': 'есть, является (форма be)', are: 'есть, являются (форма be)', am: 'есть, являюсь (форма be)',
     was: 'был, была, было (форма be)', were: 'были (форма be)', been: 'был (причастие от be)', 'let\'s': 'давай(те)',
-    will: 'будет (вспомогательный глагол будущего времени)', won: 'выиграл (форма win)'
+    will: 'будет (вспомогательный глагол будущего времени)', won: 'выиграл (форма win)',
+    "won't": 'will not — не будет, не стану (отрицание будущего времени)',
+    bit: 'a bit — немного, чуть-чуть; a bit of — кусочек; также прошедшее время от bite (кусать)'
   };
+  // устойчивые сочетания, в которых слово теряет словарное значение (of course — не «курс»)
+  var IDIOMS = {
+    'of course': 'конечно', 'a bit': 'немного, чуть-чуть', 'a lot': 'много, очень', 'at all': 'вообще, совсем',
+    'at least': 'по крайней мере', 'after all': 'всё-таки, в конце концов', 'in fact': 'на самом деле',
+    'by the way': 'кстати', 'at the moment': 'сейчас, в данный момент', 'as well': 'тоже, также',
+    'so far': 'пока что, до сих пор', 'for good': 'навсегда', 'all the time': 'постоянно, всё время'
+  };
+
+  // I'll, we'll, it'll… — сокращённое will, а не существительное will (воля) из словаря
+  var LL = /^[a-z]+'ll$/;
 
   var lex = null, phrases = null;
   function buildLex() {
@@ -92,6 +104,7 @@
   function lookup(token) {
     if (!lex) buildLex();
     var found = [];
+    if (LL.test(norm(token))) return found;
     var cands = lemmas(token);
     // составные через дефис: сначала целиком, затем по частям
     if (token.indexOf('-') > 0) token.split('-').forEach(function (part) { cands = cands.concat(lemmas(part)); });
@@ -120,8 +133,24 @@
     return hits;
   }
 
-  /** Справка по служебному слову (артикли, частицы) или null. */
-  function basic(token) { var k = norm(token); return Object.prototype.hasOwnProperty.call(BASIC, k) ? BASIC[k] : null; }
+  /** Устойчивое сочетание из IDIOMS, в которое входит токен i: [выражение, перевод] или null. */
+  function idiomAt(tokens, i) {
+    for (var start = Math.max(0, i - 3); start <= i; start++) {
+      for (var len = 4; len >= 2; len--) {
+        if (start + len <= i || start + len > tokens.length) continue;
+        var key = tokens.slice(start, start + len).map(norm).join(' ');
+        if (Object.prototype.hasOwnProperty.call(IDIOMS, key)) return [key, IDIOMS[key]];
+      }
+    }
+    return null;
+  }
 
-  EG.lexicon = { lookup: lookup, lemmas: lemmas, phraseAt: phraseAt, norm: norm, basic: basic };
+  /** Справка по служебному слову (артикли, частицы) или null. */
+  function basic(token) {
+    var k = norm(token);
+    if (LL.test(k)) return (k === "i'll" ? 'I' : k.slice(0, -3)) + ' will — сокращение will (вспомогательный глагол будущего времени)';
+    return Object.prototype.hasOwnProperty.call(BASIC, k) ? BASIC[k] : null;
+  }
+
+  EG.lexicon = { lookup: lookup, lemmas: lemmas, phraseAt: phraseAt, idiomAt: idiomAt, norm: norm, basic: basic };
 })(window.EG = window.EG || {});
