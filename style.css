@@ -490,9 +490,10 @@ button.chip:hover:not(:disabled) { border-color: var(--accent); }
 .reading-para + .reading-para { margin-top: 1em; }
 .reading-p { font-size: 1.12rem; line-height: 1.75; margin: 0; }
 .cv-chat { margin-bottom: 8px; }
-/* реплики в один столбец во всю ширину — собеседники различаются только тоном фона */
-.cv-chat .bubble.cv-line { align-self: stretch; max-width: 100%; border-radius: 14px; }
-.cv-chat .bubble.cv-line.cv-right { background: var(--accent-soft); }
+/* реплики почти во всю ширину с лёгким сдвигом, как в чате: первый собеседник слева, второй справа и другим тоном */
+.cv-chat .bubble.cv-line { align-self: flex-start; width: 88%; max-width: 88%; border-radius: 14px 14px 14px 4px; }
+.cv-chat .bubble.cv-line.cv-right { align-self: flex-end; background: var(--accent-soft); border-radius: 14px 14px 4px 14px; }
+@media (max-width: 600px) { .cv-chat .bubble.cv-line { width: 94%; max-width: 94%; } }
 .cv-line .reading-p { width: 100%; font-size: 1.08rem; line-height: 1.6; }
 .cv-ru-btn { font-size: .8rem; font-weight: 700; padding: 2px 6px; }
 .cv-grams { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
