@@ -186,9 +186,10 @@
         return b;
       }));
       var q = question(ex);
+      // i = -1 — «Показать ответ»: засчитывается как ошибка, верный вариант подсвечивается
       function pick(i) {
         if (btns[0].disabled) return;
-        var ok = opts2[i] === right;
+        var ok = i >= 0 && opts2[i] === right;
         btns.forEach(function (b, j) {
           b.disabled = true;
           if (opts2[j] === right) b.classList.add('correct');
@@ -196,13 +197,16 @@
         });
         // в задании с пропуском показываем фразу целиком
         if (ex.type === 'choose') EG.ui.fill(q, mark(ex.text, right), speak(ex.text.replace('___', right)));
-        answered(ex, ok, opts2[i], right);
+        showBtn.disabled = true;
+        answered(ex, ok, i >= 0 ? opts2[i] : '', right);
       }
+      var showBtn = h('button', { class: 'btn ghost', type: 'button', onclick: function () { pick(-1); } }, 'Показать ответ');
       keyHandler = function (e) {
         var n = parseInt(e.key, 10);
         if (n >= 1 && n <= btns.length) { e.preventDefault(); pick(n - 1); }
       };
-      return [h('p', { class: 'prompt' }, TYPE_PROMPT[ex.type]), q, ruToggle(ex), list];
+      return [h('p', { class: 'prompt' }, TYPE_PROMPT[ex.type]), q, ruToggle(ex), list,
+        h('div', { class: 'row gap wrap gr-actions' }, showBtn)];
     }
 
     function buildView(ex) {
@@ -215,7 +219,9 @@
       var reset = h('button', { class: 'btn ghost sm', type: 'button', onclick: function () {
         if (done) return; chosen.forEach(function (p) { p.used = false; }); chosen = []; draw();
       } }, 'Сбросить');
+      var showBtn = h('button', { class: 'btn ghost sm', type: 'button', onclick: reveal }, 'Показать ответ');
       function draw() {
+        reset.disabled = showBtn.disabled = done;
         line.replaceChildren.apply(line, chosen.length ? chosen.map(function (p, k) {
           return h('button', { class: 'chip', type: 'button', disabled: done, onclick: function () { if (done) return; p.used = false; chosen.splice(k, 1); draw(); } }, p.w);
         }) : [h('span', { class: 'muted small' }, 'Нажимайте на слова по порядку')]);
@@ -234,11 +240,24 @@
         draw();
         answered(ex, ok, v + w.end, ex.answer);
       }
+      // собирает фразу в верном порядке и засчитывает ошибку
+      function reveal() {
+        if (done) return;
+        done = true;
+        pool.forEach(function (p) { p.used = false; });
+        chosen = w.list.map(function (x) {
+          var p = pool.filter(function (q) { return !q.used && q.w === x; })[0];
+          p.used = true;
+          return p;
+        });
+        draw();
+        answered(ex, false, '', ex.answer);
+      }
       keyHandler = function (e) {
         if (e.key === 'Backspace' && chosen.length && !done) { e.preventDefault(); chosen.pop().used = false; draw(); }
       };
       draw();
-      return [h('p', { class: 'prompt' }, 'Соберите по-английски: ', h('strong', null, ex.ru)), line, bank, h('div', { class: 'row gap' }, reset)];
+      return [h('p', { class: 'prompt' }, 'Соберите по-английски: ', h('strong', null, ex.ru)), line, bank, h('div', { class: 'row gap' }, reset, showBtn)];
     }
 
     function fixView(ex) {
