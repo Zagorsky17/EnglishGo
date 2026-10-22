@@ -65,6 +65,19 @@ for (const t of D.topics) {
   });
   (t.sides || []).forEach((s, i) => { if (!s.name || !s.means) err(w, 'sides: нет name/means', i); pair(s.ex, w + ' side' + i, true); });
   if (t.sides && t.sides.length !== 2) err(w, 'sides: нужно ровно 2');
+  (t.cards || []).forEach((c, i) => {
+    if (!c.name || !c.full || !c.means || !c.form) err(w, 'cards: нет name/full/means/form', i);
+    pair(c.ex, w + ' card' + i, true);
+  });
+  (t.steps || []).forEach((r, i) => { if (r.length !== 2 || !r[0] || !r[1]) err(w, 'steps: нужно [вопрос, ответ]', i); });
+  (t.sound || []).forEach((r, i) => {
+    if (r.length !== 3 || !r[0] || !/^\[.+\]$/.test(r[1]) || !r[2]) err(w, 'sound: нужно [написание, [транскрипция], пояснение]', i);
+    if (/[а-яё]/i.test(r[0])) err(w, 'sound: кириллица в английском', r[0]);
+  });
+  (t.ccq || []).forEach((r, i) => {
+    if (r.length !== 3 || !r[0] || !r[1] || !r[2]) err(w, 'ccq: нужно [фраза, вопрос, ответ]', i);
+    else if (/[а-яё]/i.test(r[0])) err(w, 'ccq: кириллица в английской фразе', r[0]);
+  });
   (t.mistakes || []).forEach((m, i) => {
     if (m.length < 3 || !m[2]) err(w, 'ошибка: нужно [неверно, верно, почему]', i);
     if (GU.norm(m[0]) === GU.norm(m[1])) err(w, 'ошибка совпадает с исправлением', m[0]);

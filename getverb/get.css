@@ -42,6 +42,30 @@
 .gv-trap + .gv-time, .gv-time + .gv-trap { border-top-color: transparent; }
 .gv-trap-tag { display: inline-block; margin-right: 6px; font-size: .7rem; font-weight: 700; padding: 1px 7px; border-radius: 99px; background: var(--warn); color: #fff; text-transform: uppercase; letter-spacing: .03em; }
 
+/* ---------- get · got · gotta · gonna ---------- */
+.gv-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gv-cmp { padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); border-top: 3px solid var(--accent); }
+.gv-cmp-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.gv-cmp-name { font-size: 1.25rem; color: var(--accent); }
+.gv-cmp-means { margin: 6px 0; font-size: .92rem; line-height: 1.45; }
+.gv-cmp-form { display: block; margin-bottom: 4px; font-size: .82rem; color: var(--muted); }
+.gv-steps { margin: 0; padding-left: 22px; }
+.gv-steps li { margin: 6px 0; line-height: 1.45; }
+.gv-sound { display: flex; flex-direction: column; }
+.gv-sound-row { padding: 8px 0; }
+.gv-sound-row + .gv-sound-row { border-top: 1px dashed var(--border); }
+.gv-sound-en { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gv-sound-en code { color: var(--accent); }
+.gv-ccq-hint { margin: -2px 0 8px; }
+.gv-ccq { display: flex; flex-direction: column; gap: 6px; }
+.gv-ccq-item { border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.gv-ccq-item > summary { cursor: pointer; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 4px 10px; list-style: none; }
+.gv-ccq-item > summary::-webkit-details-marker { display: none; }
+.gv-ccq-item > summary::after { content: 'Ответ'; margin-left: auto; font-size: .8rem; color: var(--accent); }
+.gv-ccq-item[open] > summary::after { content: 'Скрыть'; }
+.gv-ccq-en { font-weight: 600; }
+.gv-ccq-item p { margin: 0; padding: 0 12px 10px; }
+
 /* ---------- фразовые глаголы ---------- */
 .gv-phrases { display: flex; flex-direction: column; }
 .gv-phrase { padding: 8px 0; }
@@ -54,5 +78,6 @@
 @media (max-width: 640px) {
   .gv-map { grid-template-columns: 1fr 1fr; }
   .gv-time { grid-template-columns: 1fr; gap: 2px; }
+  .gv-cards { grid-template-columns: 1fr; }
   .gv-nav .btn { flex: 1 1 auto; justify-content: center; }
 }
