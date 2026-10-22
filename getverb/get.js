@@ -83,6 +83,40 @@
     }));
   }
 
+  /** Карточки сравнения: слово, полная форма, смысл, формы, пример. */
+  function compareCards(list) {
+    return h('div', { class: 'gv-cards' }, list.map(function (c) {
+      return h('div', { class: 'gv-cmp' },
+        h('div', { class: 'gv-cmp-top' }, h('strong', { class: 'gv-cmp-name', lang: 'en' }, c.name), h('span', { class: 'muted small', lang: 'en' }, c.full)),
+        h('p', { class: 'gv-cmp-means' }, c.means),
+        h('code', { class: 'gv-cmp-form', lang: 'en' }, c.form),
+        U().example(c.ex));
+    }));
+  }
+
+  function stepsList(rows) {
+    return h('ol', { class: 'gv-steps' }, rows.map(function (r) {
+      return h('li', null, h('strong', null, r[0]), ' ', h('span', { class: 'muted' }, '→ '), h('span', { lang: 'en' }, r[1]));
+    }));
+  }
+
+  function soundList(rows) {
+    return h('div', { class: 'gv-sound' }, rows.map(function (r) {
+      return h('div', { class: 'gv-sound-row' },
+        h('div', { class: 'gv-sound-en' }, h('strong', { lang: 'en' }, r[0]), U().speak(r[0]), h('code', null, r[1])),
+        h('div', { class: 'muted small' }, r[2]));
+    }));
+  }
+
+  /** Вопросы на понимание: ответ скрыт, пока его не откроешь. */
+  function ccqList(rows) {
+    return h('div', { class: 'gv-ccq' }, rows.map(function (r) {
+      return h('details', { class: 'gv-ccq-item' },
+        h('summary', null, h('span', { class: 'gv-ccq-en', lang: 'en' }, r[0]), h('span', null, r[1])),
+        h('p', null, r[2]));
+    }));
+  }
+
   function card(label, body, cls) {
     return h('section', { class: 'card' + (cls ? ' ' + cls : '') }, h('div', { class: 'gr-label' }, label), body);
   }
@@ -153,6 +187,8 @@
 
     var myths = D().myths.filter(function (m) { return m.topic === t.id; });
     if (myths.length) blocks.push(card('Проверка утверждения', h('div', { class: 'gv-myths' }, myths.map(myth)), 'gv-myth-card'));
+    if (t.cards) blocks.push(card('Четыре слова рядом', compareCards(t.cards)));
+    if (t.steps) blocks.push(card('Как выбрать', stepsList(t.steps)));
     if (t.times) blocks.push(card('Форма → время → смысл', timesTable(t.times)));
     if (t.formula) blocks.push(card('Формула', u.formula(t.formula)));
     if (t.sides) blocks.push(card('Сравните', h('div', { class: 'gr-sides' }, t.sides.map(function (s) {
@@ -163,6 +199,9 @@
     }))));
     if (t.phrases) blocks.push(card('Фразовые глаголы', phrasesList(t.phrases)));
     if (t.examples) blocks.push(card('Примеры', h('div', { class: 'gr-examples' }, t.examples.map(u.example))));
+    if (t.sound) blocks.push(card('Как это звучит', soundList(t.sound)));
+    if (t.ccq) blocks.push(card('Проверь понимание', h('div', null,
+      h('p', { class: 'muted small gv-ccq-hint' }, 'Ответьте про себя, потом откройте ответ.'), ccqList(t.ccq))));
 
     var more = [];
     if (t.talk) more.push(u.fold('Так говорят в жизни', h('div', { class: 'gr-examples' }, t.talk.map(u.example))));

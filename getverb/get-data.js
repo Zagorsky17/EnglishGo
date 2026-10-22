@@ -12,7 +12,9 @@
      S — «Ситуация»            (описание ситуации по-русски → подходящая фраза)
    Последний аргумент N / C / F / S — перевод правильной фразы целиком.
 
-   Поля темы: core — суть; key — главный пример; times — строки «пример · форма · что значит · ловушка»; formula; sides — сравнение двух форм;
+   Поля темы: core — суть; key — главный пример; cards — карточки сравнения {name, full, means, form, ex};
+   steps — «как выбрать» [вопрос, ответ]; sound — «как звучит» [написание, транскрипция, пояснение];
+   ccq — «проверь понимание» [фраза, вопрос, ответ]; times — строки «пример · форма · что значит · ловушка»; formula; sides — сравнение двух форм;
    examples; phrases — фразовые глаголы [фраза, перевод, пример, перевод примера];
    talk — так говорят в жизни; mistakes — [ошибка, верно, почему]; practice — задания. */
 (function (EG) {
@@ -43,6 +45,11 @@
       claim: "I've got — это Present Perfect, значит «я получил».",
       verdict: "partly", topic: "have-got",
       text: "По форме — да, по смыслу — нет. I've got a car = I have a car: «у меня есть машина» прямо сейчас. «Я получил» — это I got (прошлое) или, по-американски, I've gotten."
+    },
+    {
+      claim: "gotta и gonna — почти одно и то же, просто сленг.",
+      verdict: "no", topic: "four",
+      text: "Нет. Это разговорное произношение двух разных конструкций: gotta = have got to («надо»), gonna = going to («собираюсь, будет»). I gotta call him — мне надо ему позвонить; I'm gonna call him — я ему позвоню. Обе — норма живой речи, а не ошибка; в письме — have to и going to."
     },
     {
       claim: "Got it — прошедшее время.",
@@ -94,6 +101,74 @@
         C("Last year we ___ a dog.", ["had", "have got", "has got"], "have got — только настоящее. В прошлом — had.", "В прошлом году у нас была собака."),
         F("Tomorrow I got a new phone.", ["Tomorrow I'm gonna get a new phone.", "Tomorrow I'm going to get a new phone.", "Tomorrow I'll get a new phone.", "Tomorrow I will get a new phone."], "Про будущее — gonna get или will get, а got — прошлое.", "Завтра я куплю новый телефон."),
         S("Звонят в дверь. Скажите семье, что откроете сами.", ["I'll get it!", "I get it every day.", "I got it last week."], "Решение в момент речи — will: I'll get it.", "Я открою!")
+      ]
+    },
+
+    /* ======================= GET · GOT · GOTTA · GONNA ======================= */
+
+    {
+      id: "four", emoji: "🔀", level: "A2",
+      title: "get · got · gotta · gonna", ru: "Четыре похожих слова — четыре разных смысла",
+      core: "Звучат похоже, а отвечают на разные вопросы. get — что происходит (обычно или сейчас). got — что уже случилось или что у меня есть. gotta — что мне НАДО сделать. gonna — что я СОБИРАЮСЬ сделать. Носитель различает их не по правилам, а по готовым кускам речи: I got a text · I gotta go · I'm gonna be late.",
+      key: ["I [got] a text from my boss — I [gotta] go. I['m gonna get] a taxi.", "Мне пришло сообщение от начальника — надо идти. Возьму такси."],
+      cards: [
+        { name: "get", full: "get / gets", means: "сейчас, обычно · получить, стать, добраться, понять", form: "I get · she gets · don't get · Do you get…?", ex: ["I always [get] lost here.", "Я тут всегда теряюсь."] },
+        { name: "got", full: "прошлое get · часть have got", means: "1) уже случилось: получил, стал, добрался; 2) 've got — «у меня есть»", form: "I got · didn't get · Did you get…? · I've got = I have", ex: ["I [got] the job!", "Меня взяли на работу!"] },
+        { name: "gotta", full: "= have got to", means: "надо, должен — обязанность сейчас", form: "I('ve) gotta + V · she('s) gotta + V · don't have to · Do you have to…?", ex: ["I [gotta] work tomorrow.", "Мне завтра на работу."] },
+        { name: "gonna", full: "= be going to", means: "собираюсь, будет — план или прогноз", form: "I'm gonna + V · I'm not gonna + V · Are you gonna…?", ex: ["It['s gonna] rain.", "Сейчас пойдёт дождь."] }
+      ],
+      steps: [
+        ["Говорите о том, что НАДО сделать?", "gotta: I gotta go."],
+        ["О плане или о том, что вот-вот будет?", "be gonna + глагол: I'm gonna call her · It's gonna rain."],
+        ["Это уже случилось?", "got: I got your message."],
+        ["Это то, что у вас ЕСТЬ сейчас?", "'ve got: I've got two kids."],
+        ["Ничего из этого — обычно или прямо сейчас?", "get / gets: I get up at seven · I get it."]
+      ],
+      sides: [
+        { name: "I gotta go", means: "надо уйти — обязанность", ex: ["Sorry, I [gotta go] — my bus is here.", "Извини, мне пора — автобус пришёл."] },
+        { name: "I got to go", means: "в рассказе о прошлом — «мне удалось побывать». Без контекста в американской речи может значить и «надо» (= gotta)", ex: ["I [got to go] to the final!", "Мне удалось попасть на финал!"] }
+      ],
+      sound: [
+        ["gonna", "[ˈɡʌnə]", "Почти «гана»; going to в быстрой речи звучит именно так."],
+        ["gotta", "[ˈɡɑːɾə]", "В американском t между гласными — быстрый звук, похожий на d: «гада». В британском — [ˈɡɒtə]."],
+        ["Got it?", "[ˈɡɑːɾɪt]", "Сливается в одно слово."],
+        ["Gotcha!", "[ˈɡɑːtʃə]", "= got you: «понял!» или «попался!»."],
+        ["What are you gonna do?", "[ˈwʌɾəjəˌɡʌnəˈduː]", "«Вадая гана ду» — так это звучит в живой речи."]
+      ],
+      ccq: [
+        ["I gotta go.", "Это план или необходимость?", "Необходимость. Человек уйдёт сейчас или очень скоро — не по желанию, а потому что надо."],
+        ["I'm gonna quit my job.", "Он уже уволился? Решение принято?", "Ещё нет, но решение уже принято — это план."],
+        ["I've got a car.", "Важно, когда он её купил?", "Нет. Важно, что машина есть сейчас (= I have a car)."],
+        ["I got to meet the band.", "Это обязанность?", "Нет. got to + V в прошлом — «удалось, выпала возможность»."],
+        ["I got a car.", "Что это значит?", "Смотря по контексту: «купил машину» (прошлое) или, в американской речи без 've, «у меня есть машина»."]
+      ],
+      examples: [
+        ["Did you [get] my email?", "Ты получил моё письмо?"],
+        ["I[’ve got] a meeting at ten, so I [gotta] run.", "У меня в десять встреча, так что мне надо бежать."],
+        ["We[’re gonna] be late — we [gotta] hurry.", "Мы опоздаем — надо поторопиться."],
+        ["I [got] home and [got] into bed.", "Я пришёл домой и лёг в кровать."],
+        ["Are you [gonna] get a dog?", "Ты собираешься завести собаку?"]
+      ],
+      mistakes: [
+        ["I gonna call you.", "I'm gonna call you.", "gonna = going to, поэтому нужно am / is / are."],
+        ["I'm gonna the gym.", "I'm gonna go to the gym.", "gonna — только перед глаголом. Перед местом без глагола — going to: I'm going to the gym."],
+        ["I gotta went.", "I gotta go.", "После gotta — начальная форма глагола."],
+        ["Yesterday I gotta work.", "Yesterday I had to work.", "Прошедшего у gotta нет — had to."],
+        ["Do you got a minute?", "Have you got a minute?", "Do you got… бывает в американском просторечии, но в стандартной речи — Have you got…? или Do you have…?"]
+      ],
+      practice: [
+        C("I ___ a new job last month.", ["got", "gotta", "gonna"], "last month — уже случилось: got.", "В прошлом месяце я нашёл новую работу."),
+        C("I'm ___ call her tomorrow.", ["gonna", "gotta", "got"], "План — I'm gonna + V. I'm gotta не говорят.", "Я позвоню ей завтра."),
+        C("My boss needs the report tonight, so I ___ finish it.", ["gotta", "gonna", "got"], "Надо, потому что требует начальник, — gotta. I gonna — без am так не говорят.", "Начальнику нужен отчёт сегодня вечером, так что мне надо его закончить."),
+        C("Do you ___ what I mean?", ["get", "got", "gotta"], "После do — начальная форма: get.", "Понимаешь, о чём я?"),
+        C("Yesterday I ___ home really late.", ["got", "get", "gotta"], "yesterday — прошлое: got home.", "Вчера я добрался домой очень поздно."),
+        M("I got to meet the band!", ["Мне удалось познакомиться с группой", "Мне надо познакомиться с группой", "Я собираюсь познакомиться с группой"], "got to + V в прошлом — «удалось». Обязанность — gotta (I've got to)."),
+        N("I'm gonna get a coffee.", ["План на ближайшее будущее", "Обязанность: надо выпить кофе", "Прошлое: взял кофе"], "be gonna + V — план.", "Я возьму кофе."),
+        S("Вы торопитесь: начальник ждёт отчёт к вечеру. Скажите другу «Мне надо закончить отчёт».", ["I gotta finish the report.", "I'm gonna finish the report.", "I got finish the report."], "Необходимость — gotta. I'm gonna finish — просто «собираюсь закончить».", "Мне надо закончить отчёт."),
+        S("Вы уже идёте в спортзал и говорите об этом другу по телефону.", ["I'm going to the gym.", "I'm gonna the gym.", "I gotta the gym."], "gonna — только перед глаголом. Перед местом — going to.", "Я иду в спортзал."),
+        F("I gotta went.", ["I gotta go.", "I've got to go.", "I have to go."], "После gotta — начальная форма.", "Мне надо идти."),
+        M("Gotcha!", ["Понял! / Попался!", "Получи!", "Я собираюсь!"], "Gotcha = got you."),
+        B("I'm gonna get a taxi.", "Я возьму такси.", "be gonna + get + что.")
       ]
     },
 
@@ -201,7 +276,7 @@
       talk: [["You got me.", "Ты меня подловил. / Без понятия."], ["I get that a lot.", "Мне это часто говорят."], ["Get the picture?", "Улавливаешь?"]],
       mistakes: [
         ["I don't got it.", "I don't get it.", "После don't — начальная форма get."],
-        ["I am getting it.", "I get it.", "«Понимаю» — состояние, обычно без -ing."]
+        ["I'm not get it.", "I don't get it.", "Отрицание — don't get. А I'm getting it — нормальная фраза: «начинаю понимать»."]
       ],
       practice: [
         M("I don't get it.", ["Не понимаю", "Не получил", "Не достану"], "get = понимать: I don't get it — не понимаю."),
@@ -264,7 +339,7 @@
         { name: "have got to + V", means: "надо, должен", ex: ["I['ve got to see] a doctor.", "Мне надо к врачу."] }
       ],
       mistakes: [
-        ["I cut my hair yesterday.", "I got my hair cut yesterday.", "I cut my hair — «я сам подстригся». В парикмахерской — got my hair cut."],
+        ["I need to get my hair to cut.", "I need to get my hair cut.", "get + что + V3, без to: get my hair cut."],
         ["I'll get him call you.", "I'll get him to call you.", "get + кого + to + глагол."]
       ],
       practice: [
