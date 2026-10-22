@@ -17,6 +17,7 @@
     { path: 'reading',   title: 'Чтение',         icon: 'book',      nav: 'side', group: 'learn' },
     { path: 'convos',    title: 'Чтение диалогов', icon: 'convo', nav: 'side', group: 'learn' },
     { path: 'get',       title: 'Глагол get',     icon: 'key',       nav: 'side', group: 'learn' }, // изолированный модуль getverb/
+    { path: 'verbs',     title: 'Ключевые глаголы', short: 'Глаголы', icon: 'layers', nav: 'side', group: 'learn' }, // изолированный модуль keyverbs/
     { path: 'grammar',   title: 'Грамматика',     icon: 'grammar',   nav: 'side', group: 'grammar' }, // изолированный модуль grammar/
     { path: 'gtoday',    title: 'Грамматика сегодня', short: 'Грамм. сегодня', icon: 'bolt', nav: 'side', group: 'grammar' }, // изолированный модуль gtoday/
     { path: 'tenses',    title: 'Таблица времён', icon: 'target',    nav: 'side', group: 'grammar' }, // изолированный модуль tenses/
