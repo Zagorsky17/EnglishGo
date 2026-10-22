@@ -1,0 +1,38 @@
+/* keyverbs/keyverbs.css — стили раздела «Ключевые глаголы».
+   Все классы с префиксом kv- — существующие стили приложения не переопределяются.
+   Основа (карточки урока, плеер упражнений) — классы gr-* из grammar/grammar.css.
+   Цвета берутся из переменных темы (светлая/тёмная) из style.css. */
+
+.kv-cta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.kv-cta p { margin: 0; flex: 1 1 260px; }
+
+.kv-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.kv-tile { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); text-decoration: none; transition: border-color .15s; }
+.kv-tile:hover { border-color: var(--accent); }
+.kv-tile-ic { font-size: 1.35rem; line-height: 1; flex-shrink: 0; }
+.kv-tile-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.kv-tile-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+
+.kv-myths { display: flex; flex-direction: column; gap: 10px; }
+.kv-myth { padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
+.kv-myth-card .kv-myth { border: 0; padding: 0; background: none; }
+.kv-myth-card .kv-myth + .kv-myth { padding-top: 10px; border-top: 1px dashed var(--border); border-radius: 0; }
+.kv-myth-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.kv-myth p { margin: 6px 0; line-height: 1.5; }
+.kv-verdict { flex-shrink: 0; font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.kv-v-no { background: var(--bad-soft); color: var(--bad); }
+.kv-v-partly { background: var(--warn-soft); color: var(--warn); }
+.kv-v-yes { background: var(--good-soft); color: var(--good); }
+
+.kv-phrases { display: flex; flex-direction: column; }
+.kv-phrase { padding: 8px 0; }
+.kv-phrase + .kv-phrase { border-top: 1px dashed var(--border); }
+.kv-phrase-top { display: flex; gap: 6px; flex-wrap: wrap; align-items: baseline; }
+.kv-phrase .gr-ex { padding: 2px 0 0; }
+
+.kv-nav { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-top: 14px; }
+.kv-foot { margin-top: 18px; }
+
+@media (max-width: 640px) {
+  .kv-nav .btn { flex: 1 1 auto; justify-content: center; }
+}
