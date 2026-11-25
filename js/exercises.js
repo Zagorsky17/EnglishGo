@@ -45,6 +45,9 @@
   function normalize(s) {
     s = String(s || '').toLowerCase()
       .replace(/[’‘`´]/g, "'").replace(/[“”]/g, '"')
+      .replace(/\b(\d{1,2}):([0-5]\d)\b/g, function (_, hour, minute) {
+        return String(Number(hour)) + (minute === '00' ? '' : 'h' + minute);
+      })
       .replace(/…/g, ' ');
     s = expandTexting(s);
     CONTRACTIONS.forEach(function (c) { s = s.replace(c[0], c[1]); });
@@ -95,6 +98,12 @@
 
   function tokens(s) { return s ? s.split(' ') : []; }
 
+  function sameNegation(a, b) {
+    // shortcut: проверяем явное отрицание, для разбора смысла по контексту нужен отдельный анализ ответа
+    var negative = /\b(?:not(?! only\b)|never|no(?! (?:problem|worries|wonder|doubt|matter)\b)|none|nothing|nobody|nowhere)\b/;
+    return negative.test(a) === negative.test(b);
+  }
+
   /** Сходство фраз 0..1: максимум из посимвольного и пословного, с мягкостью к вежливым «довескам». */
   function phraseSim(user, target) {
     var a = normalize(user), b = normalize(target);
@@ -112,25 +121,27 @@
   /** Сравнить ответ с набором правильных вариантов. */
   function matchAny(user, targets, threshold) {
     threshold = threshold || 0.84;
+    var n = normalize(user);
     var best = { sim: 0, target: targets[0] };
     targets.forEach(function (t) {
+      if (!sameNegation(n, normalize(t))) return;
       var s = phraseSim(user, t);
       if (s > best.sim) best = { sim: s, target: t };
     });
-    var n = normalize(user), shortTarget = normalize(best.target);
+    var shortTarget = normalize(best.target);
     // для коротких ответов требуем почти точное совпадение
     var th = shortTarget.length <= 6 ? 0.99 : threshold;
     return { ok: best.sim >= th, partial: !(best.sim >= th) && best.sim >= th - 0.14 && n.length > 0, sim: best.sim, target: best.target };
   }
 
   /** Совпадает ли группа ключевых слов «a|b|c» с текстом. */
-  function hasKeyword(normText, group) {
+  function hasKeyword(normText, group, exact) {
     var padded = ' ' + normText + ' ';
     return group.split('|').some(function (k) {
       k = normalize(k);
       if (!k) return false;
       if (padded.indexOf(' ' + k + ' ') >= 0) return true;
-      if (k.indexOf(' ') >= 0) return false;
+      if (exact || k.indexOf(' ') >= 0) return false;
       // одно слово — допускаем множественное число и опечатку
       return tokens(normText).some(function (w) {
         return w === k + 's' || w === k + 'es' || (k.length >= 5 && tokenEq(w, k));
@@ -150,7 +161,7 @@
 
   EG.text = {
     normalize: normalize, lev: lev, similarity: similarity, dice: dice,
-    phraseSim: phraseSim, matchAny: matchAny, hasKeyword: hasKeyword, hasCyrillic: hasCyrillic,
+    phraseSim: phraseSim, matchAny: matchAny, sameNegation: sameNegation, hasKeyword: hasKeyword, hasCyrillic: hasCyrillic,
     expandTexting: expandTexting, slangMarkers: slangMarkers, TEXTING: TEXTING
   };
 

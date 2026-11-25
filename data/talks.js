@@ -1,6 +1,7 @@
 /* data/talks.js — дополнительные сценарии режима «Разговор» (по 6 на каждый уровень)
    и продолжения сценариев из data/dialogues.js / data/dialogues-more.js.
-   Формат тот же; файл подключается после dialogues-more.js и дополняет D.scenarios / D.scenariosById. */
+   Формат тот же. requireKeywords требует все смысловые детали из keywords.
+   followup — устное задание после сценария. */
 (function (EG) {
   'use strict';
 
@@ -165,7 +166,7 @@
           explain: 'tomorrow / yesterday идут без предлога: tomorrow morning, yesterday evening.' },
         { npc: "There's a train at 8:15 and one at 9:40.", npcRu: 'Есть поезд в 8:15 и в 9:40.', intent: 'Выберите поезд в 8:15 и спросите цену.',
           accepted: [A('The 8:15, please. How much is it?', 97), A("I'll take the 8:15. How much is it?", 96), A('The 8:15 one, please. How much is it?', 94)],
-          keywords: ['8 15', 'how much'],
+          keywords: ['8:15|8 15|eight fifteen|quarter past eight', 'how much|what is the price'], requireKeywords: true,
           distractors: [X('First train. What cost?', 20, 'Лучше: The 8:15, please. How much is it?')],
           better: 'The 8:15, please. How much is it?', betterRu: 'В 8:15, пожалуйста. Сколько стоит?',
           explain: 'О времени поезда говорят the 8:15 — «тот, что в 8:15».' },
@@ -542,7 +543,7 @@
           explain: 'a connection — стыковка, пересадка. miss a connection — опоздать на неё.', learn: ['is delayed', 'I missed my connection.'] },
         { npc: 'Let me see. Which connection is it?', npcRu: 'Сейчас посмотрю. Какая пересадка?', intent: 'Скажите: поезд в 18:40 на Мюнхен из Берлина.',
           accepted: [A("It's the 18:40 to Munich from Berlin.", 97), A('The 18:40 to Munich from Berlin.', 96), A('The 18:40 train to Munich from Berlin.', 95)],
-          keywords: ['18 40', 'munich'],
+          keywords: ['18:40|18 40|six forty|6:40', 'munich'], requireKeywords: true,
           distractors: [X('Munich train, evening.', 25, 'Назовите точно: the 18:40 to Munich.')],
           better: "It's the 18:40 to Munich from Berlin.", betterRu: 'Это поезд 18:40 на Мюнхен из Берлина.',
           explain: 'Поезда называют по времени отправления: the 18:40 to Munich.' },
@@ -566,7 +567,7 @@
           explain: 'Is there anything…? — «есть ли что-нибудь…». Универсальный вопрос об альтернативах.' },
         { npc: "There's a bus at 19:30 — it takes longer but leaves sooner.", npcRu: 'Есть автобус в 19:30 — дольше едет, но раньше отправляется.', intent: 'Поблагодарите и скажите, что подождёте поезд в 20:10.',
           accepted: [A("Thanks, I'll wait for the 20:10 train.", 97), A("Thank you — I think I'll wait for the 20:10.", 96), A("Thanks. I'll just wait for the 20:10.", 95)],
-          keywords: ['20 10'],
+          keywords: ['20:10|20 10|eight ten|8:10'], requireKeywords: true,
           distractors: [X('Ok. Train better.', 25, 'Скажите решение целиком: I\'ll wait for the 20:10.')],
           better: "Thank you — I think I'll wait for the 20:10.", betterRu: 'Спасибо — пожалуй, подожду поезд в 20:10.',
           explain: 'I think I\'ll… — мягкое решение «пожалуй, я…».' }
@@ -1303,6 +1304,136 @@
           distractors: [X('Ok. Thanks. Bye.', 15, 'Теплее: That’s really kind — I’ll let you know if things free up.')],
           better: "That's really kind of you — I'll let you know if things free up.", betterRu: 'Очень мило с твоей стороны — сообщу, если станет посвободнее.',
           explain: 'free up — освободиться (о времени). Тёплое закрытие сохраняет отношения.', learn: ['Keep me posted.'] }
+      ]
+    },
+    {
+      id: 's-game-swap', topic: 'city', level: 'A1', title: 'Обмен играми в библиотеке', partner: 'Jo',
+      setting: 'You have a board game to swap. Talk to Jo at the library.', settingRu: 'Вы принесли настольную игру на обмен. Поговорите с Джо в библиотеке.',
+      closing: 'No, you don’t. Enjoy the swap!', closingRu: 'Нет, не нужен. Удачного обмена!',
+      followup: 'Представьте, что обмен заканчивается в пять. Скажите другу, где лежат игры и до какого часа можно прийти.',
+      turns: [
+        { npc: 'Hi! Can I help you?', npcRu: 'Здравствуйте! Вам помочь?', intent: 'Скажите, что вы пришли на обмен играми.',
+          accepted: [A("Hi! I'm here for the game swap.", 98), A('Hi! I came for the game swap.', 95), A('Hi! I have a game to swap.', 96)],
+          keywords: ['game', 'swap'],
+          distractors: [X('I here for the game swap.', 30, 'В английском после I нужен глагол: I am here.')],
+          better: "I'm here for the game swap.", betterRu: 'Я на обмен играми.',
+          explain: "I'm here for… помогает сказать, зачем вы пришли: I'm here for the class. — Я на занятие." },
+        { npc: 'The game table is by the desk. The swap ends at four.', npcRu: 'Стол с играми у стойки. Обмен заканчивается в четыре.', intent: 'Переспросите, точно ли обмен заканчивается в четыре.',
+          accepted: [A('Does it end at four?', 97), A('It ends at four, right?', 97), A('Did you say it ends at 4?', 94), A('At four, right?', 93)],
+          keywords: ['at four|at 4'], requireKeywords: true,
+          distractors: [X('Does it ends at four?', 30, 'После does у основного глагола начальная форма: end.')],
+          better: 'It ends at four, right?', betterRu: 'В четыре заканчивается, верно?',
+          explain: 'Для короткой сверки повторите деталь и добавьте right? С вопросом через does окончание -s у end убирается.' },
+        { npc: 'Yes, at four. Is there anything else you’d like to know?', npcRu: 'Да, в четыре. Хотите узнать что-нибудь ещё?', intent: 'Спросите, нужен ли читательский билет.',
+          accepted: [A('Do I need a library card?', 98), A('Do you need a library card for the swap?', 95), A('Can I join without a library card?', 96)],
+          keywords: ['library card'],
+          distractors: [X('Need I a library card?', 30, 'В повседневной речи спросите: Do I need a library card?')],
+          better: 'Do I need a library card?', betterRu: 'Нужен читательский билет?',
+          explain: 'Do I need…? — «мне нужно…?». После a назван любой читательский билет, который подходит для участия.' }
+      ]
+    },
+    {
+      id: 's-repair-cafe', topic: 'problems', level: 'A2', title: 'Что случилось с лампой', partner: 'Pat',
+      setting: 'Your desk lamp stopped working. Ask a volunteer at the repair café for help.', settingRu: 'Настольная лампа перестала работать. Попросите помощи у волонтёра мастерской.',
+      closing: "Sure. I'll write down the part number for you.", closingRu: 'Конечно. Запишу вам номер детали.',
+      followup: 'Теперь представьте, что не работает настольный вентилятор. Скажите, когда он сломался, и уточните, где можно найти запасную деталь.',
+      turns: [
+        { npc: 'Hi there. What seems to be the problem?', npcRu: 'Здравствуйте. Что случилось?', intent: 'Объясните, что лампа перестала работать вчера.',
+          accepted: [A('My lamp stopped working yesterday.', 98), A('The lamp broke yesterday.', 96), A('Yesterday my lamp stopped working.', 95)],
+          keywords: ['lamp', 'stopped working|broke', 'yesterday'], requireKeywords: true,
+          distractors: [X('My lamp has stopped working yesterday.', 35, 'Когда указано вчера, используйте Past Simple: stopped.')],
+          better: 'My lamp stopped working yesterday.', betterRu: 'Вчера моя лампа перестала работать.',
+          explain: 'Stopped working описывает, что вещь перестала работать. Yesterday называет завершённый момент в прошлом.' },
+        { npc: 'Has that ever happened before?', npcRu: 'Раньше такое уже случалось?', intent: 'Скажите, что это впервые, и попросите посмотреть лампу.',
+          accepted: [A("No, it's the first time. Could you take a look?", 98), A("No, it hasn't. Could you have a look?", 97), A('This is the first time. Can you take a look?', 95)],
+          keywords: ['no|first time', 'take a look|have a look'],
+          distractors: [X('No, it is first time. Can you to look?', 30, 'Скажите the first time. После can или could глагол идёт без to.')],
+          better: "No, it's the first time. Could you take a look?", betterRu: 'Нет, впервые. Не могли бы вы посмотреть?',
+          explain: 'Could you take a look? уместно и с человеком, к которому вы обращаетесь впервые, и с коллегой.' },
+        { npc: "It needs a new switch. We don't have one here today.", npcRu: 'Нужен новый выключатель. У нас сегодня такого нет.', intent: 'Спросите, где можно достать новый выключатель.',
+          accepted: [A('Do you know where I can get a new switch?', 98), A('Where can I buy a new switch?', 97), A('Where can I get one?', 96)],
+          keywords: ['where', 'get|buy', 'switch|one'],
+          distractors: [X('Do you know where can I get a new switch?', 35, 'После Do you know… используется порядок where I can get…')],
+          better: 'Do you know where I can get a new switch?', betterRu: 'Не знаете, где можно найти новый выключатель?',
+          explain: 'Прямой вопрос звучит Where can I get one? Внутри Do you know…? порядок меняется на where I can get one.' }
+      ]
+    },
+    {
+      id: 's-call-cut-out', topic: 'phone', level: 'B1', title: 'Пропал звук на звонке', partner: 'Sam',
+      setting: 'You are planning a clean-up on a video call. Ask Sam to repeat the details you missed.', settingRu: 'Вы планируете уборку территории по видеосвязи. Попросите Сэма повторить то, что вы не расслышали.',
+      closing: 'Exactly. Thanks for checking!', closingRu: 'Именно. Спасибо, что уточнили!',
+      followup: 'Представьте, что встречу перенесли на 11:30 к главному входу. Уточните новую договорённость, назвав обе детали.',
+      turns: [
+        { npc: 'The van will come through the main… Sorry, can you hear me now?', npcRu: 'Машина въедет через глав… Простите, сейчас меня слышно?', intent: 'Скажите, что пропустили конец реплики, и попросите повторить.',
+          accepted: [A('I missed the last bit. Could you say it again?', 98), A('I missed the end. Can you repeat that part?', 95), A('You cut out at the end. Could you repeat the last part?', 97)],
+          keywords: ['missed|cut out', 'last|end', 'again|repeat'],
+          distractors: [X('Repeat all from start.', 25, 'Просьба звучит резко и относится ко всему звонку. Уточните, какой фрагмент нужен.')],
+          better: 'I missed the last bit. Could you say it again?', betterRu: 'Я не расслышал последнюю часть. Можете повторить?',
+          explain: 'I missed the last bit указывает, какой кусок нужно повторить. Если причина в звуке, можно сказать You cut out.' },
+        { npc: 'The van needs the main gate. Volunteers should use the side gate.', npcRu: 'Машине нужен главный въезд. Волонтёры идут через боковой вход.', intent: 'Уточните, во сколько собираются волонтёры.',
+          accepted: [A('Can you tell me what time the volunteers are meeting?', 98), A('What time are the volunteers meeting?', 97), A('What time should the volunteers get there?', 95), A('What time do we meet?', 95)],
+          keywords: ['what time', 'volunteers|we'],
+          distractors: [X('Can you tell me what time are the volunteers meeting?', 35, 'Внутри Can you tell me…? скажите what time the volunteers are meeting.')],
+          better: 'Can you tell me what time the volunteers are meeting?', betterRu: 'Скажите, во сколько собираются волонтёры?',
+          explain: 'Уточните, о чьём времени спрашиваете. В прямом вопросе: are the volunteers meeting? Во вложенном: the volunteers are meeting.' },
+        { npc: 'The van arrives at half past nine. We meet at ten, by the side gate.', npcRu: 'Машина приезжает в половине десятого. Мы встречаемся в десять у бокового входа.', intent: 'Перескажите договорённость и проверьте время и место встречи волонтёров.',
+          accepted: [A('So, just to check, we meet at ten by the side gate, right?', 98), A("We're meeting at 10 at the side gate, right?", 97), A('So that’s ten o’clock at the side gate, correct?', 95)],
+          keywords: ['at ten|at 10|ten o clock', 'side gate'], requireKeywords: true,
+          distractors: [X('So we meet at half past nine at the main gate, right?', 30, 'Это время и вход для машины. Волонтёры встречаются в десять у бокового входа.')],
+          better: 'So, just to check, we meet at ten by the side gate, right?', betterRu: 'Сверимся: встречаемся в десять у бокового входа, верно?',
+          explain: 'Just to check подготавливает сверку. Назовите время и место одной репликой, чтобы собеседник мог поправить любую деталь.' }
+      ]
+    },
+    {
+      id: 's-caption-trial', topic: 'opinions', level: 'B2', title: 'Договориться о пробном кинопоказе', partner: 'Robin',
+      setting: 'Your cinema is considering a Saturday screening with captions. Discuss a trial with Robin.', settingRu: 'Кинотеатр обсуждает субботний показ с субтитрами. Договоритесь с Робин о пробном запуске.',
+      closing: "Good. Let's review both after the second screening.", closingRu: 'Хорошо. Посмотрим и на то и на другое после второго показа.',
+      followup: 'Предложите пробный показ в пятницу вечером. Назовите одно условие запуска и объясните, по каким двум признакам оцените результат.',
+      turns: [
+        { npc: 'The Tuesday show is hard to get to for people who work. Any ideas?', npcRu: 'Тем, кто работает, сложно прийти на сеанс во вторник. Есть идеи?', intent: 'Предложите попробовать два субботних показа с субтитрами.',
+          accepted: [A('What if we tried two Saturday screenings with captions?', 98), A('Could we run two captioned screenings on Saturdays as a trial?', 97), A('How about two captioned Saturday shows to start with?', 96)],
+          keywords: ['two|2', 'saturday|saturdays', 'captions|captioned'], requireKeywords: true,
+          distractors: [X('We should move every screening to Saturday.', 30, 'Вы предлагаете ограниченный тест: два показа, после которых можно пересмотреть решение.')],
+          better: 'What if we tried two Saturday screenings with captions?', betterRu: 'Что, если попробовать два субботних показа с субтитрами?',
+          explain: 'What if we tried…? — приглашение обсудить вариант. Tried здесь обозначает гипотезу, а действие относится к будущему.' },
+        { npc: 'People might not realise they’re booking a captioned show.', npcRu: 'Люди могут не заметить при бронировании, что показ с субтитрами.', intent: 'Признайте опасение и предложите указать это на странице бронирования.',
+          accepted: [A('Good point. Could we put a clear notice on the booking page?', 98), A("I see what you mean. Let's label it clearly on the booking page.", 97), A('Fair point. We could flag it on the booking page.', 96)],
+          keywords: ['good point|fair point|see what you mean', 'booking page'],
+          distractors: [X('Nobody cares, just do it.', 20, 'Коллега назвал конкретную проблему. Признайте её и предложите решение.')],
+          better: 'Good point. Could we put a clear notice on the booking page?', betterRu: 'Да, хороший вопрос. Можем явно указать это на странице бронирования?',
+          explain: 'Good point показывает, что вы услышали возражение. В следующем предложении назовите действие, которое его снимает.' },
+        { npc: 'All right. How will we know whether the trial worked?', npcRu: 'Хорошо. Как мы поймём, что пробные показы удались?', intent: 'Предложите оценить продажи билетов и отзывы зрителей.',
+          accepted: [A('We could look at ticket sales and collect audience feedback.', 98), A("Let's compare ticket sales and read the audience comments.", 97), A('I’d look at ticket sales as well as audience feedback.', 96)],
+          keywords: ['ticket sales', 'audience feedback|audience comments'], requireKeywords: true,
+          distractors: [X("We'll just count the tickets sold.", 30, 'Продажи показывают заполняемость. Добавьте отзывы, чтобы узнать, что изменилось для зрителей.')],
+          better: 'We could look at ticket sales and collect audience feedback.', betterRu: 'Можно посмотреть на продажи билетов и собрать отзывы зрителей.',
+          explain: 'Audience feedback — отзывы зрителей в целом. Для отдельных отзывов естественно audience comments.' }
+      ]
+    },
+    {
+      id: 's-voice-archive', topic: 'opinions', level: 'C1', title: 'Согласовать публикацию интервью', partner: 'Mina',
+      setting: 'You agreed to a radio interview about the old market. The producer wants to put a clip online.', settingRu: 'Вы согласились на радиоэфир интервью о старом рынке. Продюсер хочет выложить фрагмент в интернет.',
+      closing: "That works. I'll send you both and wait for your approval.", closingRu: 'Подходит. Пришлю и то и другое и дождусь вашего согласия.',
+      followup: 'Теперь вы согласны только на публикацию письменной цитаты без имени. Уточните границы согласия и сформулируйте, что хотите увидеть перед выпуском.',
+      turns: [
+        { npc: 'Would you be comfortable with us sharing a short clip online?', npcRu: 'Вы согласны, если мы выложим короткий фрагмент в интернет?', intent: 'Подтвердите согласие на радиоэфир и скажите, что пока не согласны на публикацию в интернете.',
+          accepted: [A("I'm happy for it to go out on the radio, but I'm not ready to agree to an online clip.", 98), A("The radio broadcast is fine, but I'd rather not approve the online clip just yet.", 97), A("I'm fine with the broadcast. I haven't agreed to anything online yet.", 96)],
+          keywords: ['radio|broadcast', 'online', 'not'], requireKeywords: true,
+          distractors: [X("I'm happy with the radio broadcast and the online clip.", 30, 'Так вы соглашаетесь на оба формата. Уточните, что решение по публикации в интернете ещё не принято.')],
+          better: "I'm happy for it to go out on the radio, but I'm not ready to agree to an online clip.", betterRu: 'Я согласен на эфир, но пока не готов согласиться на отрывок в интернете.',
+          explain: 'Отделите согласие на эфир от решения по онлайн-отрывку. Just yet позволяет показать, что вы ещё готовы обсудить условия.' },
+        { npc: 'Of course. What concerns you about the clip?', npcRu: 'Конечно. Что вас беспокоит в отрывке?', intent: 'Объясните, что без контекста отрывок может прозвучать как обвинение.',
+          accepted: [A('Taken out of context, it could sound as though I were blaming that family.', 98), A('Without the context, people might think I was blaming the family.', 97), A('Out of context, it could come across as an accusation.', 97)],
+          keywords: ['context', 'blaming|accusation'],
+          distractors: [X('I blame the family, so share the clip.', 25, 'Эта формулировка звучит как обвинение. Вы говорите о впечатлении, которое может создать фрагмент.')],
+          better: 'Taken out of context, it could sound as though I were blaming that family.', betterRu: 'Без контекста это может прозвучать так, будто я обвиняю ту семью.',
+          explain: 'Come across as описывает впечатление. После as though можно использовать were или was в этом контексте.' },
+        { npc: 'We could choose a different excerpt. What would you need before we post it?', npcRu: 'Можем взять другой отрывок. Что вам понадобится перед публикацией?', intent: 'Попросите дать вам проверить окончательный монтаж и подпись до публикации.',
+          accepted: [A("I'd like to review the final cut and the caption before you post it.", 98), A('Could you send me the final edit and the caption before publishing?', 97), A("I'd rather see the edited clip and its caption before it goes online.", 96)],
+          keywords: ['final cut|final edit|edited clip', 'caption', 'before'], requireKeywords: true,
+          distractors: [X('Send it after it goes online.', 25, 'After означает «после». Для согласования до публикации нужно before.')],
+          better: "I'd like to review the final cut and the caption before you post it.", betterRu: 'Я хотел бы проверить окончательный монтаж и подпись перед публикацией.',
+          explain: 'Before you post it ставит условие по времени. Назовите отдельно сам фрагмент и подпись, чтобы получить обе части.' }
       ]
     }
   ];

@@ -15,9 +15,9 @@
   }
   function L(who, en, ru) { return { who: who, en: en, ru: ru }; }
   function N(phrase, gram, note) { return { phrase: phrase, gram: gram, note: note }; }
-  function C(id, level, topic, title, titleRu, setting, settingRu, lines, notes, glossary, questions) {
+  function C(id, level, topic, title, titleRu, setting, settingRu, lines, notes, glossary, questions, practice) {
     return { id: id, level: level, topic: topic, title: title, titleRu: titleRu, setting: setting, settingRu: settingRu,
-      lines: lines, notes: notes, glossary: glossary, questions: questions };
+      lines: lines, notes: notes, glossary: glossary, questions: questions, practice: practice };
   }
 
   /** Времена и конструкции, которые встречаются в диалогах. id времён совпадают с #/tenses/:id. */
@@ -40,7 +40,10 @@
     'passive': 'Пассивный залог',
     'modal-perfect': 'must / should / could + have V3',
     'unreal-past': 'wish / would rather',
-    'inversion': 'Инверсия'
+    'inversion': 'Инверсия',
+    'articles': 'a / an / the',
+    'can-could': 'can / could',
+    'indirect-questions': 'Косвенные вопросы'
   };
 
   D.convos = [
@@ -172,6 +175,26 @@
         Q('How is Leo going to travel?', ['By car', 'By bus', 'By train', 'By plane'], 2, '«Are you going by train?» — «Yes».', 'Как Лео поедет?', ['На машине', 'На автобусе', 'На поезде', 'На самолёте']),
         Q('Why does Nina say "Maybe I\'ll go", not "I\'m going to go"?', ['She has a firm plan', 'She is not sure, it is not a plan yet', 'She went yesterday', 'She goes every week'], 1, 'going to — готовый план, will + maybe — решение под вопросом.', 'Почему Нина говорит «Maybe I\'ll go», а не «I\'m going to go»?', ['У неё твёрдый план', 'Она не уверена, это ещё не план', 'Она ходила вчера', 'Она ходит каждую неделю'])
       ]),
+
+    C('cv-game-swap', 'A1', 'city', 'At the Game Swap', 'На обмене настольными играми',
+      'Lena brings a game to the library.', 'Лена принесла игру в библиотеку.', [
+        L('Lena', "Hi. I'm here for the game swap.", 'Здравствуйте. Я на обмен играми.'),
+        L('Jo', 'Great! The game table is next to the front desk.', 'Отлично! Стол с играми рядом со стойкой у входа.'),
+        L('Lena', 'Can I leave my game there?', 'Можно оставить там мою игру?'),
+        L('Jo', 'Yes. Choose a game to take home, too.', 'Да. Выберите себе игру и заберите домой.'),
+        L('Lena', 'Can we play here first?', 'А можно сначала поиграть здесь?'),
+        L('Jo', "Yes, there's a big table upstairs. The swap ends at four.", 'Да, наверху есть большой стол. Обмен заканчивается в четыре.'),
+        L('Lena', 'Thanks. Do I need a library card?', 'Спасибо. Нужен читательский билет?'),
+        L('Jo', "No, you don't. Just make sure the game has all its pieces.", 'Нет. Только проверьте, что все детали игры на месте.')
+      ], [
+        N('Can I leave my game there', 'can-could', 'Can I + глагол — простой способ спросить разрешения.'),
+        N('Choose a game', 'articles', 'Можно выбрать любую из нескольких игр. Поэтому a game.'),
+        N('The game table', 'articles', 'Речь о конкретном столе, за которым обмениваются играми.'),
+        N('ends at four', 'present-simple', 'О времени по расписанию говорят в Present Simple: ends at four.')
+      ], [['game swap', 'обмен настольными играми'], ['front desk', 'стойка у входа'], ['take home', 'забрать домой'], ['upstairs', 'наверху'], ['make sure', 'убедиться, проверить']], [
+        Q("Where can Lena leave her game?", ['Upstairs', 'At the game table', 'Outside'], 1, 'Джо показывает ей стол рядом со стойкой.', 'Где Лена может оставить игру?', ['Наверху', 'На столе с играми', 'На улице']),
+        Q('What does Lena ask about after hearing the time?', ['A library card', 'The price', 'The rules of a game'], 0, '«Do I need a library card?»', 'О чём Лена спрашивает, узнав время?', ['О читательском билете', 'О цене', 'О правилах игры'])
+      ], 's-game-swap'),
 
     /* ================= A2 ================= */
     C('cv-a2-phone', 'A2', 'city', 'The Lost Phone', 'Потерянный телефон',
@@ -450,6 +473,25 @@
         Q('What is Kim going to do after her homework?', ['Watch TV', 'Call Sara', 'Go to bed', 'Play football'], 1, '«and then I\'m going to call Sara».', 'Что Ким собирается сделать после домашнего задания?', ['Посмотреть телевизор', 'Позвонить Саре', 'Лечь спать', 'Поиграть в футбол']),
         Q('In "I was looking for the room when the bell rang", which action interrupted the other?', ['was looking', 'rang', 'Both happened at the same time', 'Neither'], 1, 'Короткое действие в Past Simple прерывает длительное в Past Continuous.', 'Во фразе «I was looking for the room when the bell rang» какое действие прервало другое?', ['was looking (искала)', 'rang (прозвенел)', 'Оба произошли одновременно', 'Никакое'])
       ]),
+
+    C('cv-repair-cafe', 'A2', 'city', 'Can You Take a Look?', 'Можете посмотреть?',
+      'Noor brings a lamp to a community repair café.', 'Нур принесла лампу в общественную мастерскую.', [
+        L('Pat', 'Hi. What have you brought in today?', 'Здравствуйте. Что вы сегодня принесли?'),
+        L('Noor', 'A lamp. It stopped working last week.', 'Лампу. Она перестала работать на прошлой неделе.'),
+        L('Pat', 'Has it ever done that before?', 'Раньше такое уже случалось?'),
+        L('Noor', "No, it hasn't. Could you take a look?", 'Нет, впервые. Не могли бы вы посмотреть?'),
+        L('Pat', "Sure. The switch is broken, and we don't have a spare today.", 'Конечно. Выключатель сломан, а запасного сегодня нет.'),
+        L('Noor', 'Do you know where I can find one?', 'Не знаете, где его можно найти?'),
+        L('Pat', 'Try the hardware shop on King Street. I can write down the part number.', 'Попробуйте магазин хозтоваров на Кинг-стрит. Могу записать номер детали.'),
+        L('Noor', "That'd be great. I'll bring it back next month.", 'Было бы здорово. Я принесу лампу снова в следующем месяце.')
+      ], [
+        N('stopped working last week', 'past-simple', 'Названо конкретное время в прошлом: last week.'),
+        N('Has it ever done that before', 'present-perfect', 'Спрашивают об опыте до настоящего момента: бывало ли такое раньше?'),
+        N('where I can find one', 'indirect-questions', 'После Do you know… порядок как в утверждении: I can find. One заменяет a spare switch.')
+      ], [['take a look', 'посмотреть, взглянуть'], ['a spare', 'запасная деталь'], ['hardware shop', 'магазин хозтоваров'], ['part number', 'номер детали']], [
+        Q('What is wrong with the lamp?', ['It needs a new bulb', 'The switch is broken', 'It has no cable'], 1, 'Пэт говорит: «The switch is broken».', 'Что случилось с лампой?', ['Нужна новая лампочка', 'Сломался выключатель', 'У неё нет кабеля']),
+        Q('How does Pat offer to help Noor find the right part?', ['By writing down its number', 'By lending her another lamp', 'By ordering a new lamp'], 0, 'Пэт предлагает записать номер детали.', 'Как Пэт предлагает помочь с поиском детали?', ['Записать её номер', 'Одолжить другую лампу', 'Заказать новую лампу'])
+      ], 's-repair-cafe'),
 
     /* ================= B1 ================= */
     C('cv-b1-late', 'B1', 'people', 'Sorry I\'m Late', 'Прости, я опоздал',
@@ -741,6 +783,26 @@
         Q('What is the charity run for?', ['To buy food', 'To raise money for a new building', 'To pay the volunteers', 'To find new dogs'], 1, '«to raise five thousand pounds for a new building».', 'Для чего проводят благотворительный забег?', ['Купить корм', 'Собрать деньги на новое здание', 'Заплатить волонтёрам', 'Найти новых собак']),
         Q('In "a dog that had lived at the shelter for two years finally found a home", what happened first?', ['living at the shelter', 'finding a home', 'Both at the same time', 'Neither'], 0, 'Past Perfect (had lived) — то, что было раньше.', 'Во фразе «a dog that had lived at the shelter for two years finally found a home» что было раньше?', ['жизнь в приюте', 'обретение дома', 'Оба одновременно', 'Ничего'])
       ]),
+
+    C('cv-call-cut-out', 'B1', 'work', 'You Cut Out After “Gate”', 'После слова «вход» звук пропал',
+      'Two volunteers are checking the plan on a video call.', 'Двое волонтёров уточняют план по видеосвязи.', [
+        L('Sam', "We'll meet at the side gate. The van needs to use the main one.", 'Встретимся у бокового входа. Машине нужен главный въезд.'),
+        L('Ana', 'Sorry, you cut out after “gate”. Could you say that last bit again?', 'Извини, после слова «вход» пропал звук. Можешь повторить последнее?'),
+        L('Sam', "Sure. We're using the side gate because the van needs the main gate.", 'Конечно. Мы идём через боковой вход, потому что машине нужен главный.'),
+        L('Ana', 'Got it. Can you tell me what time the van is arriving?', 'Понятно. Скажи, во сколько приедет машина?'),
+        L('Sam', 'Half past nine. But the volunteers are meeting at ten.', 'В половине десятого. А волонтёры встречаются в десять.'),
+        L('Ana', 'So, just to check, we meet at ten by the side gate, right?', 'Сверимся. Встречаемся в десять у бокового входа, верно?'),
+        L('Sam', "Exactly. It's the gate next to the playground.", 'Точно. Это вход рядом с игровой площадкой.'),
+        L('Ana', "Great. I'll put that in the group chat now.", 'Отлично. Сейчас напишу об этом в общий чат.')
+      ], [
+        N('Could you say that last bit again', 'can-could', 'Could you…? — просьба сейчас. Last bit сужает её до последнего фрагмента.'),
+        N('what time the van is arriving', 'indirect-questions', 'Уточнение внутри Can you tell me…? Подлежащее the van стоит перед is arriving.'),
+        N('the volunteers are meeting at ten', 'present-continuous', 'Present Continuous передаёт уже согласованное время встречи.'),
+        N("I'll put that in the group chat", 'future-simple', 'Собеседница обещает действие, которое берёт на себя сейчас.')
+      ], [['cut out', 'прерываться (о звуке или связи)'], ['that last bit', 'последняя часть сказанного'], ['just to check', 'хочу уточнить, просто сверюсь']], [
+        Q('Why does Ana ask Sam to repeat himself?', ["She did not hear the end of Sam's message", 'She disagrees with the plan', 'She wants to move the meeting'], 0, 'Часть реплики не было слышно из-за пропавшего звука.', 'Почему Ана просит Сэма повторить?', ['Она не услышала конец его реплики', 'Она не согласна с планом', 'Она хочет перенести встречу']),
+        Q('What will Ana post in the group chat?', ['The new date of the clean-up', 'The name of the van driver', 'The confirmed meeting details'], 2, 'Ана сверила время и место и собирается написать их в чат.', 'Что Ана напишет в общем чате?', ['Новую дату уборки', 'Имя водителя', 'Подтверждённые детали встречи'])
+      ], 's-call-cut-out'),
 
     /* ================= B2 ================= */
     C('cv-b2-breakin', 'B2', 'society', 'The Break-In', 'Взлом',
@@ -1041,6 +1103,26 @@
         Q('"Could the samples have been contaminated?" is…', ['a guess about the past', 'a plan for the future', 'an order', 'a fact about the present'], 0, 'could have been + V3 — предположение о прошлом.', '«Could the samples have been contaminated?» — это…', ['предположение о прошлом', 'план на будущее', 'приказ', 'факт о настоящем'])
       ]),
 
+    C('cv-caption-trial', 'B2', 'society', 'Could We Trial a Saturday Show?', 'Попробуем показать в субботу?',
+      'Two cinema staff are deciding when to run a captioned screening.', 'Двое сотрудников кинотеатра выбирают время показа с субтитрами.', [
+        L('Ellis', 'What if we moved the captioned screening to Saturday afternoon?', 'Что, если перенести показ с субтитрами на субботний день?'),
+        L('Robin', "I see the appeal. I'm just worried people will book without realising it's captioned.", 'Понимаю, чем это удобно. Боюсь только, что люди забронируют билеты, не заметив, что будут субтитры.'),
+        L('Ellis', 'Could we label it clearly on the booking page and in the confirmation email?', 'Можно явно указать это на странице бронирования и в письме с подтверждением?'),
+        L('Robin', 'That would help. Would we still run the Tuesday show?', 'Это помогло бы. А показ во вторник всё ещё будет?'),
+        L('Ellis', "Yes, let's keep it for now. We could try two Saturdays and see how they go.", 'Да, пока оставим. Можно попробовать два показа по субботам и посмотреть, как пойдёт.'),
+        L('Robin', "If we only look at ticket sales, we'll miss what people thought of it.", 'Если смотреть только на продажи билетов, мы не узнаем, что об этом думают зрители.'),
+        L('Ellis', "Agreed. I'll ask the front desk to collect a few comments after each show.", 'Согласен. Попрошу сотрудников у входа собрать несколько отзывов после каждого сеанса.'),
+        L('Robin', "All right. Let's review both before we change the schedule.", 'Хорошо. Посмотрим и на продажи, и на отзывы, прежде чем менять расписание.')
+      ], [
+        N('What if we moved', 'conditional', 'What if + Past Simple вводит возможный вариант для обсуждения.'),
+        N('Could we label it clearly', 'can-could', 'Could we…? приглашает обсудить конкретный шаг.'),
+        N('If we only look at ticket sales', 'conditional', 'Возможное условие: If + Present Simple. Результат: we’ll miss.'),
+        N("I'll ask the front desk", 'future-simple', 'I’ll + глагол: говорящий берёт задачу на себя.')
+      ], [['I see the appeal', 'понимаю, чем это привлекательно'], ['for now', 'пока, на данный момент'], ['see how they go', 'посмотреть, как они пройдут']], [
+        Q('What is Robin’s first concern?', ['The films will be too long', "Customers won't know the show is captioned", 'There will be no staff on Saturday'], 1, 'Робин опасается, что зрители увидят субтитры только на сеансе.', 'Что сначала беспокоит Робин?', ['Фильмы будут слишком длинными', 'Зрители не будут знать о субтитрах', 'В субботу не будет персонала']),
+        Q('What will the two colleagues review before changing the schedule?', ['Tuesday ticket sales only', 'The wording of two emails', 'Ticket sales and audience comments'], 2, 'Они договорились оценить продажи и отзывы.', 'Что коллеги оценят, прежде чем менять расписание?', ['Только продажи во вторник', 'Формулировки двух писем', 'Продажи билетов и отзывы зрителей'])
+      ], 's-caption-trial'),
+
     /* ================= C1 ================= */
     C('cv-c1-investor', 'C1', 'money', 'The Investor Meeting', 'Встреча с инвестором',
       'Leo, the founder of a start-up, pitches to an investor.', 'Лео, основатель стартапа, презентует проект инвестору.', [
@@ -1319,7 +1401,27 @@
         Q('What practical test does Victor suggest?', ['Ask her clients for money', 'Work out how long she could survive without an income', 'Take a long holiday first', 'Find a business partner'], 1, '«Work out how long you could survive without an income.»', 'Какую практическую проверку предлагает Виктор?', ['Попросить денег у клиентов', 'Посчитать, сколько она продержится без дохода', 'Сначала взять долгий отпуск', 'Найти делового партнёра']),
         Q('"Seldom have I felt so unsure" is an example of…', ['inversion for emphasis', 'a question', 'the passive', 'a future form'], 0, 'После Seldom в начале — инверсия.', '«Seldom have I felt so unsure» — это пример…', ['инверсии для усиления', 'вопроса', 'пассива', 'формы будущего']),
         Q('"Had I been braver, it might have been more interesting" means that Victor…', ['was very brave', "wasn't brave enough, and things could have been different", 'will be braver', 'is talking about the future'], 1, 'Инверсия Had I been — нереальное условие в прошлом.', '«Had I been braver, it might have been more interesting» значит, что Виктор…', ['был очень смелым', 'не был достаточно смелым, и всё могло сложиться иначе', 'станет смелее', 'говорит о будущем'])
-      ])
+      ]),
+
+    C('cv-voice-archive', 'C1', 'society', 'Before We Put It Online', 'Прежде чем выложить в сеть',
+      'A radio producer asks Ruth about sharing an excerpt from her interview.', 'Продюсер радиостанции обсуждает с Рут публикацию фрагмента интервью.', [
+        L('Mina', "We've picked a short excerpt about the market. Would you be comfortable with us sharing it online?", 'Мы выбрали короткий фрагмент о рынке. Вы согласны, если мы выложим его в интернет?'),
+        L('Ruth', "I'm happy for the interview to go out on the radio. Online is a different story.", 'Я согласна на радиоэфир. Публикация в интернете — другое дело.'),
+        L('Mina', 'Is it the wording of the clip that concerns you?', 'Вас беспокоит, как звучит сам отрывок?'),
+        L('Ruth', "It's the lack of context. On its own, it could sound as though I were blaming the family.", 'Дело в контексте. Сам по себе отрывок может звучать так, будто я обвиняю эту семью.'),
+        L('Mina', 'We could use the passage about setting up the stalls instead. Would that address your concern?', 'Можно взять отрывок о том, как собирали торговые ряды. Это решит проблему?'),
+        L('Ruth', "I'd rather hear the final cut first. Could you send the caption as well?", 'Я бы предпочла сначала услышать окончательный монтаж. Пришлёте и подпись?'),
+        L('Mina', "Of course. We'll hold off until you've had a chance to see both.", 'Конечно. Отложим публикацию, пока у вас не будет возможности ознакомиться и с тем, и с другим.'),
+        L('Ruth', "Thanks. If we do share it, let's link to the full programme so people can hear the rest.", 'Спасибо. Если всё-таки выложим, давайте добавим ссылку на передачу целиком, чтобы можно было послушать остальное.')
+      ], [
+        N("We've picked a short excerpt", 'present-perfect', 'Выбор уже сделан. Для разговора важен его текущий результат — конкретный фрагмент.'),
+        N('I were blaming the family', 'unreal-past', 'После as though форма were подчёркивает воображаемое впечатление: Рут семью не обвиняла.'),
+        N("I'd rather hear", 'unreal-past', 'Когда действие выполняет сам говорящий, после would rather идёт начальная форма без to: hear.'),
+        N('If we do share it', 'conditional', 'Ударное do подчёркивает условие: если мы всё-таки решим опубликовать.')
+      ], [['a different story', 'другое дело'], ['final cut', 'окончательный монтаж'], ['hold off', 'повременить, отложить']], [
+        Q("Why isn't Ruth ready to approve the first clip?", ['It could misrepresent what she meant', 'She opposes the radio broadcast', 'She wants to be paid first'], 0, 'Без контекста фрагмент может прозвучать как обвинение.', 'Почему Рут пока не согласна на первый отрывок?', ['Он может исказить её смысл', 'Она против радиоэфира', 'Она хочет сначала получить оплату']),
+        Q('What does Mina agree to do before publishing anything online?', ['Record the entire interview again', 'Remove the complete programme', 'Wait for Ruth to review the edit and the caption'], 2, 'Мина согласилась отложить публикацию до проверки отрывка и подписи.', 'Что Мина соглашается сделать до публикации в интернете?', ['Перезаписать всё интервью', 'Убрать передачу целиком', 'Дождаться, пока Рут проверит монтаж и подпись'])
+      ], 's-voice-archive')
   ];
 
   D.convosById = Object.create(null); // без прототипа: id «constructor» из backup не найдёт Object

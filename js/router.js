@@ -44,7 +44,9 @@
 
   function parse() {
     var hash = location.hash.replace(/^#\/?/, '');
-    var parts = hash.split('/').filter(Boolean).map(decodeURIComponent);
+    var parts;
+    try { parts = hash.split('/').filter(Boolean).map(decodeURIComponent); }
+    catch (e) { parts = []; }
     var name = parts[0] || 'home';
     var route = ROUTES.filter(function (r) { return r.path === name; })[0];
     if (!route || !EG.views[name]) { name = 'home'; route = ROUTES[0]; parts = []; }

@@ -53,12 +53,12 @@ for (const s of EG.data.scenarios) {
     t.accepted.forEach(a => {
       const ev = EG.dialogue.evaluateTurn(t, a.t);
       if (!ev.correct) err('accepted not correct', s.id, i, a.t, ev.verdict);
-      const kwOk = (t.keywords || []).every(g => EG.text.hasKeyword(EG.text.normalize(a.t), g));
+      const kwOk = (t.keywords || []).every(g => EG.text.hasKeyword(EG.text.normalize(a.t), g, t.requireKeywords));
       if (!kwOk) err('accepted misses keyword', s.id, i, a.t);
     });
     (t.distractors || []).forEach(dd => {
       const ev = EG.dialogue.evaluateTurn(t, dd.t);
-      if (ev.verdict === 'great' || ev.verdict === 'good') err('distractor accepted', s.id, i, dd.t, ev.verdict);
+      if (ev.correct) err('distractor accepted', s.id, i, dd.t, ev.verdict);
     });
   });
 }
@@ -73,9 +73,18 @@ for (const txt of ["Hi, I'm Olga. Nice to meet you!", "My name is Petr, nice to 
   const ev = EG.dialogue.evaluateTurn(fd.turns[0], txt);
   console.log('  first-day t0:', JSON.stringify(txt), '→', ev.verdict, ev.naturalness);
 }
-// matchAny
-for (const [u, t] of [["cant i get", "Can I get"], ["could i get", "Can I get"], ["nice to meet u", "Nice to meet you."], ["I am just looking thanks", "I'm just looking, thanks."], ["gona", "gonna"]]) {
-  console.log('  match', JSON.stringify(u), 'vs', JSON.stringify(t), JSON.stringify(EG.text.matchAny(u, [t])));
+// Свободный ввод: отрицание нельзя потерять из-за похожего текста или совпадения ключевых слов.
+for (const [u, t, ok] of [["cant i get", "Can I get", false], ["I can come", "I can't come", false],
+  ["I can’t come", "I cannot come", true], ["nice to meet u", "Nice to meet you.", true],
+  ["I am just looking thanks", "I'm just looking, thanks.", true],
+  ["I have no booking", "I have a booking", false]]) {
+  if (EG.text.matchAny(u, [t]).ok !== ok) err('typed match verdict', u, t, ok);
+}
+if (EG.dialogue.evaluateTurn(sc.turns[0], "I don't want a medium latte, please.").correct) err('negation passed via keywords');
+const timeTurn = EG.data.scenariosById['s-call-cut-out'].turns[2];
+for (const [text, correct] of [["We're meeting at 10:00 at the side gate, right?", true],
+  ["We're meeting at 10:30 at the side gate, right?", false], ["We're meeting at 10 at the main gate, right?", false]]) {
+  if (EG.dialogue.evaluateTurn(timeTurn, text).correct !== correct) err('meeting details verdict', text, correct);
 }
 // SRS
 let c = EG.srs.newCard('x', 0);
@@ -156,6 +165,7 @@ console.log('  exercise availability:', JSON.stringify(cnt));
     if (!EG.LEVELS.includes(t.level)) err('text level', t.id);
     if (!EG.data.textTopics[t.topic]) err('text topic', t.id, t.topic);
     if (!t.paragraphs.length || !t.questions.length) err('text empty', t.id);
+    if (t.practice && EG.data.convosById[t.practice]?.level !== t.level) err('text practice link', t.id, t.practice);
     t.questions.forEach((q, i) => {
       if (!(q.answer >= 0 && q.answer < q.options.length)) err('text answer idx', t.id, i);
       if (new Set(q.options).size !== q.options.length) err('text dup options', t.id, i);
@@ -201,6 +211,10 @@ console.log('  exercise availability:', JSON.stringify(cnt));
     if (!c.setting || !c.settingRu || /[а-яё]/i.test(c.setting)) err('convo setting', c.id);
     if (c.lines.length < 8 || !c.questions.length) err('convo too short', c.id);
     if (new Set(c.lines.map(l => l.who)).size < 2) err('convo speakers', c.id);
+    if (c.practice) {
+      const scene = EG.data.scenariosById[c.practice];
+      if (!scene || scene.level !== c.level || !scene.followup) err('convo practice link', c.id, c.practice);
+    }
     c.lines.forEach((l, i) => {
       if (!l.who || !l.en || !l.ru) err('convo line', c.id, i);
       if (/[а-яё]/i.test(l.en)) err('convo line not in English', c.id, i);
@@ -250,5 +264,26 @@ console.log('  exercise availability:', JSON.stringify(cnt));
   if (EG.wordTrainer.mask('ice cream', 2) !== 'ic_ _____') err('mask', EG.wordTrainer.mask('ice cream', 2));
   console.log('units', EG.LEVELS.map(l => l + ':' + EG.wordTrainer.units(l).length).join(' '));
 }
-console.log(errors ? `\n${errors} ERRORS` : '\nOK');
-process.exitCode = errors ? 1 : 0;
+
+async function checkBackup() {
+  const warn = console.warn;
+  console.warn = () => {}; // в Node проверяем предусмотренный режим работы без IndexedDB
+  try { await EG.db.open(); } finally { console.warn = warn; }
+  const answer = { id: 1, ts: 1, itemId: 'test', correct: true };
+  await EG.db.put('answers', answer);
+  const snapshot = await EG.db.exportAll();
+  await EG.db.wipe(snapshot);
+  const saved = await EG.db.get('meta', 'preImportBackup');
+  if (!saved || await EG.db.count('answers') !== 0) return err('wipe and undo snapshot');
+  const validated = EG.db.validateBackup(saved.value);
+  if (!validated.ok) return err('invalid undo snapshot');
+  await EG.db.importValidated(validated);
+  if (await EG.db.get('meta', 'preImportBackup')) err('undo snapshot left after restore');
+  await EG.db.put('answers', { ts: 2, itemId: 'test-next', correct: true });
+  if ((await EG.db.getAll('answers')).length !== 2) err('history overwritten after restore');
+}
+
+checkBackup().catch(e => err('backup check', e)).then(() => {
+  console.log(errors ? `\n${errors} ERRORS` : '\nOK');
+  process.exitCode = errors ? 1 : 0;
+});

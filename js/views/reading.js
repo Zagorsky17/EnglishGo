@@ -156,7 +156,7 @@
             EG.ui.speakBtn(token, true)),
           h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Закрыть', onclick: closePop }, icon('x'))),
         gl.map(function (g) {
-          return h('div', { class: 'pop-gloss' }, h('span', { class: 'badge' + (g[2] ? ' st-learning' : '') }, g[2] ? 'время' : 'выражение'), h('strong', { lang: 'en' }, g[0]), h('span', null, '— ' + g[1]));
+          return h('div', { class: 'pop-gloss' }, h('span', { class: 'badge' + (g[2] ? ' st-learning' : '') }, g[2] ? 'грамматика' : 'выражение'), h('strong', { lang: 'en' }, g[0]), h('span', null, '— ' + g[1]));
         }),
         EG.lexicon.basic(token) ? h('p', { class: 'pop-basic' }, h('span', { class: 'badge' }, 'служебное слово'), ' ' + EG.lexicon.basic(token)) : null,
         entries.length ? entries.map(entryRow)
@@ -254,7 +254,7 @@
         EG.ui.speak(isDialogue ? t.lines.map(function (l) { return l.en; }).join(' ') : t.paragraphs.join(' '));
       } }, icon('speaker'), isDialogue ? 'Прослушать диалог' : 'Прослушать текст') : null;
       var notes = t.notes && t.notes.length ? h('section', { class: 'card' },
-        h('h3', { class: 'card-title' }, 'Времена в диалоге'),
+        h('h3', { class: 'card-title' }, 'Грамматика в диалоге'),
         h('div', { class: 'gloss-list' }, t.notes.map(function (n) {
           return h('div', { class: 'gloss-row cv-note' },
             h('strong', { lang: 'en' }, n.phrase), EG.ui.speakBtn(n.phrase, true),
@@ -280,7 +280,7 @@
     /* ---------- тест ---------- */
     function startQuiz() {
       closePop();
-      var idx = 0, right = 0;
+      var idx = 0, right = 0, translated = 0;
       var showRu = false; // перевод вопросов: включённый остаётся до конца теста
       // варианты перемешиваем (кроме «верно/неверно»), чтобы правильный ответ не стоял всегда на одном месте
       var orders = t.questions.map(function (q) {
@@ -289,7 +289,7 @@
       });
       function renderQ() {
         var q = t.questions[idx], order = orders[idx];
-        var locked = false;
+        var locked = false, usedTranslation = showRu;
         var ruParts = [];
         function ru(text, cls) {
           if (!text) return null;
@@ -307,6 +307,7 @@
         var ruBtn = hasRu ? h('button', { class: 'link-btn', type: 'button', 'aria-pressed': String(showRu), onclick: toggleRu }, showRu ? 'Скрыть перевод' : 'Перевод') : null;
         function toggleRu() {
           showRu = !showRu;
+          if (showRu && !locked) usedTranslation = true;
           ruParts.forEach(function (el) { el.hidden = !showRu; });
           ruBtn.textContent = showRu ? 'Скрыть перевод' : 'Перевод';
           ruBtn.setAttribute('aria-pressed', String(showRu));
@@ -317,6 +318,7 @@
           locked = true;
           var oi = order[k], ok = oi === q.answer;
           if (ok) right++;
+          if (usedTranslation) translated++;
           btns.forEach(function (b, j) {
             b.disabled = true;
             if (order[j] === q.answer) b.classList.add('correct');
@@ -328,11 +330,11 @@
             h('div', { class: 'fb-head' }, h('span', { class: 'fb-verdict ' + (ok ? 'good' : 'bad') }, icon(ok ? 'check' : 'x'), ok ? 'Верно!' : 'Неверно')),
             !ok ? h('p', null, 'Правильный ответ: ', h('strong', null, q.options[q.answer])) : null,
             q.explain ? h('p', { class: 'fb-note' }, icon('bulb'), q.explain) : null), next);
-          keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); advance(); } };
+          keyHandler = function (e) { if (e.key === 'Enter' && !e.target.closest('button, a')) { e.preventDefault(); advance(); } };
           setTimeout(function () { next.focus({ preventScroll: true }); }, 30);
           EG.ui.scrollToEnd(foot);
         }
-        function advance() { keyHandler = null; idx++; if (idx < t.questions.length) renderQ(); else finish(right); }
+        function advance() { keyHandler = null; idx++; if (idx < t.questions.length) renderQ(); else finish(right, translated); }
         keyHandler = function (e) { var n = parseInt(e.key, 10); if (n >= 1 && n <= btns.length) { e.preventDefault(); pick(n - 1); } };
         body.replaceChildren(h('div', { class: 'card ex-card enter' },
           h('div', { class: 'row between' }, h('div', { class: 'ex-label' }, icon('book'), 'Вопрос ' + (idx + 1) + ' из ' + t.questions.length),
@@ -367,7 +369,7 @@
       return out.slice(0, 12);
     }
 
-    function finish(right) {
+    function finish(right, translated) {
       var score = Math.round(right / t.questions.length * 100);
       saveMinutes();
       var fresh = newWords();
@@ -387,13 +389,17 @@
             h('div', { class: 'finish-nums' },
               h('div', null, h('strong', null, '+' + (xp || 0)), h('span', null, 'XP')),
               h('div', null, h('strong', null, t.words), h('span', null, 'слов прочитано')))),
+          translated ? h('p', { class: 'muted small' }, 'Перевод открыт до ответа в ' + translated + ' из ' + t.questions.length + ' вопросов.') : null,
           fresh.length ? h('div', { class: 'learn-list' },
             h('span', { class: 'metric-label' }, 'Новые слова уровня ' + t.level + ' из текста'),
             h('div', { class: 'chips' }, fresh.map(function (w) { return h('span', { class: 'chip static' }, h('span', { lang: 'en' }, w.en), h('span', { class: 'muted' }, ' — ' + w.ru)); })),
             h('div', { class: 'row gap wrap' }, addAll)) : null,
           h('div', { class: 'row gap wrap center' },
             h('button', { class: 'btn ghost', type: 'button', onclick: showReading }, 'Перечитать'),
-            next ? h('a', { class: 'btn primary', href: K.href + next.id }, K.nextLabel + next.title) : h('a', { class: 'btn primary', href: K.back }, K.allLabel))));
+            t.practice ? h('a', { class: 'btn primary', href: (isDialogue ? '#/talk/' : '#/convo/') + t.practice },
+              isDialogue ? 'Ответить своими словами' : 'Прочитать диалог по теме', icon('arrow')) : null,
+            next ? h('a', { class: 'btn ' + (t.practice ? 'ghost' : 'primary'), href: K.href + next.id }, K.nextLabel + next.title)
+              : h('a', { class: 'btn ' + (t.practice ? 'ghost' : 'primary'), href: K.back }, K.allLabel))));
         window.scrollTo(0, 0);
       }).catch(function (e) { console.error(e); });
     }
@@ -418,6 +424,8 @@
   function grammarChip(id) {
     var name = EG.data.convoGrammar[id] || id;
     var card = EG.tenses && EG.tenses.data && EG.tenses.data.byId[id];
+    var topic = EG.grammar && EG.grammar.data && EG.grammar.data.byId[id];
+    if (topic && !card) return h('a', { class: 'badge cv-gram', href: '#/grammar/t/' + id }, name);
     return card ? h('a', { class: 'badge cv-gram', href: '#/tenses/' + id, title: 'Открыть в «Таблице времён»' }, name)
       : h('span', { class: 'badge cv-gram' }, name);
   }

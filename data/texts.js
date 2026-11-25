@@ -12,8 +12,8 @@
   function Q(q, options, answer, explain, qRu, optionsRu) {
     return { q: q, options: options, answer: answer, explain: explain || '', qRu: qRu, optionsRu: optionsRu || (options === TFE ? TF : null) };
   }
-  function T(id, level, topic, title, titleRu, paragraphs, glossary, questions) {
-    return { id: id, level: level, topic: topic, title: title, titleRu: titleRu, paragraphs: paragraphs, glossary: glossary, questions: questions };
+  function T(id, level, topic, title, titleRu, paragraphs, glossary, questions, practice) {
+    return { id: id, level: level, topic: topic, title: title, titleRu: titleRu, paragraphs: paragraphs, glossary: glossary, questions: questions, practice: practice };
   }
 
   D.textTopics = {
@@ -133,6 +133,18 @@
       Q('What did the family do on Sunday evening?', ['They went to the cinema', 'They watched a comedy on TV', 'They played games', 'They went for a walk'], 1, '«my family watched an old comedy on TV».', 'Что семья делала в воскресенье вечером?', ['Ходила в кино', 'Смотрела комедию по телевизору', 'Играла в игры', 'Гуляла'])
     ]),
 
+    T('t-a1-game-swap', 'A1', 'city', 'Swap a Game', 'Обмен настольными играми', [
+      "Do you have a board game you don't play? Bring it to the library on Saturday and take a different game home.",
+      "The swap starts at two and ends at four. The game table is next to the front desk. Put your game on the table. Then choose a game to take home. You can also stay and play. There is a big table in the room upstairs.",
+      "You don't need a library card for the swap. Please bring a game with all its pieces. If you have a question, ask the person at the front desk."
+    ], [
+      ['board game', 'настольная игра'], ['swap', 'обмен'], ['front desk', 'стойка у входа'], ['take home', 'забрать домой'], ['all its pieces', 'все детали из комплекта']
+    ], [
+      Q('When does the swap end?', ['At two', 'At four', 'At six'], 1, '«The swap starts at two and ends at four.»', 'Когда заканчивается обмен?', ['В два', 'В четыре', 'В шесть']),
+      Q('Where can you stay and play?', ['In the room upstairs', 'At the front desk', 'Outside the library'], 0, 'Для игры есть большой стол в комнате наверху.', 'Где можно остаться и поиграть?', ['В комнате наверху', 'У стойки на входе', 'На улице у библиотеки']),
+      Q('You can join the swap without a library card.', TFE, 0, '«You don’t need a library card for the swap.»', 'В обмене можно участвовать без читательского билета.')
+    ], 'cv-game-swap'),
+
     /* ================= A2 ================= */
     T('t-a2-spain', 'A2', 'travel', 'Two Weeks in Spain', 'Две недели в Испании', [
       "Last summer I went on holiday to Spain with my best friend, Sara. We spent two weeks there and visited three cities: Madrid, Seville and Barcelona. We travelled by train because it is fast and comfortable.",
@@ -240,6 +252,19 @@
       Q('How many people shouted "Surprise!"?', ['Ten', 'Twenty', 'Forty', 'Eighty'], 2, '«forty people shouted \'Surprise!\'»', 'Сколько человек крикнули «Сюрприз!»?', ['Десять', 'Двадцать', 'Сорок', 'Восемьдесят']),
       Q('What did Grandma say in her speech?', ['That she was tired', 'That she felt like the richest woman in the world', 'That she doesn\'t like surprises', 'That she would move to Italy'], 1, '«I feel like the richest woman in the world».', 'Что бабушка сказала в речи?', ['Что она устала', 'Что чувствует себя самой богатой женщиной в мире', 'Что не любит сюрпризы', 'Что уедет в Италию'])
     ]),
+
+    T('t-a2-repair-cafe', 'A2', 'city', 'A Saturday Repair Café', 'Субботняя мастерская', [
+      "Last Saturday, Noor took an old lamp to a repair café. It wasn't a café with a menu. It was a room in the community centre where volunteers helped people fix things.",
+      "At the door, a volunteer asked what was wrong. Noor said the lamp had stopped working the week before. The volunteer wrote down her name and asked her to wait by the window. Two people were ahead of her, so she made herself a cup of tea.",
+      "When it was her turn, Noor sat with a volunteer called Pat. Pat found a problem with the switch. The café didn't have the right part that day, but Pat wrote down what Noor needed to buy. Noor decided to bring the lamp back the following month."
+    ], [
+      ['repair café', 'общественная мастерская, где помогают чинить вещи'], ['ahead of her', 'перед ней в очереди'],
+      ['her turn', 'её очередь'], ['switch', 'выключатель'], ['the right part', 'подходящая деталь']
+    ], [
+      Q('What did the first volunteer do?', ['Fixed the lamp', 'Wrote down her name', 'Sold her a new part'], 1, 'На входе волонтёр записал имя Нур и попросил подождать.', 'Что сделал первый волонтёр?', ['Починил лампу', 'Записал её имя', 'Продал ей деталь']),
+      Q('Why did Noor leave with the lamp still broken?', ['The café was closing', 'Pat could not find the fault', 'The café did not have the right part'], 2, 'Пэт нашёл неисправность, но нужной детали в тот день не было.', 'Почему Нур ушла с неисправной лампой?', ['Мастерская закрывалась', 'Пэт не нашёл неисправность', 'В мастерской не было нужной детали']),
+      Q('What is Noor planning to do next month?', ['Bring the lamp back', 'Buy a new lamp', 'Become a volunteer'], 0, '«Noor decided to bring the lamp back the following month.»', 'Что Нур собирается сделать в следующем месяце?', ['Снова принести лампу', 'Купить новую лампу', 'Стать волонтёром'])
+    ], 'cv-repair-cafe'),
 
     /* ================= B1 ================= */
     T('t-b1-remote', 'B1', 'work', 'Working from Home: Dream or Trap?', 'Работа из дома: мечта или ловушка?', [
@@ -352,6 +377,20 @@
       Q('The word "leftovers" means…', ['fresh vegetables', 'food that remains after a meal', 'frozen meat', 'shopping lists'], 1, 'leftovers — остатки еды.', 'Слово «leftovers» означает…', ['свежие овощи', 'еду, оставшуюся после трапезы', 'замороженное мясо', 'списки покупок'])
     ]),
 
+    T('t-b1-call-cut-out', 'B1', 'work', 'One Word We Missed', 'Одно пропущенное слово', [
+      "During a planning call for a neighbourhood clean-up, Ana's sound kept cutting out. She heard “meet at the gate” and then something about half past nine. That sounded clear enough, so she wrote down “9:30, main gate”.",
+      "Before the call ended, Ana read back what she had written. Sam corrected her straight away. They were meeting at the side gate, because the delivery van needed to get through the main one. He also explained that half past nine was when the van would arrive. The volunteers were meeting at ten.",
+      "Ana put both times in the group chat, with a short note about which gate to use. Then another volunteer asked if the side gate was the one next to the playground. It was. They added that detail too.",
+      "Next time Ana's sound failed, she asked the speaker to repeat just the part she'd missed. At the end, she checked the plan aloud before sending it to anyone else."
+    ], [
+      ['cutting out', 'прерываться, пропадать (о звуке)'], ['read back', 'зачитала записанное для проверки'], ['get through', 'проехать, пройти'],
+      ['aloud', 'вслух']
+    ], [
+      Q('Who was expected at half past nine?', ['All the volunteers', 'The driver of the delivery van', 'The playground staff'], 1, 'В 9:30 должна была приехать машина. Волонтёры собирались в 10:00.', 'Кого ждали в половине десятого?', ['Всех волонтёров', 'Водителя машины доставки', 'Работников игровой площадки']),
+      Q('Why were volunteers told to use the side gate?', ['The main gate was locked', 'The playground was closed', 'The delivery van needed the main gate'], 2, 'Главный въезд нужно было оставить свободным для машины.', 'Почему волонтёров попросили идти через боковой вход?', ['Главный вход был закрыт', 'Игровая площадка была закрыта', 'Машине нужен был главный въезд']),
+      Q('What did Ana change on a later call?', ['She repeated the whole call herself', 'She asked for the missing part and checked the plan aloud', 'She stopped noting down times'], 1, 'Ана стала переспрашивать пропущенное и зачитывать итоговый план.', 'Что Ана изменила в следующем звонке?', ['Сама пересказала весь звонок', 'Попросила повторить пропущенное и проверила план вслух', 'Перестала записывать время'])
+    ], 'cv-call-cut-out'),
+
     /* ================= B2 ================= */
     T('t-b2-sleep', 'B2', 'science', 'Why We Sleep', 'Зачем мы спим', [
       "We spend roughly a third of our lives asleep, yet for centuries scientists had surprisingly little idea why. Today we know that sleep is not simply a period of rest when the brain switches off. On the contrary, during certain stages of sleep the brain is almost as active as when we are awake.",
@@ -461,6 +500,20 @@
       Q('Why do medicine and aviation analyse mistakes openly?', ['Because errors there can have serious consequences', 'Because they rarely make mistakes', 'Because it is required by customers', 'Because it saves time'], 0, 'Ошибки там могут иметь серьёзные последствия.', 'Почему в медицине и авиации ошибки разбирают открыто?', ['Потому что ошибки там могут иметь серьёзные последствия', 'Потому что там редко ошибаются', 'Потому что этого требуют клиенты', 'Потому что это экономит время']),
       Q('Which question does the writer recommend asking after a failure?', ['Why am I so bad at this?', 'Who is to blame?', 'What can I learn from this?', 'Should I stop trying?'], 2, 'Последний абзац.', 'Какой вопрос автор советует задавать себе после неудачи?', ['Почему у меня так плохо получается?', 'Кто виноват?', 'Чему это меня учит?', 'Не бросить ли мне?'])
     ]),
+
+    T('t-b2-caption-trial', 'B2', 'society', 'A Screening Worth Trying', 'Пробный кинопоказ', [
+      "At the Maple Cinema, the manager wanted to make more screenings accessible to people who relied on captions. The cinema already offered one captioned show on Tuesday afternoons. The trouble was that people who worked or studied during the day rarely had a chance to attend.",
+      "A Saturday matinee looked like the obvious alternative, but it was also one of the cinema's busiest slots. The manager worried that regular customers might book without realising the captions would be visible to everyone in the room. One member of staff suggested putting a clear label on the booking page and repeating the information in the confirmation email.",
+      "The team agreed to try two Saturday screenings and to keep the Tuesday show during the trial. On both Saturdays, there would also be an evening screening of the same film. The first trial sold fewer tickets than a typical Saturday matinee, but several visitors wrote that it was the first time they had managed to come.",
+      "When the team met to review the trial, the manager put those comments next to the ticket figures. A single sales figure could tell them how full the room was. It couldn't tell them who had finally been able to use it. They decided to run the trial for another month before choosing a permanent schedule."
+    ], [
+      ['relied on captions', 'нуждались в субтитрах'], ['matinee', 'дневной сеанс'], ['busiest slots', 'самые востребованные часы'],
+      ['confirmation email', 'письмо с подтверждением'], ['ticket figures', 'данные о продаже билетов']
+    ], [
+      Q('Why did the team consider Saturday screenings?', ['The Tuesday show was always full', 'Some people could not attend on a weekday afternoon', 'The cinema was closing on Tuesdays'], 1, 'Ради тех, кто работает или учится днём в будни.', 'Почему команда задумалась о субботних показах?', ['Во вторник всегда был аншлаг', 'Часть зрителей не могла прийти в будний день', 'Кинотеатр закрывался по вторникам']),
+      Q('What were staff going to do about the visible captions?', ['Warn customers when they booked', 'Remove them if someone complained', 'Show them only on personal screens'], 0, 'Информацию планировали разместить на странице бронирования и повторить в письме.', 'Что решили сделать с информацией о видимых всем субтитрах?', ['Предупредить зрителей при бронировании', 'Убрать субтитры при жалобе', 'Показывать их только на персональных экранах']),
+      Q('Why did the manager compare the comments with ticket sales?', ['To check that every visitor had paid', 'To find out who had booked twice', 'To understand a benefit that ticket sales alone did not capture'], 2, 'Продажи показывают заполняемость, отзывы помогли понять, кто впервые смог прийти.', 'Зачем руководитель сопоставил отзывы с продажей билетов?', ['Проверить, что все заплатили', 'Узнать, кто забронировал дважды', 'Понять пользу, которой не видно по продажам'])
+    ], 'cv-caption-trial'),
 
     /* ================= C1 ================= */
     T('t-c1-attention', 'C1', 'tech', 'The Attention Economy', 'Экономика внимания', [
@@ -579,7 +632,22 @@
       Q('"Diminishing returns" means…', ['growing profits', 'less benefit from each additional effort', 'free time', 'higher salaries'], 1, 'Убывающая отдача.', '«Diminishing returns» означает…', ['растущую прибыль', 'всё меньшую отдачу от каждого дополнительного усилия', 'свободное время', 'более высокие зарплаты']),
       Q('What is the writer\'s main argument in the last paragraph?', ['Rest is a sign of failure', 'Reclaiming time for rest may help us do our best work', 'Everyone should work more', 'Idleness is dangerous'], 1, 'Отдых — не лень, а условие хорошей работы.', 'В чём главный аргумент автора в последнем абзаце?', ['Отдых — признак неудачи', 'Если вернуть время для отдыха, это поможет работать лучше всего', 'Всем нужно работать больше', 'Безделье опасно']),
       Q('Which word best describes the writer\'s attitude to the "cult of busyness"?', ['Admiring', 'Critical', 'Neutral', 'Enthusiastic'], 1, 'Автор критически относится к культу занятости.', 'Какое слово лучше всего описывает отношение автора к «культу занятости»?', ['Восхищённое', 'Критическое', 'Нейтральное', 'Восторженное'])
-    ])
+    ]),
+
+    T('t-c1-voice-archive', 'C1', 'society', 'Whose Voice Is It?', 'Чей это голос?', [
+      "For a community radio project, Mina recorded former shopkeepers talking about a market that had closed. Her most vivid interview was with Ruth, who could still recall the names of the regulars and the way the market sounded just before opening. The team wanted to put an excerpt online ahead of the broadcast.",
+      "Ruth had agreed to the interview and was happy for it to go out on the radio. She hesitated when she heard about the online clip. On air, the story would be introduced as a memory of the market. A clip shared on its own could sound like a complaint about a particular family, even though she hadn't meant it that way.",
+      "The producer pointed out that a shorter clip might reach people who never tuned in. Mina suggested using a different passage and sending Ruth the exact edit, along with the caption that would appear underneath it. They also agreed to leave the names of the customers out of the clip.",
+      "Ruth approved the revised excerpt. She asked the team to link to the complete programme so listeners could hear the rest of the story. At their next meeting, the team changed its interview checklist. Contributors would now be asked separately about recording, broadcast and online excerpts. The distinction mattered most when someone said yes to one use and wanted time to think about another."
+    ], [
+      ['excerpt', 'отрывок'], ['go out on the radio', 'прозвучать в радиоэфире'], ['on its own', 'сам по себе, без контекста'],
+      ['tuned in', 'слушали передачу'], ['exact edit', 'конкретная смонтированная версия'],
+      ['clip', 'короткий аудиофрагмент'], ['caption', 'подпись к публикации'], ['contributors', 'участники, предоставившие материал']
+    ], [
+      Q('What worried Ruth about the online clip?', ['The radio would cancel the full interview', 'The team would mispronounce the market name', 'People might interpret it differently without the introduction'], 2, 'Рут опасалась, что короткий фрагмент без вступления примут за жалобу на конкретную семью.', 'Что беспокоило Рут в публикации отрывка в интернете?', ['Радиостанция отменит полное интервью', 'Команда неправильно произнесёт название рынка', 'Без вступления слушатели могут истолковать его иначе']),
+      Q('What did Mina propose sending Ruth for review?', ['The edited clip and its caption', 'A list of all the listeners', 'The live broadcast schedule'], 0, 'Мина предложила прислать готовый монтаж и подпись к публикации.', 'Что Мина предложила прислать Рут на согласование?', ['Смонтированный отрывок и подпись к нему', 'Список всех слушателей', 'Расписание прямого эфира']),
+      Q('What principle did the new checklist reflect?', ['The producer should decide how to share recordings', 'Agreement to one use should be treated separately from agreement to another', 'All material should stay offline'], 1, 'Команда стала отдельно спрашивать о записи, радиоэфире и публикации фрагментов.', 'Какой принцип отразили в обновлённом списке вопросов?', ['Продюсер должен решать, как распространять записи', 'Согласие на один способ использования рассматривают отдельно от согласия на другой', 'Все материалы должны оставаться офлайн'])
+    ], 'cv-voice-archive')
   ];
 
   D.textsById = Object.create(null); // без прототипа: id «constructor» из backup не найдёт Object

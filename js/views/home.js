@@ -38,8 +38,9 @@
         h('p', { class: 'muted' }, pct >= 100 ? 'Можно остановиться — или закрепить результат разговорной практикой.' :
           'Осталось ' + (goal - t.xp) + ' XP. ' + (t.correct + t.wrong ? 'Ответов сегодня: ' + (t.correct + t.wrong) + '.' : 'Начните с короткой сессии.')),
         h('div', { class: 'row gap wrap' },
-          h('a', { class: 'btn primary', href: '#/today' }, icon('today'), 'Начать занятие'),
-          reviewDue ? h('a', { class: 'btn ghost', href: '#/review' }, 'Повторить (' + reviewDue + ')') : h('a', { class: 'btn ghost', href: '#/talk' }, 'Разговор'))));
+          h('a', { class: 'btn primary', href: '#/talk' }, icon('talk'), 'Разговорная практика'),
+          h('a', { class: 'btn ghost', href: '#/today' }, 'Начать занятие'),
+          reviewDue ? h('a', { class: 'btn ghost', href: '#/review' }, 'Повторить (' + reviewDue + ')') : null)));
 
     var tiles = h('section', { class: 'tiles' },
       tile('review', String(reviewDue), 'на повторение', '#/review', reviewDue ? 'accent' : ''),
@@ -75,7 +76,7 @@
       'Хранилище IndexedDB недоступно (' + EG.db.reason + '). Прогресс не сохранится после закрытия. Сделайте экспорт в настройках.') : null;
 
     root.append(
-      EG.ui.pageHead(greeting(), 'Учимся говорить, а не зубрить.'),
+      EG.ui.pageHead(greeting()),
       warn, dayCard, tiles,
       h('div', { class: 'grid-2' }, recCard, levelCard));
   };
