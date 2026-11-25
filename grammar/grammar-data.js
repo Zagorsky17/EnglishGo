@@ -473,7 +473,7 @@
         { name: "Past Simple", means: "конкретное событие, время известно", ex: ["I [went] to London last year.", "Я ездил в Лондон в прошлом году."] },
         { name: "Present Perfect", means: "опыт или результат сейчас, время неважно", ex: ["I['ve been] to London.", "Я бывал в Лондоне."] }
       ],
-      signals: ["yesterday, ago, last…, in 2019 → Past Simple", "ever, never, just, already, yet, so far, since → Present Perfect", "вопрос When…? — всегда Past Simple"],
+      signals: ["yesterday, ago, last…, in 2019 → Past Simple", "ever, never, just, already, yet, so far, since часто встречаются с Present Perfect", "О времени завершённого события: When did it happen?"],
       mistakes: [
         ["When have you arrived?", "When did you arrive?", "When… спрашивает о времени — Past Simple."],
         ["I have finished it two hours ago.", "I finished it two hours ago.", "ago → Past Simple."]
@@ -759,11 +759,11 @@
 
     {
       id: "may-might", group: "compare", level: "A2",
-      title: "may vs might", ru: "Может быть — насколько уверенно?",
-      core: "Оба значат «может быть». may — чуть увереннее и официальнее, might — менее уверенно и чаще в разговоре. Ещё may — вежливое «можно?».",
+      title: "may vs might", ru: "Возможность и разрешение",
+      core: "May и might выражают возможность: It may rain / It might rain. Степень уверенности зависит от контекста и интонации. May также используется для разрешения.",
       sides: [
         { name: "may", means: "возможность, вежливое разрешение", ex: ["[May] I come in?", "Можно войти?"] },
-        { name: "might", means: "возможность, меньше уверенности", ex: ["I [might] be late.", "Возможно, я опоздаю."] }
+        { name: "might", means: "возможность", ex: ["I [might] be late.", "Возможно, я опоздаю."] }
       ],
       signals: ["May I…? — вежливо просим разрешения", "might — частый выбор в разговоре о планах: I might go.", "после may / might — глагол без to"],
       mistakes: [
@@ -771,7 +771,7 @@
         ["It mays rain.", "It may rain.", "У may не бывает -s."]
       ],
       practice: [
-        C("___ I ask you a question?", ["May", "Might", "Must"], "Вежливо просим разрешения — May I…?", "Можно задать вам вопрос?"),
+        S("Вы хотите задать вопрос после доклада. Выберите обычную вежливую просьбу о разрешении.", ["May I ask a question?", "Must I ask a question?", "May you ask a question?"], "May I…? — просьба о разрешении. Must I…? — вопрос об обязанности.", "Можно задать вопрос?"),
         M("I might go to the party.", ["Возможно, пойду — не уверен", "Точно пойду", "Мне разрешили пойти"], "might — неуверенная возможность."),
         C("Take an umbrella. It ___ rain later.", ["might", "must", "can to"], "Возможность — might.", "Возьми зонт. Позже может пойти дождь."),
         F("She may to know the answer.", ["She may know the answer."], "После may — без to.", "Возможно, она знает ответ."),
@@ -780,6 +780,63 @@
     },
 
     /* ======================= КОНСТРУКЦИИ ======================= */
+
+    {
+      id: "articles", group: "constructions", level: "A1",
+      title: "a / an / the", ru: "Какую вещь имеете в виду?",
+      core: "A / an вводит один предмет из группы: a game. The показывает, что собеседник может определить, о каком предмете речь: the game on this table.",
+      key: ["I brought [a] game. [The] game is in my bag.", "Я принёс игру. Она у меня в сумке."],
+      when: ["a / an — один предмет, который можно сосчитать: a card, an umbrella.", "the — предмет уже назван, виден или однозначно определяется по ситуации: the front desk.", "Для вещей в целом во множественном числе и для вещества часто артикль не нужен: I like games. We need water."],
+      signals: ["a перед согласным звуком: a university", "an перед гласным звуком: an hour", "В словах my card и this card уже есть указатель на предмет."],
+      formula: [["один из группы", "a / an + существительное в единственном числе"], ["определимый", "the + существительное"], ["вещи в целом", "games / water"]],
+      examples: [
+        ["Do I need [a] library card?", "Мне нужен читательский билет? Подойдёт любой действующий."],
+        ["Where’s [the] game table?", "Где стол с играми? Оба знают, о каком столе речь."],
+        ["Do you have [an] umbrella?", "У вас есть зонт?"],
+        ["Can I leave [my] bag here?", "Можно оставить здесь мою сумку?"]
+      ],
+      mistakes: [
+        ["I need ticket.", "I need a ticket.", "Перед исчисляемым ticket в единственном числе нужен указатель, например a или my."],
+        ["We waited for a hour.", "We waited for an hour.", "Буква h в hour не произносится. Первый звук гласный."],
+        ["Where is the my bag?", "Where is my bag?", "My уже указывает, чья это сумка. The здесь лишний."]
+      ],
+      practice: [
+        C("I have ___ game to swap.", ["a", "an", "many"], "Одна игра, перед согласным звуком — a.", "У меня есть игра на обмен."),
+        C("I brought a game. ___ game is in my bag.", ["The", "An", "Any"], "Игра уже упомянута, поэтому the.", "Я принёс игру. Она у меня в сумке."),
+        C("It takes ___ hour.", ["an", "a", "some"], "Hour начинается с гласного звука.", "Это занимает час."),
+        S("Вам подойдёт любой свободный стул. Попросите стул.", ["Can I have a chair?", "Can I have chair?", "Can I have an chair?"], "A chair — один стул из нескольких.", "Можно мне стул?"),
+        F("I have an library card.", ["I have a library card."], "Library начинается с согласного звука, поэтому a.", "У меня есть читательский билет.")
+      ]
+    },
+
+    {
+      id: "indirect-questions", group: "constructions", level: "A2",
+      title: "Косвенные вопросы", ru: "Как вежливо уточнить",
+      core: "В Can you tell me where the gate is? вопрос уже начинается с Can you tell me. Внутри второй части порядок как в утверждении: the gate is.",
+      key: ["Could you tell me [where the gate is]?", "Не подскажете, где вход?"],
+      when: ["Для вопроса с where, when, what time сохраните вопросительное слово: Do you know when the shop opens?", "Для вопроса с ответом «да» или «нет» используйте if или whether: Do you know if the shop is open?", "В конце стоит вопросительный знак, если вся реплика — вопрос. В I wonder where it is ставится точка."],
+      signals: ["Do you know…? · Could you tell me…? · I wonder…", "После if, whether или where: the shop is open, the gate is, we are meeting."],
+      formula: [["где / когда", "Do you know + where / when + подлежащее + глагол?"], ["да / нет", "Could you tell me + if / whether + подлежащее + глагол?"]],
+      examples: [
+        ["Do you know [where I can find a spare]?", "Не знаете, где найти запасную деталь?"],
+        ["Could you tell me [what time the shop opens]?", "Не подскажете, во сколько открывается магазин?"],
+        ["Can you check [if the room is free]?", "Можете проверить, свободна ли комната?"]
+      ],
+      vs: { a: ["[Where is] the gate?", "прямой вопрос"], b: ["Do you know [where the gate is]?", "вопрос внутри другой фразы"],
+        text: "В прямом вопросе is стоит перед the gate. В косвенном the gate идёт перед is. С do / does / did уберите вспомогательный глагол и верните форму смыслового: What time does it open? → Do you know what time it opens?" },
+      mistakes: [
+        ["Could you tell me where is the gate?", "Could you tell me where the gate is?", "После where — the gate is."],
+        ["Do you know when does the shop open?", "Do you know when the shop opens?", "Во вложенной части уберите does и добавьте -s к opens."],
+        ["Do you know is it open?", "Do you know if it's open?", "Если ответ — да или нет, вложенную часть вводит if или whether."]
+      ],
+      practice: [
+        C("Can you tell me where ___?", ["the gate is", "is the gate", "does the gate"], "Внутри вопроса порядок как в утверждении: the gate is.", "Скажите, где вход?"),
+        C("Do you know what time the shop ___?", ["opens", "does opens", "open"], "В нейтральном вопросе после Do you know…? используйте the shop opens.", "Не знаете, во сколько открывается магазин?"),
+        B("Do you know if the room is free?", "Не знаете, свободна ли комната?", "If вводит вопрос с ответом «да» или «нет». Дальше the room is free."),
+        F("Do you know where can I buy a spare?", ["Do you know where I can buy a spare?"], "После where идут I и can buy.", "Не знаете, где купить запасную деталь?"),
+        S("Попросите проверить, включены ли субтитры.", ["Could you check if the captions are on?", "Could you check if are the captions on?", "Could you check are the captions on?"], "If + the captions are on.", "Не могли бы вы проверить, включены ли субтитры?")
+      ]
+    },
 
     {
       id: "there-is", group: "constructions", level: "A1",
@@ -1226,7 +1283,7 @@
     {
       id: "reported", group: "constructions", level: "B1",
       title: "Косвенная речь", ru: "Он сказал, что…",
-      core: "Пересказываем чужие слова. Если said / told в прошлом, время в пересказе обычно «сдвигается» на шаг назад.",
+      core: "При пересказе с said или told время часто сдвигается назад: I’m tired → She said she was tired. Если сказанное всё ещё актуально, можно сохранить исходное время: She said she lives nearby.",
       key: ["He said he [was] tired.", "Он сказал, что устал. (Он сказал: «I'm tired».)"],
       when: ["Пересказ: She said she would call.", "Вопросы: He asked if I was OK.", "Просьбы: She told me to wait."],
       signals: ["said (that) / told me (that)", "asked if / asked where…", "told me to + V — просьба или указание"],
@@ -1239,7 +1296,7 @@
       ],
       talk: [["He said he'd call.", "Он сказал, что позвонит."], ["She asked me to tell you.", "Она просила тебе передать."]],
       vs: { a: ["She said, «[I'm] tired».", "прямая речь"], b: ["She said she [was] tired.", "косвенная речь: сдвиг времени"],
-        text: "В пересказе am → was, will → would, can → could." },
+        text: "При сдвиге am → was, will → would, can → could. В косвенном вопросе меняется и порядок слов.", link: "indirect-questions" },
       mistakes: [
         ["He asked where do I live.", "He asked where I lived.", "В косвенном вопросе нет do, порядок слов — как в утверждении."],
         ["She said me that she was busy.", "She told me that she was busy.", "С человеком — told."],
@@ -1250,7 +1307,7 @@
         C("She asked me where I ___.", ["lived", "did live", "do live"], "Косвенный вопрос: без do, сдвиг времени.", "Она спросила меня, где я живу."),
         C("He told me ___ the door.", ["to close", "close", "closing"], "told + кого + to + V.", "Он велел мне закрыть дверь."),
         F("She asked me where do I work.", ["She asked me where I worked.", "She asked me where I work."], "Без do: where I worked.", "Она спросила, где я работаю."),
-        M("He said he would call.", ["Он обещал позвонить", "Он уже позвонил", "Он звонит сейчас"], "would — будущее с точки зрения прошлого.")
+        M("He said he would call.", ["Он сказал, что позвонит", "Он уже позвонил", "Он звонит сейчас"], "Would передаёт действие, которое было будущим в момент разговора.")
       ]
     },
 
@@ -1384,10 +1441,10 @@
 
   // Порядок «от простого к сложному» — для рекомендации «Что мне учить дальше?»
   var CURRICULUM = [
-    "present-simple", "present-continuous", "ps-vs-pc", "there-is", "past-simple", "past-continuous",
+    "present-simple", "present-continuous", "ps-vs-pc", "articles", "there-is", "past-simple", "past-continuous",
     "have-got", "want-to", "would-like", "need-to", "have-to", "can-could", "much-many", "some-any",
     "present-perfect", "past-vs-perfect", "since-for", "going-to", "future-simple", "will-vs-going",
-    "say-tell", "do-make", "modals", "should-haveto", "must-haveto", "used-to", "used-vs-would",
+    "indirect-questions", "say-tell", "do-make", "modals", "should-haveto", "must-haveto", "used-to", "used-vs-would",
     "be-used-to", "get-used-to", "few-little", "present-perfect-continuous", "perfect-vs-perfect-cont",
     "be-able-to", "make-let", "infinitive", "gerund", "may-might", "conditionals", "passive", "relative",
     "past-perfect", "future-continuous", "reported", "have-done", "future-perfect"

@@ -155,7 +155,10 @@
 
   function memPut(store, value) {
     var v = clone(value);
-    if (STORES[store].autoIncrement && v.id == null) v.id = memory.seq++;
+    if (STORES[store].autoIncrement) {
+      if (v.id == null) v.id = memory.seq++;
+      else memory.seq = Math.max(memory.seq, Math.floor(v.id) + 1);
+    }
     memory[store].set(keyOf(store, v), v);
     return keyOf(store, v);
   }
@@ -237,29 +240,34 @@
   }
 
   /** Полная замена содержимого всех хранилищ одной транзакцией (всё или ничего). */
-  function replaceAll(storesData) {
+  function replaceAll(storesData, snapshot) {
     if (memory) {
       return memWrite(function () {
         STORE_NAMES.forEach(function (n) {
           memory[n].clear();
           (storesData[n] || []).forEach(function (v) { memPut(n, v); });
         });
+        if (snapshot) memPut('meta', { key: 'preImportBackup', value: snapshot });
       });
     }
     return withTx(STORE_NAMES, 'readwrite', function (tx) {
-      STORE_NAMES.forEach(function (n) {
-        var os = tx.objectStore(n);
-        os.clear();
-        (storesData[n] || []).forEach(function (v) { os.put(v); });
-      });
+      try {
+        STORE_NAMES.forEach(function (n) {
+          var os = tx.objectStore(n);
+          os.clear();
+          (storesData[n] || []).forEach(function (v) { os.put(v); });
+        });
+        if (snapshot) tx.objectStore('meta').put({ key: 'preImportBackup', value: snapshot });
+      } catch (e) {
+        tx.abort();
+        throw e;
+      }
       return txDone(tx);
     }, { durability: 'strict' });
   }
 
-  function wipe() {
-    var empty = {};
-    STORE_NAMES.forEach(function (n) { empty[n] = []; });
-    return replaceAll(empty);
+  function wipe(snapshot) {
+    return replaceAll({}, snapshot);
   }
 
   /* ---------- экспорт ---------- */
@@ -482,8 +490,8 @@
     };
   }
 
-  function importValidated(result) {
-    return replaceAll(result.stores).then(function () {
+  function importValidated(result, snapshot) {
+    return replaceAll(result.stores, snapshot).then(function () {
       if (result.settings && EG.storage) EG.storage.replace(result.settings);
     });
   }

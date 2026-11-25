@@ -168,8 +168,7 @@
   EG.views.talk = function (root, params) {
     if (params[0]) return runTalk(root, params[0]);
     root.append(
-      EG.ui.pageHead('Разговор', 'Вы — в реальной ситуации. Собеседник говорит, вы отвечаете своими словами. Думайте на английском: приложение оценит смысл и естественность.'),
-      h('div', { class: 'notice' }, icon('bulb'), 'Пишите так, как сказали бы вслух. Не бойтесь ошибок — разбор покажет, как звучит естественнее. Кнопка «Варианты» — если совсем трудно.'),
+      EG.ui.pageHead('Разговор', 'Скажите ответ вслух, затем введите его и сравните с образцом. «Варианты» помогут, если трудно начать.'),
       groupedList(EG.data.scenarios, function (s) { return '#/talk/' + s.id; }, 'talk'));
   };
 
@@ -183,6 +182,7 @@
     function onKey(e) { if (keyHandler && !e.metaKey && !e.ctrlKey) keyHandler(e); }
     document.addEventListener('keydown', onKey);
     var settingRu = h('p', { class: 'muted hidden' }, sc.settingRu);
+    var model = EG.data.convos.find(function (c) { return c.practice === sc.id; });
 
     root.append(
       h('a', { class: 'back-link', href: '#/talk' }, icon('back'), 'Разговор'),
@@ -191,6 +191,7 @@
         h('p', { class: 'setting', lang: 'en' }, sc.setting, ' ', EG.ui.speakBtn(sc.setting, true),
           h('button', { class: 'link-btn small', onclick: function () { settingRu.classList.toggle('hidden'); } }, 'перевод')),
         settingRu,
+        model ? h('a', { class: 'link-btn', href: '#/convo/' + model.id }, 'Прочитать пример разговора') : null,
         h('div', { class: 'bar thin talk-progress' }, h('span', { style: { width: '0%' } }))),
       log, controls);
     var progressFill = root.querySelector('.talk-progress span');
@@ -205,7 +206,7 @@
         EG.ui.autoSpeak(turn.npc);
       }
       shownAt = Date.now();
-      var input = h('textarea', { class: 'input big', rows: 2, placeholder: 'Ответьте по-английски…', lang: 'en', autocapitalize: 'sentences', spellcheck: 'false' });
+      var input = h('textarea', { class: 'input big', rows: 2, maxlength: 500, 'aria-label': 'Ваш ответ по-английски', placeholder: 'Введите то, что сказали…', lang: 'en', autocapitalize: 'sentences', spellcheck: 'false' });
       var hintsBox = h('div', { class: 'options en hidden' });
       var usedHint = false;
       var sent = false; // защита от двойной отправки (двойной клик, зажатый Enter)
@@ -260,7 +261,7 @@
           controls.replaceChildren(h('div', { class: 'row gap wrap' },
             !ev.correct || ev.naturalness < 75 ? h('button', { class: 'btn ghost', onclick: function () { keyHandler = null; showTurn(true); } }, 'Сказать ещё раз') : null,
             nextBtn));
-          keyHandler = function (e) { if (e.key === 'Enter') { e.preventDefault(); next(); } };
+          keyHandler = function (e) { if (e.key === 'Enter' && !e.target.closest('button, a, summary')) { e.preventDefault(); next(); } };
           setTimeout(function () { nextBtn.focus({ preventScroll: true }); }, 30);
           scroll();
         });
@@ -277,7 +278,7 @@
         if (b) { e.preventDefault(); b.click(); }
       };
       EG.ui.fill(controls,
-        isRetry ? h('p', { class: 'muted small' }, 'Попробуйте ещё раз — используйте более естественный вариант.') : null,
+        h('p', { class: 'muted small' }, isRetry ? 'Скажите реплику ещё раз. Воспользуйтесь разбором.' : 'Сначала ответьте вслух. Затем введите ту же реплику.'),
         EG.storage.get('talkHints') && turn.intent ? h('p', { class: 'intent' }, h('span', { class: 'muted' }, 'Задача: '), turn.intent) : null,
         input,
         h('div', { class: 'row gap wrap' },
@@ -302,11 +303,11 @@
         var others = EG.data.scenarios.filter(function (s) { return s.id !== sc.id && s.level === sc.level && !EG.state.dialogues.has(s.id); });
         controls.replaceChildren(h('div', { class: 'card finish enter' },
           h('h2', null, 'Разговор завершён'),
-          h('p', { class: 'muted' }, score >= 80 ? 'Вы звучите естественно. Так держать!' : score >= 50 ? 'Вас понимают. Теперь — шлифуем естественность.' : 'Хорошее начало. Повторите сценарий — во второй раз будет заметно легче.'),
+          sc.followup ? h('p', null, h('strong', null, 'Ещё один ответ вслух. '), sc.followup) : null,
           h('div', { class: 'finish-stats' },
             EG.ui.ring(score, score + '%', 'результат'),
             h('div', { class: 'finish-nums' },
-              h('div', null, h('strong', null, nat + '%'), h('span', null, 'естественность')),
+              h('div', null, h('strong', null, nat + '%'), h('span', null, 'по образцам')),
               h('div', null, h('strong', null, '+' + (r[0] || 0)), h('span', null, 'XP бонус')))),
           ids.length ? h('div', { class: 'learn-list' }, h('span', { class: 'metric-label' }, 'Выражения добавлены в повторение'),
             h('div', { class: 'chips' }, ids.map(function (id) { var v = EG.data.byId[id]; return h('span', { class: 'chip static' }, v.en, h('span', { class: 'muted' }, ' — ' + v.ru)); }))) : null,

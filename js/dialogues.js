@@ -61,24 +61,32 @@
 
     // лучшее совпадение с принятыми вариантами
     var best = null;
+    var compatible = false;
     turn.accepted.forEach(function (a) {
-      var s = EG.text.phraseSim(raw, a.t);
-      if (!best || s > best.sim) best = { sim: s, a: a };
+      var target = EG.text.normalize(a.t);
+      var exact = norm === target;
+      var same = EG.text.sameNegation(norm, target);
+      if (same) compatible = true;
+      var s = same ? EG.text.phraseSim(raw, a.t) : 0;
+      if (!best || exact || (!best.exact && s > best.sim)) best = { sim: s, a: a, exact: exact };
     });
 
     // явно неудачные варианты
     var badHit = null;
     (turn.distractors || []).forEach(function (d) {
+      var target = EG.text.normalize(d.t);
+      if (!EG.text.sameNegation(norm, target)) return;
       var s = EG.text.phraseSim(raw, d.t);
-      if (s >= 0.88 && (!badHit || s > badHit.sim)) badHit = { sim: s, d: d };
+      var exact = norm === target;
+      if (s >= 0.88 && (!badHit || exact || (!badHit.exact && s > badHit.sim))) badHit = { sim: s, d: d, exact: exact };
     });
 
     var groups = turn.keywords || [];
-    var hit = groups.filter(function (g) { return EG.text.hasKeyword(norm, g); }).length;
+    var hit = groups.filter(function (g) { return EG.text.hasKeyword(norm, g, turn.requireKeywords); }).length;
     var coverage = groups.length ? hit / groups.length : 0;
     var words = norm.split(' ').length;
 
-    if (badHit && (!best || badHit.sim > best.sim)) {
+    if (badHit && !best.exact && (badHit.exact || badHit.sim > best.sim)) {
       return {
         verdict: 'awkward', correct: false, partial: true, naturalness: badHit.d.n != null ? badHit.d.n : 25,
         match: turn.accepted[0], coverage: coverage, note: badHit.d.note,
@@ -86,22 +94,22 @@
       };
     }
 
-    if (best.sim >= 0.8) {
+    if (best.sim >= 0.8 && (!turn.requireKeywords || coverage === 1)) {
       var nat = Math.round(best.a.n * (0.85 + 0.15 * best.sim));
       return {
         verdict: best.a.n >= 80 ? 'great' : 'good', correct: true, naturalness: nat,
         match: best.a, coverage: coverage, note: best.a.note,
-        message: best.a.n >= 80 ? 'Отлично! Так и говорят носители.' : 'Верно и понятно.'
+        message: best.a.n >= 80 ? 'Ваш ответ близок к образцу.' : 'Подходит к ситуации.'
       };
     }
 
-    if (groups.length && coverage >= 0.999) {
+    if (!turn.requireKeywords && coverage === 1 && compatible) {
       // смысл передан своими словами
       var n2 = Math.round(50 + best.sim * 30 - (words > 18 ? 10 : 0));
       return {
         verdict: 'understood', correct: true, naturalness: EG.util.clamp(n2, 40, 78),
         match: best.a, coverage: coverage,
-        message: 'Вас поймут! Смысл передан. Посмотрите, как сказать естественнее.'
+        message: 'В ответе есть ключевые слова. Сравните формулировку с образцом.'
       };
     }
 
@@ -115,7 +123,7 @@
 
     return {
       verdict: 'miss', correct: false, naturalness: 10, match: best.a, coverage: coverage,
-      message: 'Собеседник вас, скорее всего, не поймёт. Разберите правильный вариант.'
+      message: 'Ответ сильно отличается от образца. Сравните их и попробуйте ещё раз.'
     };
   }
 

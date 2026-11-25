@@ -13,7 +13,7 @@
   function turnFeedback(turn, ev, opts) {
     opts = opts || {};
     var toneMap = { great: 'good', good: 'good', understood: 'ok', partial: 'warn', awkward: 'warn', miss: 'bad' };
-    var verdictLabel = { great: 'Отлично', good: 'Правильно', understood: 'Понятно', partial: 'Частично', awkward: 'Неудачно', miss: 'Непонятно' };
+    var verdictLabel = { great: 'Близко к образцу', good: 'Подходит', understood: 'Ключевые слова совпали', partial: 'Частично', awkward: 'Не подходит', miss: 'Сверьте с образцом' };
     var tone = toneMap[ev.verdict] || 'bad';
     var nat = ev.naturalness || 0;
     var better = turn.better || (turn.accepted[0] && turn.accepted[0].t);
@@ -30,12 +30,12 @@
       h('div', { class: 'metric-row' },
         h('div', { class: 'metric' }, h('span', { class: 'metric-label' }, 'Правильность'),
           h('strong', null, ev.correct ? 'смысл передан' : ev.partial ? 'частично' : 'не передан')),
-        h('div', { class: 'metric grow' }, h('span', { class: 'metric-label' }, 'Естественность · ' + nat + '%'),
+        h('div', { class: 'metric grow' }, h('span', { class: 'metric-label' }, 'Оценка по образцам · ' + nat + '%'),
           EG.ui.bar(nat, nat >= 75 ? 'good' : nat >= 45 ? 'ok' : 'bad'))
       ),
       ev.note ? h('p', { class: 'fb-note' }, icon('bulb'), ev.note) : null,
       better ? h('div', { class: 'better' },
-        h('span', { class: 'metric-label' }, ev.verdict === 'great' ? 'Так говорят носители' : 'Более естественный вариант'),
+        h('span', { class: 'metric-label' }, 'Пример ответа'),
         h('div', { class: 'better-line' }, h('strong', { lang: 'en' }, better), EG.ui.speakBtn(better, true), star(better, turn.betterRu)),
         turn.betterRu ? h('p', { class: 'muted' }, turn.betterRu) : null
       ) : null,

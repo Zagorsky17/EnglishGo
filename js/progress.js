@@ -271,7 +271,7 @@
     var sc = nextOf(EG.data.scenarios, 'talk');
     if (sc) {
       recs.push({ icon: 'talk', tone: 'accent', title: 'Разговор: ' + sc.title,
-        text: sc.settingRu + ' Отвечайте своими словами — приложение оценит естественность.', href: '#/talk/' + sc.id });
+        text: sc.settingRu + ' Ответьте вслух, затем сравните письменный ответ с образцом.', href: '#/talk/' + sc.id });
     }
     if (due === 0 && t.xp < goal) {
       recs.push({ icon: 'today', tone: 'accent', title: 'Учите новое',

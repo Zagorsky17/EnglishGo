@@ -85,7 +85,7 @@
       EG.ui.modal({
         title: 'Восстановить прогресс?',
         body: h('div', null,
-          h('p', null, 'Текущие данные будут полностью заменены данными из файла' + (res.exportedAt ? ' от ' + new Date(res.exportedAt).toLocaleString('ru-RU') : '') + '. Импорт можно будет отменить.'),
+          h('p', null, 'Прогресс основных разделов будет заменён данными из файла' + (res.exportedAt ? ' от ' + new Date(res.exportedAt).toLocaleString('ru-RU') : '') + '. Импорт можно будет отменить.'),
           warnOld.length ? h('div', { class: 'notice warn' }, icon('mistakes'), h('div', null, warnOld.map(function (w) { return h('p', { class: 'small' }, w); }))) : null,
           h('ul', { class: 'plain' },
             h('li', null, 'Карточек SRS: ', h('strong', null, s.cards)),
@@ -100,7 +100,7 @@
         actions: [{ label: 'Отмена', value: false }, { label: 'Восстановить', value: true, primary: true }]
       }).then(function (ok) {
         if (!ok) return;
-        replaceWithUndo(function () { return EG.db.importValidated(res); })
+        replaceWithUndo(function (snapshot) { return EG.db.importValidated(res, snapshot); })
           .then(function () {
             EG.app.applyTheme();
             EG.ui.toast('Прогресс восстановлен. Отменить можно в настройках.', 'good');
@@ -114,11 +114,7 @@
 
   /** Заменить все данные, сохранив текущие для «Отменить». */
   function replaceWithUndo(replace) {
-    return EG.db.exportAll().then(function (snapshot) {
-      return replace().then(function () {
-        return EG.db.put('meta', { key: 'preImportBackup', value: snapshot });
-      });
-    }).then(function () { return EG.state.load(); });
+    return EG.db.exportAll().then(replace).then(function () { return EG.state.load(); });
   }
 
   function undoReplace() {
@@ -192,13 +188,13 @@
             });
           } }, 'Отменить последний импорт / сброс') : null,
           fileInput),
-        h('p', { class: 'muted small' }, 'Файл english-app-backup.json. При импорте проверяются формат, версия и каждая запись — повреждённый файл не затронет текущие данные.'),
+        h('p', { class: 'muted small' }, 'Файл english-app-backup.json содержит настройки и прогресс основных разделов. «Грамматика», «Грамматика сегодня» и «Неправильные глаголы сегодня» хранят прогресс отдельно.'),
         h('p', { class: 'muted small' }, '🔒 В файле — ваша история ответов и имя. Не публикуйте его и не пересылайте посторонним.')),
       h('section', { class: 'card danger-zone' },
         h('h3', { class: 'card-title' }, 'Сброс'),
-        h('p', { class: 'muted' }, 'Удалит весь прогресс: карточки, историю, ошибки, статистику. Настройки сохранятся.'),
+        h('p', { class: 'muted' }, 'Сбрасывает карточки, историю ответов, ошибки и статистику основных разделов.'),
         h('button', { class: 'btn danger', onclick: function () {
-          EG.ui.confirm('Сбросить весь прогресс?', 'Сброс можно будет отменить сразу после него, но надёжнее сначала сделать экспорт.', 'Сбросить', true).then(function (ok) {
+          EG.ui.confirm('Сбросить прогресс основных разделов?', 'Сброс можно будет отменить сразу после него, но надёжнее сначала сделать экспорт.', 'Сбросить', true).then(function (ok) {
             if (!ok) return;
             replaceWithUndo(EG.db.wipe).then(function () { EG.ui.toast('Прогресс сброшен. Отменить можно в настройках.'); EG.router.go('home'); })
               .catch(function (e) { EG.ui.toast('Не удалось сбросить: ' + e.message, 'bad'); });
